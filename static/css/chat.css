@@ -17,6 +17,7 @@
 }
 
 .Chat-Layout {
+    margin: 0 auto;
     box-sizing: border-box;
     width: 1257px;
     max-width: 100%;
@@ -387,12 +388,95 @@
     height: 100%;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: center;   
     gap: 24px;
 }
 
+.ChatContent-Icon {
+    display: flex;
+    width: 96px;
+    height: 96px;
+    font-size: 48px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background-color: #f6f8f8;
+}
+
+.ChatContent-Texts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.Upper-Text {
+    max-width: 100%;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 24px;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.Bottom-Text {
+    max-width: 100%;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 24px;
+    word-wrap: break-word;
+    word-break: break-word;
+    color: #52636f;
+}
+
+.ChatContent-Button {
+    display: inline-flex;
+    border: 1px solid transparent;
+    padding-left: 16px;
+    padding-right: 16px;
+    font-size: 15px;
+    line-height: 20px;
+    outline-color: #0f141a;
+    background-color: #0f141a;    
+    border-radius: 9999px;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    min-width: 36px;
+    gap: 4px;
+
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+
+    cursor: pointer;
+}
+
+.ChatContent-Button-Text {
+    display: -webkit-box;
+    overflow: hidden;
+    max-width: 100%;
+    color: white;
+    font-weight: 700;
+    font-size: inherit;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
 .ChatPage-Wrapper {
-    
+
+}
+
+
+/* 모달 부분 ------------------------- */
+
+.Modal-BackDrop {
+    position: fixed;
+    inset: 0px;
+    z-index: 50;
+    background-color: rgba(0, 0, 0, 0.8);
 }
 
 .off {
