@@ -1,12 +1,3 @@
----
-name: globalgates issue template
-about: Describe this issue template's purpose here.
-title: ''
-labels: ''
-assignees: kausha-kr
-
----
-
 name: ⚙️ Service 개발/수정
 description: Spring Backend Service 단위의 개발 또는 수정 작업을 요청합니다.
 title: "[Service] "
@@ -18,9 +9,7 @@ body:
       value: |
         ## 🛠️ Service 작업 요청서
         > 새로운 Service 로직을 추가하거나 기존 로직을 수정할 때 작성합니다.
-        
         ---
-
   - type: dropdown
     id: module
     attributes:
@@ -38,7 +27,7 @@ body:
         - mypage (전문가)
         - admin (관리자)
         - friends (친구)
-        - "404 (오류)"
+        - 404 (오류)
         - ad (광고)
         - chat (채팅)
         - search (검색)
@@ -47,7 +36,6 @@ body:
         - common (공통 모듈)
     validations:
       required: true
-
   - type: dropdown
     id: work-type
     attributes:
@@ -60,7 +48,6 @@ body:
         - 🐛 버그 수정
     validations:
       required: true
-
   - type: input
     id: service-name
     attributes:
@@ -69,7 +56,6 @@ body:
       placeholder: "예: MemberService.join() 또는 ExperienceService"
     validations:
       required: true
-
   - type: textarea
     id: description
     attributes:
@@ -78,9 +64,8 @@ body:
       placeholder: |
         ### 목적
         - ex) 회원 가입 시 중복 아이디 체크 로직 구현
-        
+
         ### 상세 내용
-        - 
         - 
         - 
     validations:
