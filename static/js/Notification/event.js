@@ -65,7 +65,10 @@
             // SVG 아이콘 모양 교체
             // - 활성:   data-active에 저장된 채워진 아이콘 path 사용
             // - 비활성: data-inactive에 저장된 외곽선 아이콘 path 사용
-            path.setAttribute("d", isActive ? path.dataset.active : path.dataset.inactive);
+            path.setAttribute(
+                "d",
+                isActive ? path.dataset.active : path.dataset.inactive,
+            );
 
             // tab-link--active 클래스 추가/제거
             // classList.toggle(className, force)에서 force가 true면 추가, false면 제거
@@ -146,8 +149,30 @@
 
             lastScrollY = currentY; // 다음 스크롤 이벤트를 위해 현재 위치 저장
         },
-        { passive: true }
+        { passive: true },
     );
+
+    /* ===== 상단 탭 (전체/멘션) 클릭 처리 ===================
+     * .notif-tab 요소들 중 클릭된 탭만 활성화합니다.
+     * - notif-tab--active 클래스 이동
+     * - aria-selected 속성 갱신
+     * - indicator는 CSS transition(opacity)으로 부드럽게 전환
+     ====================================================== */
+    document.querySelectorAll(".notif-tab").forEach((tab) => {
+        tab.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            // 모든 탭 비활성화
+            document.querySelectorAll(".notif-tab").forEach((t) => {
+                t.classList.remove("notif-tab--active");
+                t.setAttribute("aria-selected", "false");
+            });
+
+            // 클릭된 탭 활성화
+            tab.classList.add("notif-tab--active");
+            tab.setAttribute("aria-selected", "true");
+        });
+    });
 
     /* ===== 초기화 실행 ===================================== */
     // 스크립트 로드 완료 시 notifications 탭을 활성 상태로 초기화
@@ -155,3 +180,9 @@
 
     console.log("[Notification] 페이지 로드 완료.");
 })();
+
+const bookmarkButton = document.querySelector(
+    ".tweet-action-right",
+).firstElementChild;
+
+bookmarkButton.addEventListener("click", (e) => {});

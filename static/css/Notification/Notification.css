@@ -161,10 +161,6 @@ body {
 }
 
 .notif-tab__indicator {
-    display: none;
-}
-
-.notif-tab--active .notif-tab__indicator {
     display: block;
     position: absolute;
     bottom: 0;
@@ -175,6 +171,12 @@ body {
     height: 4px;
     border-radius: 4px;
     background-color: #1d9bf0;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.notif-tab--active .notif-tab__indicator {
+    opacity: 1;
 }
 
 /* ── 새 게시물 버튼 ─────────────────────────────────────── */
@@ -274,8 +276,8 @@ body {
 
 /* ── 아이콘 SVG ─────────────────────────────────────────── */
 .notif-icon {
-    width: 20px;
-    height: 20px;
+    width: 26px;
+    height: 26px;
 }
 
 .notif-icon--follow {
@@ -440,8 +442,13 @@ body {
 
 .tweet-meta {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 3px;
+    flex: 1;
     min-width: 0;
+    overflow: hidden;
 }
 
 .tweet-displayname {
@@ -463,8 +470,144 @@ body {
     color: #536471;
     text-decoration: none;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+}
+
+.tweet-badge {
+    font-size: 13px;
+    color: #536471;
+    white-space: nowrap;
+}
+
+.tweet-sep {
+    color: #536471;
+    font-size: 15px;
+}
+
+.tweet-time {
+    font-size: 15px;
+    color: #536471;
+    white-space: nowrap;
+}
+
+.tweet-actions-top {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.tweet-more-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: none;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #536471;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.tweet-more-btn:hover {
+    background-color: rgba(29, 155, 240, 0.1);
+    color: #1d9bf0;
+}
+
+.tweet-more-icon {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.tweet-reply-to {
+    font-size: 15px;
+    color: #536471;
+    margin-bottom: 4px;
+    line-height: 20px;
+}
+
+.tweet-mention {
+    color: #1d9bf0;
+    text-decoration: none;
+}
+
+.tweet-mention:hover {
+    text-decoration: underline;
+}
+
+.tweet-text {
+    font-size: 15px;
+    line-height: 20px;
+    color: #0f1419;
+    word-break: break-word;
+    margin-bottom: 8px;
+}
+
+/* ── 트윗 액션 바 ────────────────────────────────────────── */
+.tweet-action-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.tweet-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 6px;
+    height: 34px;
+    border: none;
+    background: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    color: #536471;
+    font-size: 13px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.tweet-action-btn:hover {
+    background-color: rgba(29, 155, 240, 0.1);
+    color: #1d9bf0;
+}
+
+.tweet-action-btn--retweet:hover {
+    background-color: rgba(0, 186, 124, 0.1);
+    color: #00ba7c;
+}
+
+.tweet-action-btn--like:hover {
+    background-color: rgba(249, 24, 128, 0.1);
+    color: #f91880;
+}
+
+.tweet-action-icon {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.tweet-action-count {
+    font-size: 13px;
+}
+
+.tweet-action-spacer {
+    flex: 1;
+}
+
+.tweet-action-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ── 빈 아이콘 컬럼 (트윗 알림에서 숨김) ──────────────────── */
+.notif-item__icon-col--empty {
+    display: none;
 }
 
 /* ── 반응형 ─────────────────────────────────────────────── */
@@ -493,8 +636,8 @@ body {
     }
 
     .notif-icon {
-        width: 18px;
-        height: 18px;
+        width: 22px;
+        height: 22px;
     }
 
     .notif-avatar {

@@ -50,8 +50,21 @@
                                             role="tab"
                                             aria-selected="true"
                                             class="notif-tab notif-tab--active"
+                                            data-notif-tab="all"
                                         >
                                             <span class="notif-tab__label">전체</span>
+                                            <span class="notif-tab__indicator"></span>
+                                        </a>
+                                    </div>
+                                    <div role="presentation" class="notif-tabnav__item">
+                                        <a
+                                            href="/notifications/mentions"
+                                            role="tab"
+                                            aria-selected="false"
+                                            class="notif-tab"
+                                            data-notif-tab="mentions"
+                                        >
+                                            <span class="notif-tab__label">멘션</span>
                                             <span class="notif-tab__indicator"></span>
                                         </a>
                                     </div>
@@ -63,62 +76,6 @@
                     <section class="notif-timeline" aria-labelledby="notif-timeline-label" role="region">
                         <h1 id="notif-timeline-label" class="notif-timeline__title">알림</h1>
                         <div class="notif-list" aria-label="타임라인: 알림">
-
-                            <!-- 알림 1: 팔로우 - 흰가지 -->
-                            <article class="notif-item" role="article" tabindex="0" data-testid="notification">
-                                <div class="notif-item__inner">
-                                    <div class="notif-item__icon-col">
-                                        <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--follow">
-                                            <g><path d="M17.863 13.44c1.477 1.58 2.366 3.8 2.632 6.46l.11 1.1H3.395l.11-1.1c.266-2.66 1.155-4.88 2.632-6.46C7.627 11.85 9.648 11 12 11s4.373.85 5.863 2.44zM12 2C9.791 2 8 3.79 8 6s1.791 4 4 4 4-1.79 4-4-1.791-4-4-4z"></path></g>
-                                        </svg>
-                                    </div>
-                                    <div class="notif-item__body">
-                                        <ul class="notif-avatar-list" role="list">
-                                            <li class="notif-avatar-item">
-                                                <a href="/white_gaji" aria-hidden="true" role="link" tabindex="-1" class="notif-avatar-link">
-                                                    <img src="https://pbs.twimg.com/profile_images/2013655513079123976/CB8lNS6i_bigger.jpg" alt="" draggable="true" class="notif-avatar" />
-                                                </a>
-                                            </li>
-                                        </ul>
-                                        <div class="notif-content">
-                                            <p class="notif-message">
-                                                <a href="/white_gaji" role="link" class="notif-username">흰가지🌳<svg viewBox="0 0 22 22" aria-label="인증된 계정" role="img" class="notif-verified-icon"><g><path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"></path></g></svg></a>
-                                                님이 나를 팔로우했습니다.
-                                                <span class="notif-sep" aria-hidden="true">·</span>
-                                                <time class="notif-time" datetime="2026-03-09T01:16:14.159Z" aria-label="1시간 전">1시간</time>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <!-- 알림 2: 팔로우 - 자이 -->
-                            <article class="notif-item" role="article" tabindex="0" data-testid="notification">
-                                <div class="notif-item__inner">
-                                    <div class="notif-item__icon-col">
-                                        <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--follow">
-                                            <g><path d="M17.863 13.44c1.477 1.58 2.366 3.8 2.632 6.46l.11 1.1H3.395l.11-1.1c.266-2.66 1.155-4.88 2.632-6.46C7.627 11.85 9.648 11 12 11s4.373.85 5.863 2.44zM12 2C9.791 2 8 3.79 8 6s1.791 4 4 4 4-1.79 4-4-1.791-4-4-4z"></path></g>
-                                        </svg>
-                                    </div>
-                                    <div class="notif-item__body">
-                                        <ul class="notif-avatar-list" role="list">
-                                            <li class="notif-avatar-item">
-                                                <a href="/JaiInTheSun" aria-hidden="true" role="link" tabindex="-1" class="notif-avatar-link">
-                                                    <img src="https://pbs.twimg.com/profile_images/2004041124697329664/_EdX_aaL_bigger.png" alt="" draggable="true" class="notif-avatar" />
-                                                </a>
-                                            </li>
-                                        </ul>
-                                        <div class="notif-content">
-                                            <p class="notif-message">
-                                                <a href="/JaiInTheSun" role="link" class="notif-username">자이<svg viewBox="0 0 22 22" aria-label="인증된 계정" role="img" class="notif-verified-icon"><g><path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"></path></g></svg></a>
-                                                님이 나를 팔로우했습니다.
-                                                <span class="notif-sep" aria-hidden="true">·</span>
-                                                <time class="notif-time" datetime="2026-03-09T01:05:50.480Z" aria-label="2시간 전">2시간</time>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
 
                             <!-- 알림 3: 팔로우 - 밤하늘의 별들 -->
                             <article class="notif-item" role="article" tabindex="0" data-testid="notification">
@@ -214,214 +171,6 @@
                                 </div>
                             </article>
 
-                            <!-- 알림 6: 보안 - 새 디바이스 로그인 -->
-                            <article class="notif-item notif-item--system" role="article" tabindex="0" data-testid="notification">
-                                <div class="notif-item__inner">
-                                    <div class="notif-item__icon-col">
-                                        <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--x-logo">
-                                            <g><path d="M21.742 21.75l-7.563-11.179 7.056-8.321h-2.456l-5.691 6.714-4.54-6.714H2.359l7.29 10.776L2.25 21.75h2.456l6.035-7.118 4.818 7.118h6.191-.008zM7.739 3.818L18.81 20.182h-2.447L5.29 3.818h2.447z"></path></g>
-                                        </svg>
-                                    </div>
-                                    <div class="notif-item__body">
-                                        <div class="notif-content">
-                                            <p class="notif-message">
-                                                새로운 디바이스에서 2026년 3월 07일에 내 @CodeKim1218 계정에 로그인되었습니다. 지금 로그인 활동을 검토해 보세요.
-                                                <span class="notif-sep" aria-hidden="true">·</span>
-                                                <time class="notif-time" datetime="2026-03-08T06:38:02.645Z" aria-label="20시간 전">20시간</time>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <!-- 알림 7: 팔로우 - 하늘 -->
-                            <article class="notif-item" role="article" tabindex="0" data-testid="notification">
-                                <div class="notif-item__inner">
-                                    <div class="notif-item__icon-col">
-                                        <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--follow">
-                                            <g><path d="M17.863 13.44c1.477 1.58 2.366 3.8 2.632 6.46l.11 1.1H3.395l.11-1.1c.266-2.66 1.155-4.88 2.632-6.46C7.627 11.85 9.648 11 12 11s4.373.85 5.863 2.44zM12 2C9.791 2 8 3.79 8 6s1.791 4 4 4 4-1.79 4-4-1.791-4-4-4z"></path></g>
-                                        </svg>
-                                    </div>
-                                    <div class="notif-item__body">
-                                        <ul class="notif-avatar-list" role="list">
-                                            <li class="notif-avatar-item">
-                                                <a href="/dfisrj1" aria-hidden="true" role="link" tabindex="-1" class="notif-avatar-link">
-                                                    <img src="https://pbs.twimg.com/profile_images/1998994551042879496/0S1Q2GgC_bigger.jpg" alt="" draggable="true" class="notif-avatar" />
-                                                </a>
-                                            </li>
-                                        </ul>
-                                        <div class="notif-content">
-                                            <p class="notif-message">
-                                                <a href="/dfisrj1" role="link" class="notif-username">하늘<svg viewBox="0 0 22 22" aria-label="인증된 계정" role="img" class="notif-verified-icon"><g><path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"></path></g></svg></a>
-                                                님이 나를 팔로우했습니다.
-                                                <span class="notif-sep" aria-hidden="true">·</span>
-                                                <time class="notif-time" datetime="2026-03-08T04:35:00.000Z" aria-label="22시간 전">22시간</time>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <!-- 알림 8: 팔로우 - 하린 -->
-                            <article class="notif-item" role="article" tabindex="0" data-testid="notification">
-                                <div class="notif-item__inner">
-                                    <div class="notif-item__icon-col">
-                                        <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--follow">
-                                            <g><path d="M17.863 13.44c1.477 1.58 2.366 3.8 2.632 6.46l.11 1.1H3.395l.11-1.1c.266-2.66 1.155-4.88 2.632-6.46C7.627 11.85 9.648 11 12 11s4.373.85 5.863 2.44zM12 2C9.791 2 8 3.79 8 6s1.791 4 4 4 4-1.79 4-4-1.791-4-4-4z"></path></g>
-                                        </svg>
-                                    </div>
-                                    <div class="notif-item__body">
-                                        <ul class="notif-avatar-list" role="list">
-                                            <li class="notif-avatar-item">
-                                                <a href="/deniswddgjmf" aria-hidden="true" role="link" tabindex="-1" class="notif-avatar-link">
-                                                    <img src="https://pbs.twimg.com/profile_images/2011848260282171395/BZW31FS8_bigger.jpg" alt="" draggable="true" class="notif-avatar" />
-                                                </a>
-                                            </li>
-                                        </ul>
-                                        <div class="notif-content">
-                                            <p class="notif-message">
-                                                <a href="/deniswddgjmf" role="link" class="notif-username">하린</a>
-                                                님이 나를 팔로우했습니다.
-                                                <span class="notif-sep" aria-hidden="true">·</span>
-                                                <time class="notif-time" datetime="2026-03-08T01:40:43.642Z" aria-label="3월 8일">3월 8일</time>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <!-- 알림 9: 좋아요 - Sabu (스파클) -->
-                            <article class="notif-item" role="article" tabindex="0" data-testid="notification">
-                                <div class="notif-item__inner">
-                                    <div class="notif-item__icon-col">
-                                        <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--sparkle">
-                                            <g><path d="M22.99 11.295l-6.986-2.13-.877-.326-.325-.88L12.67.975c-.092-.303-.372-.51-.688-.51-.316 0-.596.207-.688.51l-2.392 7.84-1.774.657-6.148 1.82c-.306.092-.515.372-.515.69 0 .32.21.6.515.69l7.956 2.358 2.356 7.956c.09.306.37.515.69.515.32 0 .6-.21.69-.514l1.822-6.15.656-1.773 7.84-2.392c.303-.09.51-.37.51-.687 0-.316-.207-.596-.51-.688z" fill="#794BC4"></path></g>
-                                        </svg>
-                                    </div>
-                                    <div class="notif-item__body">
-                                        <ul class="notif-avatar-list" role="list">
-                                            <li class="notif-avatar-item">
-                                                <a href="/SabuCoin" aria-hidden="true" role="link" tabindex="-1" class="notif-avatar-link">
-                                                    <img src="https://pbs.twimg.com/profile_images/1933733568502796288/_VHVEs7t_bigger.jpg" alt="" draggable="true" class="notif-avatar" />
-                                                </a>
-                                            </li>
-                                        </ul>
-                                        <div class="notif-content">
-                                            <p class="notif-message">
-                                                <a href="/SabuCoin" role="link" class="notif-username">Sabu</a>
-                                                <span class="notif-sep" aria-hidden="true">·</span>
-                                                <time class="notif-time" datetime="2026-03-07T21:39:14.806Z" aria-label="3월 8일">3월 8일</time>
-                                            </p>
-                                            <p class="notif-tweet-preview">긴급속보 미국은 이란의 모든 원유/석유가 미국의 소유가 되었다고 발표</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <!-- 알림 10: 팔로우 - ZharaLhatse -->
-                            <article class="notif-item" role="article" tabindex="0" data-testid="notification">
-                                <div class="notif-item__inner">
-                                    <div class="notif-item__icon-col">
-                                        <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--follow">
-                                            <g><path d="M17.863 13.44c1.477 1.58 2.366 3.8 2.632 6.46l.11 1.1H3.395l.11-1.1c.266-2.66 1.155-4.88 2.632-6.46C7.627 11.85 9.648 11 12 11s4.373.85 5.863 2.44zM12 2C9.791 2 8 3.79 8 6s1.791 4 4 4 4-1.79 4-4-1.791-4-4-4z"></path></g>
-                                        </svg>
-                                    </div>
-                                    <div class="notif-item__body">
-                                        <ul class="notif-avatar-list" role="list">
-                                            <li class="notif-avatar-item">
-                                                <a href="/mdkph" aria-hidden="true" role="link" tabindex="-1" class="notif-avatar-link">
-                                                    <img src="https://pbs.twimg.com/profile_images/1423123673/phpG489iT_bigger" alt="" draggable="true" class="notif-avatar" />
-                                                </a>
-                                            </li>
-                                        </ul>
-                                        <div class="notif-content">
-                                            <p class="notif-message">
-                                                <a href="/mdkph" role="link" class="notif-username">ZharaLhatse<svg viewBox="0 0 22 22" aria-label="인증된 계정" role="img" class="notif-verified-icon"><g><path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"></path></g></svg></a>
-                                                님이 나를 팔로우했습니다.
-                                                <span class="notif-sep" aria-hidden="true">·</span>
-                                                <time class="notif-time" datetime="2026-03-07T04:03:45.999Z" aria-label="3월 7일">3월 7일</time>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <!-- 알림 11: 팔로우 - 빛나는 -->
-                            <article class="notif-item" role="article" tabindex="0" data-testid="notification">
-                                <div class="notif-item__inner">
-                                    <div class="notif-item__icon-col">
-                                        <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--follow">
-                                            <g><path d="M17.863 13.44c1.477 1.58 2.366 3.8 2.632 6.46l.11 1.1H3.395l.11-1.1c.266-2.66 1.155-4.88 2.632-6.46C7.627 11.85 9.648 11 12 11s4.373.85 5.863 2.44zM12 2C9.791 2 8 3.79 8 6s1.791 4 4 4 4-1.79 4-4-1.791-4-4-4z"></path></g>
-                                        </svg>
-                                    </div>
-                                    <div class="notif-item__body">
-                                        <ul class="notif-avatar-list" role="list">
-                                            <li class="notif-avatar-item">
-                                                <a href="/LunaBloommm" aria-hidden="true" role="link" tabindex="-1" class="notif-avatar-link">
-                                                    <img src="https://pbs.twimg.com/profile_images/1933215810581114881/NyRbCZ3g_bigger.jpg" alt="" draggable="true" class="notif-avatar" />
-                                                </a>
-                                            </li>
-                                        </ul>
-                                        <div class="notif-content">
-                                            <p class="notif-message">
-                                                <a href="/LunaBloommm" role="link" class="notif-username">빛나는</a>
-                                                님이 나를 팔로우했습니다.
-                                                <span class="notif-sep" aria-hidden="true">·</span>
-                                                <time class="notif-time" datetime="2026-03-07T00:19:31.228Z" aria-label="3월 7일">3월 7일</time>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <!-- 알림 12: 보안 - 새 디바이스 로그인 (3월 6일) -->
-                            <article class="notif-item notif-item--system" role="article" tabindex="0" data-testid="notification">
-                                <div class="notif-item__inner">
-                                    <div class="notif-item__icon-col">
-                                        <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--x-logo">
-                                            <g><path d="M21.742 21.75l-7.563-11.179 7.056-8.321h-2.456l-5.691 6.714-4.54-6.714H2.359l7.29 10.776L2.25 21.75h2.456l6.035-7.118 4.818 7.118h6.191-.008zM7.739 3.818L18.81 20.182h-2.447L5.29 3.818h2.447z"></path></g>
-                                        </svg>
-                                    </div>
-                                    <div class="notif-item__body">
-                                        <div class="notif-content">
-                                            <p class="notif-message">
-                                                새로운 디바이스에서 2026년 3월 06일에 내 @CodeKim1218 계정에 로그인되었습니다. 지금 로그인 활동을 검토해 보세요.
-                                                <span class="notif-sep" aria-hidden="true">·</span>
-                                                <time class="notif-time" datetime="2026-03-06T23:32:37.709Z" aria-label="3월 7일">3월 7일</time>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <!-- 알림 13: 좋아요 - Sabu (스파클, 다른 게시물) -->
-                            <article class="notif-item" role="article" tabindex="0" data-testid="notification">
-                                <div class="notif-item__inner">
-                                    <div class="notif-item__icon-col">
-                                        <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--sparkle">
-                                            <g><path d="M22.99 11.295l-6.986-2.13-.877-.326-.325-.88L12.67.975c-.092-.303-.372-.51-.688-.51-.316 0-.596.207-.688.51l-2.392 7.84-1.774.657-6.148 1.82c-.306.092-.515.372-.515.69 0 .32.21.6.515.69l7.956 2.358 2.356 7.956c.09.306.37.515.69.515.32 0 .6-.21.69-.514l1.822-6.15.656-1.773 7.84-2.392c.303-.09.51-.37.51-.687 0-.316-.207-.596-.51-.688z" fill="#794BC4"></path></g>
-                                        </svg>
-                                    </div>
-                                    <div class="notif-item__body">
-                                        <ul class="notif-avatar-list" role="list">
-                                            <li class="notif-avatar-item">
-                                                <a href="/SabuCoin" aria-hidden="true" role="link" tabindex="-1" class="notif-avatar-link">
-                                                    <img src="https://pbs.twimg.com/profile_images/1933733568502796288/_VHVEs7t_bigger.jpg" alt="" draggable="true" class="notif-avatar" />
-                                                </a>
-                                            </li>
-                                        </ul>
-                                        <div class="notif-content">
-                                            <p class="notif-message">
-                                                <a href="/SabuCoin" role="link" class="notif-username">Sabu</a>
-                                                <span class="notif-sep" aria-hidden="true">·</span>
-                                                <time class="notif-time" datetime="2026-03-06T21:23:45.314Z" aria-label="3월 7일">3월 7일</time>
-                                            </p>
-                                            <p class="notif-tweet-preview">🚨 속보 사우디, UAE, 쿠웨이트, 카타르가 미국 원유에 매몰 결정...</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-
                             <!-- 알림 14: 파란색 체크마크 획득 -->
                             <article class="notif-item" role="article" tabindex="0" data-testid="notification">
                                 <div class="notif-item__inner">
@@ -450,11 +199,11 @@
                                 </div>
                             </article>
 
-                            <!-- 알림 15: 트윗 카드 - 김민중 (@sokkomann) -->
+                            <!-- 알림 15: 댓글 알림 - 김민중 (@sokkomann) -->
                             <article class="notif-tweet-item" role="article" tabindex="0" data-testid="tweet">
                                 <div class="notif-item__inner">
-                                    <div class="notif-item__icon-col notif-item__icon-col--empty"></div>
                                     <div class="tweet-body">
+                                        <!-- 헤더: 아바타 + 메타정보 + 더보기 버튼 -->
                                         <div class="tweet-header">
                                             <a href="/sokkomann" class="tweet-avatar-link" aria-hidden="true" role="link" tabindex="-1">
                                                 <img src="https://pbs.twimg.com/profile_images/2029093315963158528/9_GGpfuL_bigger.png" alt="" draggable="true" class="tweet-avatar" />
@@ -462,6 +211,63 @@
                                             <div class="tweet-meta">
                                                 <a href="/sokkomann" role="link" class="tweet-displayname">김민중</a>
                                                 <a href="/sokkomann" role="link" tabindex="-1" class="tweet-handle">@sokkomann</a>
+                                                <span class="tweet-sep">·</span>
+                                                <span class="tweet-badge">멤버</span>
+                                                <span class="tweet-sep">·</span>
+                                                <time class="tweet-time" datetime="2026-03-06T01:10:28.795Z" aria-label="3월 6일">3월 6일</time>
+                                            </div>
+                                            <div class="tweet-actions-top">
+                                                <button class="tweet-more-btn" aria-label="더보기" aria-haspopup="true">
+                                                    <svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-more-icon">
+                                                        <g><path d="M3 12c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm9 2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm7 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path></g>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <!-- 답글 대상 표시 -->
+                                        <p class="tweet-reply-to">
+                                            <a href="/CodeKim1218" role="link" class="tweet-mention">@CodeKim1218</a>
+                                            님과
+                                            <a href="/tmtsugar" role="link" class="tweet-mention">@tmtsugar</a>
+                                            님에게 보내는 답글
+                                        </p>
+                                        <!-- 댓글 내용 -->
+                                        <p class="tweet-text">hello</p>
+                                        <!-- 액션 바: 5개 아이템 균등 배치 (북마크+공유는 하나의 그룹) -->
+                                        <div class="tweet-action-bar">
+                                            <button class="tweet-action-btn" aria-label="답글">
+                                                <svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-action-icon">
+                                                    <g><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01zm8.005-6c-3.317 0-6.005 2.69-6.005 6 0 3.37 2.77 6.08 6.138 6.01l.351-.01h1.761v2.3l5.087-2.81c1.951-1.08 3.163-3.13 3.163-5.36 0-3.39-2.744-6.13-6.129-6.13H9.756z"></path></g>
+                                                </svg>
+                                                <span class="tweet-action-count">1</span>
+                                            </button>
+                                            <button class="tweet-action-btn tweet-action-btn--retweet" aria-label="리트윗">
+                                                <svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-action-icon">
+                                                    <g><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"></path></g>
+                                                </svg>
+                                            </button>
+                                            <button class="tweet-action-btn tweet-action-btn--like" aria-label="마음에 들어요">
+                                                <svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-action-icon">
+                                                    <g><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91zm4.187 7.69c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.41-4.86-.514-6.67.887-1.79 2.647-2.91 4.601-3.01 1.651-.09 3.368.56 4.798 2.01 1.429-1.45 3.146-2.1 4.796-2.01 1.954.1 3.714 1.22 4.601 3.01.896 1.81.846 4.17-.514 6.67z"></path></g>
+                                                </svg>
+                                            </button>
+                                            <button class="tweet-action-btn tweet-action-btn--views" aria-label="조회수">
+                                                <svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-action-icon">
+                                                    <g><path d="M8.75 21V3h2v18h-2zM18 21V8.5h2V21h-2zM4 21l.004-10h2L6 21H4zm9.248 0v-7h2v7h-2z"></path></g>
+                                                </svg>
+                                                <span class="tweet-action-count">6</span>
+                                            </button>
+                                            <div class="tweet-action-right">
+                                                <button class="tweet-action-btn" aria-label="북마크">
+                                                    <svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-action-icon">
+                                                        <g><path d="M4 4.5C4 3.12 5.119 2 6.5 2h11C18.881 2 20 3.12 20 4.5v18.44l-8-5.71-8 5.71V4.5zM6.5 4c-.276 0-.5.22-.5.5v14.56l6-4.29 6 4.29V4.5c0-.28-.224-.5-.5-.5h-11z"></path></g>
+                                                    </svg>
+                                                </button>
+                                                <button class="tweet-action-btn" aria-label="공유">
+                                                    <svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-action-icon">
+                                                        <g><path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"></path></g>
+                                                    </svg>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -486,76 +292,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </article>
-
-                            <!-- 알림 17: 좋아요 - Inevitable West (스파클) -->
-                            <article class="notif-item" role="article" tabindex="0" data-testid="notification">
-                                <div class="notif-item__inner">
-                                    <div class="notif-item__icon-col">
-                                        <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--sparkle">
-                                            <g><path d="M22.99 11.295l-6.986-2.13-.877-.326-.325-.88L12.67.975c-.092-.303-.372-.51-.688-.51-.316 0-.596.207-.688.51l-2.392 7.84-1.774.657-6.148 1.82c-.306.092-.515.372-.515.69 0 .32.21.6.515.69l7.956 2.358 2.356 7.956c.09.306.37.515.69.515.32 0 .6-.21.69-.514l1.822-6.15.656-1.773 7.84-2.392c.303-.09.51-.37.51-.687 0-.316-.207-.596-.51-.688z" fill="#794BC4"></path></g>
-                                        </svg>
-                                    </div>
-                                    <div class="notif-item__body">
-                                        <ul class="notif-avatar-list" role="list">
-                                            <li class="notif-avatar-item">
-                                                <a href="/Inevitablewest" aria-hidden="true" role="link" tabindex="-1" class="notif-avatar-link">
-                                                    <img src="https://pbs.twimg.com/profile_images/1849508889718312960/cuJBcI8u_bigger.jpg" alt="" draggable="true" class="notif-avatar" />
-                                                </a>
-                                            </li>
-                                        </ul>
-                                        <div class="notif-content">
-                                            <p class="notif-message">
-                                                <a href="/Inevitablewest" role="link" class="notif-username">Inevitable West</a>
-                                                <span class="notif-sep" aria-hidden="true">·</span>
-                                                <time class="notif-time" datetime="2026-03-05T20:22:12.447Z" aria-label="3월 6일">3월 6일</time>
-                                            </p>
-                                            <p class="notif-tweet-preview" lang="en">🚨 BREAKING: Donald Trump has done the impossible: He has boots on the ground in Iran, and they are non-Western! Iraqi Kurds have stepped up and pledged allegiance to the United States. This is undeniably GENIUS.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <!-- 알림 18: 보안 - 새 디바이스 로그인 (3월 5일) -->
-                            <article class="notif-item notif-item--system" role="article" tabindex="0" data-testid="notification">
-                                <div class="notif-item__inner">
-                                    <div class="notif-item__icon-col">
-                                        <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--x-logo">
-                                            <g><path d="M21.742 21.75l-7.563-11.179 7.056-8.321h-2.456l-5.691 6.714-4.54-6.714H2.359l7.29 10.776L2.25 21.75h2.456l6.035-7.118 4.818 7.118h6.191-.008zM7.739 3.818L18.81 20.182h-2.447L5.29 3.818h2.447z"></path></g>
-                                        </svg>
-                                    </div>
-                                    <div class="notif-item__body">
-                                        <div class="notif-content">
-                                            <p class="notif-message">
-                                                새로운 디바이스에서 2026년 3월 05일에 내 @CodeKim1218 계정에 로그인되었습니다. 지금 로그인 활동을 검토해 보세요.
-                                                <span class="notif-sep" aria-hidden="true">·</span>
-                                                <time class="notif-time" datetime="2026-03-05T11:53:06.683Z" aria-label="3월 5일">3월 5일</time>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <!-- 알림 19: 계정 검토 알림 -->
-                            <article class="notif-item notif-item--with-banner" role="article" tabindex="0" data-testid="notification">
-                                <div class="notif-item__banner">현재 계정을 검토 중입니다.</div>
-                                <div class="notif-item__inner">
-                                    <div class="notif-item__icon-col">
-                                        <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--x-logo">
-                                            <g><path d="M21.742 21.75l-7.563-11.179 7.056-8.321h-2.456l-5.691 6.714-4.54-6.714H2.359l7.29 10.776L2.25 21.75h2.456l6.035-7.118 4.818 7.118h6.191-.008zM7.739 3.818L18.81 20.182h-2.447L5.29 3.818h2.447z"></path></g>
-                                        </svg>
-                                    </div>
-                                    <div class="notif-item__body">
-                                        <div class="notif-content">
-                                            <p class="notif-message">
-                                                귀하의 계정은 곧 파란색 체크마크를 받기 위한 검토를 거칠 예정입니다.
-                                                <span class="notif-sep" aria-hidden="true">·</span>
-                                                <time class="notif-time" datetime="2026-03-05T09:11:06.279Z" aria-label="3월 5일">3월 5일</time>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
+                            </article>                        
 
                             <!-- 알림 20: 녹음 준비 알림 -->
                             <article class="notif-item" role="article" tabindex="0" data-testid="notification">
