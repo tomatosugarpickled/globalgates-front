@@ -83,6 +83,62 @@
         });
     }
 
+    /* ===== DISCONNECT CONFIRMATION MODAL ===== */
+    const modal = document.getElementById("disconnectModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalConfirm = document.getElementById("modalConfirm");
+    const modalCancel = document.getElementById("modalCancel");
+    let pendingBtn = null;
+
+    function openModal(btn) {
+        pendingBtn = btn;
+
+        // 핸들 또는 이름 가져오기
+        let handle = "";
+        const card = btn.closest("[data-handle]");
+        if (card) {
+            handle = card.dataset.handle;
+        } else {
+            const handleEl = btn.closest(".trend-item")?.querySelector(".sidebar-user-handle");
+            if (handleEl) handle = handleEl.textContent.trim();
+        }
+
+        modalTitle.textContent = handle
+            ? `${handle} 님과의 연결을 끊으시겠습니까?`
+            : "연결을 끊으시겠습니까?";
+
+        modal.classList.add("active");
+    }
+
+    function closeModal() {
+        modal.classList.remove("active");
+        pendingBtn = null;
+    }
+
+    if (modalConfirm) {
+        modalConfirm.addEventListener("click", () => {
+            if (pendingBtn) {
+                pendingBtn.classList.remove("connected");
+                pendingBtn.classList.add("default");
+                pendingBtn.textContent = "Connect";
+                pendingBtn.style.borderColor = "";
+                pendingBtn.style.color = "";
+                pendingBtn.style.background = "";
+            }
+            closeModal();
+        });
+    }
+
+    if (modalCancel) {
+        modalCancel.addEventListener("click", closeModal);
+    }
+
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) closeModal();
+        });
+    }
+
     /* ===== CONNECT / CONNECTED / DISCONNECT ===== */
     document.addEventListener("click", (e) => {
         const btn = e.target.closest(".connect-btn, .connect-btn-sm");
@@ -93,9 +149,8 @@
             btn.classList.add("connected");
             btn.textContent = "Connected";
         } else if (btn.classList.contains("connected")) {
-            btn.classList.remove("connected");
-            btn.classList.add("default");
-            btn.textContent = "Connect";
+            // 바로 해제하지 않고 확인 모달 표시
+            openModal(btn);
         }
     });
 
