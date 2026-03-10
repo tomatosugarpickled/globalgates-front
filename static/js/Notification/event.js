@@ -1,7 +1,9 @@
+window.addEventListener("load", () => {
 // Notification 화면 전용 이벤트 스크립트
 // - 하단 탭, 알림 탭, 답글 모달, 공유 메뉴, 이모지/위치 선택기를 한 파일에서 관리한다.
 // - 서버 라우팅처럼 주소를 바꾸는 로직은 주석 처리하고 DOM 이벤트 기반 UI 토글만 사용한다.
 
+// ===== 1. 화면에서 자주 쓰는 DOM 찾기 =====
 // 페이지 공통 탭 요소
 const tabLinks = document.querySelectorAll(".tab-link");
 const notifTabs = document.querySelectorAll(".notif-tab");
@@ -44,7 +46,29 @@ const replyLocationDeleteButton = replyModalOverlay?.querySelector("[data-locati
 const replyLocationCompleteButton = replyModalOverlay?.querySelector("[data-location-complete]");
 const replyLocationSearchInput = replyModalOverlay?.querySelector("[data-location-search]");
 const replyLocationList = replyModalOverlay?.querySelector("[data-location-list]");
+const replyUserTagTrigger = replyModalOverlay?.querySelector("[data-user-tag-trigger]");
+const replyUserTagLabel = replyModalOverlay?.querySelector("[data-user-tag-label]");
+const replyTagView = replyModalOverlay?.querySelector(".tweet-modal__tag-view");
+const replyTagCloseButton = replyModalOverlay?.querySelector("[data-testid='tag-back']");
+const replyTagCompleteButton = replyModalOverlay?.querySelector("[data-tag-complete]");
+const replyTagSearchForm = replyModalOverlay?.querySelector("[data-tag-search-form]");
+const replyTagSearchInput = replyModalOverlay?.querySelector("[data-tag-search]");
+const replyTagChipList = replyModalOverlay?.querySelector("[data-tag-chip-list]");
+const replyTagResults = replyModalOverlay?.querySelector("[data-tag-results]");
+const replyMediaAltTrigger = replyModalOverlay?.querySelector("[data-media-alt-trigger]");
+const replyMediaAltLabel = replyModalOverlay?.querySelector("[data-media-alt-label]");
+const replyMediaView = replyModalOverlay?.querySelector(".tweet-modal__media-view");
+const replyMediaBackButton = replyModalOverlay?.querySelector("[data-testid='media-back']");
+const replyMediaPrevButton = replyModalOverlay?.querySelector("[data-media-prev]");
+const replyMediaNextButton = replyModalOverlay?.querySelector("[data-media-next]");
+const replyMediaSaveButton = replyModalOverlay?.querySelector("[data-media-save]");
+const replyMediaTitle = replyModalOverlay?.querySelector("[data-media-title]");
+const replyMediaPreviewImages =
+    replyModalOverlay?.querySelectorAll("[data-media-preview-image]") ?? [];
+const replyMediaAltInput = replyModalOverlay?.querySelector("[data-media-alt-input]");
+const replyMediaAltCount = replyModalOverlay?.querySelector("[data-media-alt-count]");
 
+// ===== 2. 화면 상태값 =====
 // 화면 상태값
 let lastScrollY = 0;
 let activeReplyTrigger = null;
@@ -57,31 +81,25 @@ let pendingReplyFormats = new Set();
 let activeEmojiCategory = "recent";
 let selectedLocation = null;
 let pendingLocation = null;
+let selectedTaggedUsers = [];
+let pendingTaggedUsers = [];
+let replyMediaEdits = [];
+let pendingReplyMediaEdits = [];
+let activeReplyMediaIndex = 0;
 let attachedReplyFiles = [];
 let attachedReplyFileUrls = [];
 let pendingAttachmentEditIndex = null;
+let currentTagResults = [];
+let cachedLocationNames = [];
 const maxReplyImages = 4;
+const maxReplyMediaAltLength = 1000;
 
-// 이모지/위치 데이터
+// ===== 3. 고정 설정값 =====
+// 이모지 데이터와 제한값처럼 화면 동작에 꼭 필요한 최소 설정만 둔다.
 const emojiRecentsKey = "notification_reply_recent_emojis";
 const maxRecentEmojis = 18;
-const availableLocations = [
-    "대한민국 서초구",
-    "대한민국 강남구",
-    "대한민국 송파구",
-    "대한민국 광진구",
-    "대한민국 동작구",
-    "대한민국 중구",
-    "대한민국 과천시",
-    "대한민국 관악구",
-    "대한민국 동대문구",
-    "대한민국 강동구",
-    "대한민국 중랑구",
-    "대한민국 성동구",
-    "대한민국 용산구",
-    "대한민국 마포구",
-];
 
+// 카테고리별 라벨/아이콘 정보는 이모지 탭 렌더링에 사용한다.
 const emojiCategoryMeta = {
     recent: {
         label: "최근",
@@ -152,8 +170,24 @@ const formatButtonLabels = {
     },
 };
 
+// ===== 4. 공통 유틸 함수 =====
+// 문자열 정리, HTML 이스케이프, 최근 이모지 저장처럼 여러 기능에서 같이 쓰는 도우미 함수들이다.
 function getTextContent(element) {
     return element?.textContent.trim() ?? "";
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, (char) => {
+        const entities = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+        };
+
+        return entities[char] ?? char;
+    });
 }
 
 // Twemoji CDN이 로드되어 있으면 현재 영역의 유니코드 이모지를 SVG로 치환한다.
@@ -337,6 +371,437 @@ function renderEmojiPicker() {
     renderEmojiPickerContent();
 }
 
+// ===== 4-1. 사용자 태그 =====
+// 첨부 이미지가 있을 때만 태그 화면을 열 수 있고, 검색 대상은 현재 알림 카드 DOM에서 읽는다.
+function cloneTaggedUsers(users) {
+    return users.map((user) => ({ ...user }));
+}
+
+// 현재 알림 카드 DOM에서 태그 검색 후보 사용자를 읽어온다.
+// 서버 데이터 대신 이미 화면에 보이는 이름/아이디/프로필 이미지를 재사용한다.
+function getCurrentPageTagUsers() {
+    const tweetItems = document.querySelectorAll(".notif-tweet-item");
+    const seenHandles = new Set();
+
+    return Array.from(tweetItems)
+        .map((tweetItem, index) => {
+            const name = getTextContent(tweetItem.querySelector(".tweet-displayname"));
+            const handle = getTextContent(tweetItem.querySelector(".tweet-handle"));
+            const avatar = tweetItem.querySelector(".tweet-avatar")?.getAttribute("src") ?? "";
+
+            if (!name || !handle || seenHandles.has(handle)) {
+                return null;
+            }
+
+            seenHandles.add(handle);
+
+            return {
+                id: `${handle.replace("@", "") || "user"}-${index}`,
+                name,
+                handle,
+                avatar,
+            };
+        })
+        .filter(Boolean);
+}
+
+function isTagModalOpen() {
+    return Boolean(replyTagView && !replyTagView.hidden);
+}
+
+function getTagSearchTerm() {
+    return replyTagSearchInput?.value.trim() ?? "";
+}
+
+function getTaggedUserSummary(users) {
+    if (users.length === 0) {
+        return "사용자 태그하기";
+    }
+
+    return users.map((user) => user.name).join(", ");
+}
+
+function syncUserTagTrigger() {
+    const canTagUsers = isReplyImageSet();
+    const label = getTaggedUserSummary(selectedTaggedUsers);
+
+    if (replyUserTagTrigger) {
+        replyUserTagTrigger.hidden = !canTagUsers;
+        replyUserTagTrigger.disabled = !canTagUsers;
+        replyUserTagTrigger.setAttribute("aria-label", label);
+    }
+
+    if (replyUserTagLabel) {
+        replyUserTagLabel.textContent = label;
+    }
+
+    if (!canTagUsers && isTagModalOpen()) {
+        closeTagPanel({ restoreFocus: false });
+    }
+}
+
+function renderTagChipList() {
+    if (!replyTagChipList) {
+        return;
+    }
+
+    if (pendingTaggedUsers.length === 0) {
+        replyTagChipList.innerHTML = "";
+        return;
+    }
+
+    replyTagChipList.innerHTML = pendingTaggedUsers
+        .map((user) => {
+            const avatarMarkup = user.avatar
+                ? `<span class="tweet-modal__tag-chip-avatar"><img src="${escapeHtml(user.avatar)}" alt="${escapeHtml(user.name)}" /></span>`
+                : '<span class="tweet-modal__tag-chip-avatar"></span>';
+
+            return `
+                <button type="button" class="tweet-modal__tag-chip" data-tag-remove-id="${escapeHtml(user.id)}">
+                    ${avatarMarkup}
+                    <span class="tweet-modal__tag-chip-name">${escapeHtml(user.name)}</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-modal__tag-chip-icon">
+                        <g><path d="M10.59 12 4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path></g>
+                    </svg>
+                </button>
+            `;
+        })
+        .join("");
+}
+
+function getFilteredTagUsers(query) {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    if (!normalizedQuery) {
+        return [];
+    }
+
+    return getCurrentPageTagUsers()
+        .filter((user) => {
+            const haystack = `${user.name} ${user.handle}`.toLowerCase();
+            return haystack.includes(normalizedQuery);
+        })
+        .slice(0, 6);
+}
+
+function renderTagResults(users) {
+    if (!replyTagResults || !replyTagSearchInput) {
+        return;
+    }
+
+    currentTagResults = users;
+    const hasQuery = getTagSearchTerm().length > 0;
+
+    if (!hasQuery) {
+        /*
+        검색 기록이 아예 없을 때 보여줄 수 있는 예시 UI
+
+        replyTagResults.innerHTML =
+            '<p class="tweet-modal__tag-history-empty">최근 검색 기록이 없습니다. 이름이나 아이디를 입력하면 아래에 목록이 표시됩니다.</p>';
+        */
+        replyTagSearchInput.setAttribute("aria-expanded", "false");
+        replyTagSearchInput.removeAttribute("aria-controls");
+        replyTagResults.removeAttribute("role");
+        replyTagResults.removeAttribute("id");
+        replyTagResults.innerHTML = "";
+        return;
+    }
+
+    replyTagSearchInput.setAttribute("aria-expanded", "true");
+    replyTagSearchInput.setAttribute("aria-controls", "notification-tag-results");
+    replyTagResults.setAttribute("role", "listbox");
+    replyTagResults.id = "notification-tag-results";
+
+    if (users.length === 0) {
+        replyTagResults.innerHTML =
+            '<p class="tweet-modal__tag-empty">일치하는 사용자를 찾지 못했습니다.</p>';
+        return;
+    }
+
+    replyTagResults.innerHTML = users
+        .map((user) => {
+            const isSelected = pendingTaggedUsers.some((taggedUser) => taggedUser.id === user.id);
+            const subtitle = isSelected ? `${user.handle} 이미 태그됨` : user.handle;
+            const avatarMarkup = user.avatar
+                ? `<span class="tweet-modal__tag-avatar"><img src="${escapeHtml(user.avatar)}" alt="${escapeHtml(user.name)}" /></span>`
+                : '<span class="tweet-modal__tag-avatar"></span>';
+
+            return `
+                <div role="option" class="tweet-modal__tag-option" data-testid="typeaheadResult">
+                    <div role="checkbox" aria-checked="${String(isSelected)}" aria-disabled="${String(isSelected)}" class="tweet-modal__tag-checkbox">
+                        <button
+                            type="button"
+                            class="tweet-modal__tag-user"
+                            data-tag-user-id="${escapeHtml(user.id)}"
+                            ${isSelected ? "disabled" : ""}
+                        >
+                            ${avatarMarkup}
+                            <span class="tweet-modal__tag-user-body">
+                                <span class="tweet-modal__tag-user-name">${escapeHtml(user.name)}</span>
+                                <span class="tweet-modal__tag-user-handle">${escapeHtml(subtitle)}</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        })
+        .join("");
+}
+
+function runTagSearch() {
+    const query = getTagSearchTerm();
+
+    if (!query) {
+        renderTagResults([]);
+        return;
+    }
+
+    renderTagResults(getFilteredTagUsers(query));
+}
+
+function openTagPanel() {
+    if (!composeView || !replyTagView || !isReplyImageSet()) {
+        return;
+    }
+
+    closeEmojiPicker();
+    pendingTaggedUsers = cloneTaggedUsers(selectedTaggedUsers);
+    composeView.hidden = true;
+    replyTagView.hidden = false;
+
+    if (replyTagSearchInput) {
+        replyTagSearchInput.value = "";
+    }
+
+    renderTagChipList();
+    renderTagResults([]);
+
+    window.requestAnimationFrame(() => {
+        replyTagSearchInput?.focus();
+    });
+}
+
+function closeTagPanel({ restoreFocus = true } = {}) {
+    if (!composeView || !replyTagView || replyTagView.hidden) {
+        return;
+    }
+
+    replyTagView.hidden = true;
+    composeView.hidden = false;
+    pendingTaggedUsers = cloneTaggedUsers(selectedTaggedUsers);
+
+    if (replyTagSearchInput) {
+        replyTagSearchInput.value = "";
+    }
+
+    renderTagChipList();
+    renderTagResults([]);
+
+    if (restoreFocus) {
+        window.requestAnimationFrame(() => {
+            if (replyUserTagTrigger && !replyUserTagTrigger.hidden) {
+                replyUserTagTrigger.focus();
+                return;
+            }
+
+            replyEditor?.focus();
+        });
+    }
+}
+
+function applyPendingTaggedUsers() {
+    selectedTaggedUsers = cloneTaggedUsers(pendingTaggedUsers);
+    syncUserTagTrigger();
+}
+
+function resetTaggedUsers() {
+    selectedTaggedUsers = [];
+    pendingTaggedUsers = [];
+
+    if (replyTagSearchInput) {
+        replyTagSearchInput.value = "";
+    }
+
+    renderTagChipList();
+    renderTagResults([]);
+    syncUserTagTrigger();
+}
+
+// ===== 4-2. 첨부 이미지 설명 편집 =====
+// 이미지별 alt 값을 따로 들고 있다가 저장 버튼을 누를 때만 실제 상태로 반영한다.
+function createDefaultReplyMediaEdit() {
+    return {
+        alt: "",
+    };
+}
+
+function cloneReplyMediaEdits(edits) {
+    return edits.map((edit) => ({
+        alt: edit.alt,
+    }));
+}
+
+function isMediaEditorOpen() {
+    return Boolean(replyMediaView && !replyMediaView.hidden);
+}
+
+function getReplyMediaTriggerLabel() {
+    return replyMediaEdits.some((edit) => edit.alt.trim().length > 0)
+        ? "설명 수정"
+        : "설명 추가";
+}
+
+function syncReplyMediaEditsToAttachments() {
+    if (!isReplyImageSet()) {
+        replyMediaEdits = [];
+        pendingReplyMediaEdits = [];
+        activeReplyMediaIndex = 0;
+        syncMediaAltTrigger();
+        return;
+    }
+
+    replyMediaEdits = attachedReplyFiles.map((_, index) => {
+        const existing = replyMediaEdits[index];
+        return existing
+            ? {
+                  alt: existing.alt ?? "",
+              }
+            : createDefaultReplyMediaEdit();
+    });
+
+    if (pendingReplyMediaEdits.length !== replyMediaEdits.length) {
+        pendingReplyMediaEdits = cloneReplyMediaEdits(replyMediaEdits);
+    }
+
+    activeReplyMediaIndex = Math.min(
+        activeReplyMediaIndex,
+        Math.max(replyMediaEdits.length - 1, 0),
+    );
+    syncMediaAltTrigger();
+}
+
+function getCurrentReplyMediaUrl() {
+    return attachedReplyFileUrls[activeReplyMediaIndex] ?? "";
+}
+
+function getReplyMediaImageAlt(index) {
+    return replyMediaEdits[index]?.alt ?? "";
+}
+
+function getCurrentPendingReplyMediaEdit() {
+    return pendingReplyMediaEdits[activeReplyMediaIndex] ?? createDefaultReplyMediaEdit();
+}
+
+function getReplyMediaTitle() {
+    return "이미지 설명 수정";
+}
+
+function syncMediaAltTrigger() {
+    const canEdit = isReplyImageSet();
+    const label = getReplyMediaTriggerLabel();
+
+    if (replyMediaAltTrigger) {
+        replyMediaAltTrigger.hidden = !canEdit;
+        replyMediaAltTrigger.disabled = !canEdit;
+        replyMediaAltTrigger.setAttribute("aria-label", label);
+    }
+
+    if (replyMediaAltLabel) {
+        replyMediaAltLabel.textContent = label;
+    }
+
+    if (!canEdit && isMediaEditorOpen()) {
+        closeMediaEditor({ restoreFocus: false, discardChanges: true });
+    }
+}
+
+function renderMediaEditor() {
+    if (!replyMediaView || pendingReplyMediaEdits.length === 0) {
+        return;
+    }
+
+    const currentEdit = getCurrentPendingReplyMediaEdit();
+    const currentUrl = getCurrentReplyMediaUrl();
+    const imageAlt = currentEdit.alt ?? "";
+
+    if (replyMediaTitle) {
+        replyMediaTitle.textContent = getReplyMediaTitle();
+    }
+
+    if (replyMediaPrevButton) {
+        replyMediaPrevButton.disabled = activeReplyMediaIndex === 0;
+    }
+
+    if (replyMediaNextButton) {
+        replyMediaNextButton.disabled =
+            activeReplyMediaIndex >= pendingReplyMediaEdits.length - 1;
+    }
+
+    replyMediaPreviewImages.forEach((image) => {
+        image.src = currentUrl;
+        image.alt = imageAlt;
+        image.style.transform = "";
+    });
+
+    if (replyMediaAltInput) {
+        replyMediaAltInput.value = imageAlt;
+    }
+
+    if (replyMediaAltCount) {
+        replyMediaAltCount.textContent = `${imageAlt.length} / ${maxReplyMediaAltLength.toLocaleString()}`;
+    }
+}
+
+function openMediaEditor() {
+    if (!composeView || !replyMediaView || !isReplyImageSet()) {
+        return;
+    }
+
+    closeEmojiPicker();
+    pendingReplyMediaEdits = cloneReplyMediaEdits(replyMediaEdits);
+    activeReplyMediaIndex = 0;
+    composeView.hidden = true;
+    replyMediaView.hidden = false;
+    renderMediaEditor();
+
+    window.requestAnimationFrame(() => {
+        replyMediaAltInput?.focus();
+    });
+}
+
+function closeMediaEditor({ restoreFocus = true, discardChanges = true } = {}) {
+    if (!composeView || !replyMediaView || replyMediaView.hidden) {
+        return;
+    }
+
+    if (discardChanges) {
+        pendingReplyMediaEdits = cloneReplyMediaEdits(replyMediaEdits);
+    }
+
+    replyMediaView.hidden = true;
+    composeView.hidden = false;
+
+    if (restoreFocus) {
+        window.requestAnimationFrame(() => {
+            if (replyMediaAltTrigger && !replyMediaAltTrigger.hidden) {
+                replyMediaAltTrigger.focus();
+                return;
+            }
+
+            replyEditor?.focus();
+        });
+    }
+}
+
+function saveReplyMediaEdits() {
+    replyMediaEdits = cloneReplyMediaEdits(pendingReplyMediaEdits);
+    renderReplyAttachment();
+    syncMediaAltTrigger();
+    closeMediaEditor({ discardChanges: false });
+}
+
+// ===== 4-3. 위치 선택 =====
+// 위치 목록은 HTML에서 읽고, 선택된 값만 상태에 저장한다.
 function isLocationModalOpen() {
     return Boolean(replyLocationView && !replyLocationView.hidden);
 }
@@ -348,11 +813,20 @@ function getLocationSearchTerm() {
 function getFilteredLocations() {
     const searchTerm = getLocationSearchTerm();
 
-    if (!searchTerm) {
-        return availableLocations;
+    // 처음 한 번만 HTML의 기본 목록을 읽어 두고, 이후에는 그 값을 재사용한다.
+    if (cachedLocationNames.length === 0 && replyLocationList) {
+        cachedLocationNames = Array.from(
+            replyLocationList.querySelectorAll(".tweet-modal__location-item-label"),
+        )
+            .map((item) => getTextContent(item))
+            .filter(Boolean);
     }
 
-    return availableLocations.filter((location) => location.includes(searchTerm));
+    if (!searchTerm) {
+        return cachedLocationNames;
+    }
+
+    return cachedLocationNames.filter((location) => location.includes(searchTerm));
 }
 
 // 위치 선택 상태에 따라 위치 pill / 삭제 버튼 / 툴바 라벨을 갱신한다.
@@ -420,7 +894,7 @@ function renderLocationList() {
             const isSelected = pendingLocation === location;
 
             return `
-                <button type="button" class="tweet-modal__location-item" role="menuitem" data-location-value="${location}">
+                <button type="button" class="tweet-modal__location-item" role="menuitem">
                     <span class="tweet-modal__location-item-label">${location}</span>
                     <span class="tweet-modal__location-item-check">
                         ${
@@ -530,6 +1004,8 @@ function resetReplyAttachment() {
     clearAttachedReplyFileUrls();
     attachedReplyFiles = [];
     pendingAttachmentEditIndex = null;
+    resetTaggedUsers();
+    syncReplyMediaEditsToAttachments();
 
     if (replyFileInput) {
         replyFileInput.value = "";
@@ -550,12 +1026,14 @@ function createReplyAttachmentUrls() {
 }
 
 function getReplyImageCell(index, imageUrl, cellClass) {
+    const imageAlt = getReplyMediaImageAlt(index);
+
     return `
         <div class="media-cell ${cellClass}">
             <div class="media-cell-inner">
                 <div class="media-img-container" aria-label="미디어" role="group">
                     <div class="media-bg" style="background-image: url('${imageUrl}');"></div>
-                    <img alt="" draggable="false" src="${imageUrl}" class="media-img">
+                    <img alt="${escapeHtml(imageAlt)}" draggable="false" src="${imageUrl}" class="media-img">
                 </div>
                 <div class="media-btn-row">
                     <button type="button" class="media-btn" data-attachment-edit-index="${index}">
@@ -684,6 +1162,8 @@ function renderReplyAttachment() {
     if (attachedReplyFiles.length === 0) {
         replyAttachmentMedia.innerHTML = "";
         replyAttachmentPreview.hidden = true;
+        resetTaggedUsers();
+        syncReplyMediaEditsToAttachments();
         return;
     }
 
@@ -691,15 +1171,21 @@ function renderReplyAttachment() {
     createReplyAttachmentUrls();
 
     if (isReplyImageSet()) {
+        syncReplyMediaEditsToAttachments();
+        syncUserTagTrigger();
         renderReplyImageGrid();
         return;
     }
 
     if (isReplyVideoSet()) {
+        resetTaggedUsers();
+        syncReplyMediaEditsToAttachments();
         renderReplyVideoAttachment();
         return;
     }
 
+    resetTaggedUsers();
+    syncReplyMediaEditsToAttachments();
     replyAttachmentMedia.innerHTML = "";
     const filePreview = document.createElement("div");
     const fileIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -1090,6 +1576,7 @@ function populateReplyModal(button) {
     }
 }
 
+// ===== 5. 답글 모달 열기/닫기 =====
 // 답글 모달을 열 때마다 입력 상태와 선택 상태를 초기화한다.
 function openReplyModal(button) {
     if (!replyModalOverlay || !replyEditor) {
@@ -1112,6 +1599,8 @@ function openReplyModal(button) {
     activeEmojiCategory = "recent";
     selectedLocation = null;
     pendingLocation = null;
+    selectedTaggedUsers = [];
+    pendingTaggedUsers = [];
     resetReplyAttachment();
     if (replyEmojiSearchInput) {
         replyEmojiSearchInput.value = "";
@@ -1125,8 +1614,18 @@ function openReplyModal(button) {
     if (replyLocationView) {
         replyLocationView.hidden = true;
     }
+    if (replyTagView) {
+        replyTagView.hidden = true;
+    }
+    if (replyMediaView) {
+        replyMediaView.hidden = true;
+    }
+    closeDraftPanel({ restoreFocus: false });
+    renderDraftPanel();
     renderLocationList();
     syncLocationUI();
+    syncUserTagTrigger();
+    syncReplyMediaEditsToAttachments();
     syncReplySubmitState();
     syncReplyFormatButtons();
 
@@ -1160,6 +1659,9 @@ function closeReplyModal(options = {}) {
     document.body.classList.remove("modal-open");
     closeEmojiPicker();
     closeLocationPanel({ restoreFocus: false });
+    closeTagPanel({ restoreFocus: false });
+    closeMediaEditor({ restoreFocus: false, discardChanges: true });
+    closeDraftPanel({ restoreFocus: false });
 
     if (replyEditor) {
         replyEditor.textContent = "";
@@ -1169,9 +1671,13 @@ function closeReplyModal(options = {}) {
     pendingReplyFormats = new Set();
     selectedLocation = null;
     pendingLocation = null;
+    selectedTaggedUsers = [];
+    pendingTaggedUsers = [];
     resetReplyAttachment();
     renderLocationList();
     syncLocationUI();
+    syncUserTagTrigger();
+    syncReplyMediaEditsToAttachments();
     syncReplySubmitState();
     syncReplyFormatButtons();
     if (restoreFocus) {
@@ -1188,7 +1694,7 @@ function trapFocus(event) {
 
     const focusableElements = Array.from(
         replyModal.querySelectorAll(
-            'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+            'button:not([disabled]), [href], input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
         ),
     ).filter((element) => !element.hasAttribute("hidden"));
 
@@ -1223,6 +1729,7 @@ function updateReplyCount(button) {
     button.setAttribute("aria-label", `${nextCount} 답글`);
 }
 
+// ===== 6. 공유/더보기 드롭다운 =====
 // 공유 메뉴는 버튼 좌표를 기준으로 임시 DOM을 만들어서 표시한다.
 function closeShareDropdown() {
     if (!activeShareDropdown) {
@@ -1289,22 +1796,16 @@ function openShareDropdown(button) {
 function getNotificationDropdownItems(button) {
     const tweetItem = button.closest(".notif-tweet-item");
     const handle = getTextContent(tweetItem?.querySelector(".tweet-handle")) || "@sokkomann";
-    const handleId = handle.replace("@", "") || "sokkomann";
 
     return [
         {
-            label: `이 커뮤니티에서 ${handleId} 님의 게시물 찾기`,
-            href: `/i/communities/2029485144793395219/search/?q=(from%3A${handleId})`,
-            icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M11 4c-3.87 0-7 3.13-7 7s3.13 7 7 7c1.93 0 3.68-.78 4.95-2.05S18 12.93 18 11c0-3.87-3.13-7-7-7zm-9 7c0-4.97 4.03-9 9-9s9 4.03 9 9c0 2.12-.74 4.08-1.97 5.62l3.68 3.67-1.41 1.42-3.68-3.68C15.08 19.26 13.13 20 11 20c-4.97 0-9-4.03-9-9zm11.5-2.5c0 1.38-1.12 2.5-2.5 2.5S8.5 9.88 8.5 8.5 9.62 6 11 6s2.5 1.12 2.5 2.5zm-6.76 5.97C7.58 12.89 9.07 12 11 12s3.42.89 4.26 2.47c-1 1.24-2.54 2.03-4.26 2.03s-3.26-.79-4.26-2.03z"></path></g></svg>',
-        },
-        {
             label: "게시물 숨기기",
-            href: `/i/report/hide_community_tweet/2029785009826189583`,
+            href: "",
             icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M3.693 21.707l-1.414-1.414 2.429-2.429c-2.479-2.421-3.606-5.376-3.658-5.513l-.131-.352.131-.352c.133-.353 3.331-8.648 10.937-8.648 2.062 0 3.989.621 5.737 1.85l2.556-2.557 1.414 1.414L3.693 21.707zm-.622-9.706c.356.797 1.354 2.794 3.051 4.449l2.417-2.418c-.361-.609-.553-1.306-.553-2.032 0-2.206 1.794-4 4-4 .727 0 1.424.192 2.033.554l2.263-2.264C14.953 5.434 13.512 5 11.986 5c-5.416 0-8.258 5.535-8.915 7.001zM11.986 10c-1.103 0-2 .897-2 2 0 .178.023.352.067.519l2.451-2.451c-.167-.044-.341-.067-.519-.067zm10.951 1.647l.131.352-.131.352c-.133.353-3.331 8.648-10.937 8.648-.709 0-1.367-.092-2-.223v-2.047c.624.169 1.288.27 2 .27 5.415 0 8.257-5.533 8.915-7-.252-.562-.829-1.724-1.746-2.941l1.438-1.438c1.53 1.971 2.268 3.862 2.33 4.027z"></path></g></svg>',
         },
         {
             label: "커뮤니티에서 작성자 차단",
-            href: `/i/report/remove_community_member/2029093121464930304?community_id=2029485144793395219`,
+            href: "",
             icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M12 3.75c-4.56 0-8.25 3.69-8.25 8.25s3.69 8.25 8.25 8.25 8.25-3.69 8.25-8.25S16.56 3.75 12 3.75zM1.75 12C1.75 6.34 6.34 1.75 12 1.75S22.25 6.34 22.25 12 17.66 22.25 12 22.25 1.75 17.66 1.75 12zm8.84 0l-2.3-2.29 1.42-1.42 2.29 2.3 2.29-2.3 1.42 1.42-2.3 2.29 2.3 2.29-1.42 1.42-2.29-2.3-2.29 2.3-1.42-1.42 2.3-2.29z"></path></g></svg>',
         },
         {
@@ -1314,23 +1815,8 @@ function getNotificationDropdownItems(button) {
         },
         {
             label: "리스트에서 추가/제거하기",
-            href: "/i/lists/add_member",
+            href: "",
             icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M5.5 4c-.28 0-.5.22-.5.5v15c0 .28.22.5.5.5H12v2H5.5C4.12 22 3 20.88 3 19.5v-15C3 3.12 4.12 2 5.5 2h13C19.88 2 21 3.12 21 4.5V13h-2V4.5c0-.28-.22-.5-.5-.5h-13zM16 10H8V8h8v2zm-8 2h8v2H8v-2zm10 7v-3h2v3h3v2h-3v3h-2v-3h-3v-2h3z"></path></g></svg>',
-        },
-        {
-            label: "뮤트",
-            href: "",
-            icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M18 6.59V1.2L8.71 7H5.5C4.12 7 3 8.12 3 9.5v5C3 15.88 4.12 17 5.5 17h2.09l-2.3 2.29 1.42 1.42 15.5-15.5-1.42-1.42L18 6.59zm-8 8V8.55l6-3.75v3.79l-6 6zM5 9.5c0-.28.22-.5.5-.5H8v6H5.5c-.28 0-.5-.22-.5-.5v-5zm6.5 9.24l1.45-1.45L16 19.2V14l2 .02v8.78l-6.5-4.06z"></path></g></svg>',
-        },
-        {
-            label: "이 대화 뮤트하기",
-            href: "",
-            icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M18 6.59V1.2L8.71 7H5.5C4.12 7 3 8.12 3 9.5v5C3 15.88 4.12 17 5.5 17h2.09l-2.3 2.29 1.42 1.42 15.5-15.5-1.42-1.42L18 6.59zm-8 8V8.55l6-3.75v3.79l-6 6zM5 9.5c0-.28.22-.5.5-.5H8v6H5.5c-.28 0-.5-.22-.5-.5v-5zm6.5 9.24l1.45-1.45L16 19.2V14l2 .02v8.78l-6.5-4.06z"></path></g></svg>',
-        },
-        {
-            label: "이 대화에서 나가기",
-            href: "",
-            icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M21.503 6.745c.475 1.032.748 2.176.748 3.385 0 2.955-1.608 5.68-4.196 7.11l-8.054 4.459v-3.452l2-2v2.06l5.086-2.816c1.952-1.079 3.164-3.133 3.164-5.36 0-.644-.101-1.264-.286-1.847l1.538-1.538zM3.71 21.71l-1.414-1.414 3.401-3.401C3.34 15.5 1.751 12.935 1.751 10c0-4.411 3.591-8 8.005-8h4.366c1.818 0 3.494.608 4.849 1.62l1.325-1.325 1.414 1.414-18 18.001zm3.462-6.29L17.545 5.047C16.567 4.386 15.389 4 14.123 4H9.757c-3.311 0-6.005 2.691-6.005 6 0 2.389 1.401 4.451 3.421 5.42z"></path></g></svg>',
         },
         {
             label: `${handle} 님 차단하기`,
@@ -1339,26 +1825,10 @@ function getNotificationDropdownItems(button) {
             icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M12 3.75c-4.55 0-8.25 3.69-8.25 8.25 0 1.92.66 3.68 1.75 5.08L17.09 5.5C15.68 4.4 13.92 3.75 12 3.75zm6.5 3.17L6.92 18.5c1.4 1.1 3.16 1.75 5.08 1.75 4.56 0 8.25-3.69 8.25-8.25 0-1.92-.65-3.68-1.75-5.08zM1.75 12C1.75 6.34 6.34 1.75 12 1.75S22.25 6.34 22.25 12 17.66 22.25 12 22.25 1.75 17.66 1.75 12z"></path></g></svg>',
         },
         {
-            label: "활동 게시물개 보기",
-            href: `/${handleId}/status/2029785009826189583/quotes`,
-            testid: "tweetEngagements",
-            icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M4 19h16v2H4v-2zm1-2V8h3v9H5zm5 0V3h3v14h-3zm5 0v-6h3v6h-3z"></path></g></svg>',
-        },
-        {
-            label: "게시물 담기",
-            href: "",
-            icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M15.24 4.31l-4.55 15.93-1.93-.55 4.55-15.93 1.93.55zm-8.33 3.6L3.33 12l3.58 4.09-1.5 1.32L.67 12l4.74-5.41 1.5 1.32zm11.68-1.32L23.33 12l-4.74 5.41-1.5-1.32L20.67 12l-3.58-4.09 1.5-1.32z"></path></g></svg>',
-        },
-        {
             label: "게시물 신고하기",
             href: "",
             testid: "report",
             icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M3 2h18.61l-3.5 7 3.5 7H5v6H3V2zm2 12h13.38l-2.5-5 2.5-5H5v10z"></path></g></svg>',
-        },
-        {
-            label: "그룹 노트 요청하기",
-            href: "/i/communitynotes/noterequest/2029785009826189583",
-            icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M22 2.63v17.74l-7.05-2.27c-.29 1.65-1.72 2.9-3.45 2.9C9.57 21 8 19.43 8 17.5v-1.63l-1.15-.37H4.5C3.12 15.5 2 14.38 2 13v-3c0-1.38 1.12-2.5 2.5-2.5h2.35L22 2.63zM6 9.5H4.5c-.27 0-.5.22-.5.5v3c0 .28.23.5.5.5H6v-4zm2 4.27l12 3.86V5.37L8 9.23v4.54zm2 2.74v.99c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-.02l-3-.97z"></path></g></svg>',
         },
     ];
 }
@@ -1442,11 +1912,14 @@ function openNotificationDropdown(button) {
     activeMoreButton.setAttribute("aria-expanded", "true");
 }
 
+// ===== 7. 초기 렌더링 =====
 // 초기 렌더링: 위치/탭 상태를 한 번 맞춰 둔다.
 renderLocationList();
 syncLocationUI();
+syncUserTagTrigger();
 setActiveTab("notifications");
 
+// ===== 8. 이벤트 연결 =====
 // 하단 탭 아이콘 상태 변경
 tabLinks.forEach((link) => {
     link.addEventListener("click", (event) => {
@@ -1580,8 +2053,29 @@ replyModalOverlay?.addEventListener("click", (event) => {
 replyModalOverlay?.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
         event.preventDefault();
+        if (isMediaEditorOpen()) {
+            closeMediaEditor();
+            return;
+        }
+
+        if (isTagModalOpen()) {
+            closeTagPanel();
+            return;
+        }
+
         if (isLocationModalOpen()) {
             closeLocationPanel();
+            return;
+        }
+
+        if (isDraftConfirmOpen()) {
+            closeDraftConfirm();
+            renderDraftPanel();
+            return;
+        }
+
+        if (isDraftPanelOpen()) {
+            closeDraftPanel();
             return;
         }
 
@@ -1709,6 +2203,16 @@ replyGeoButton?.addEventListener("click", (event) => {
     openLocationPanel();
 });
 
+replyUserTagTrigger?.addEventListener("click", (event) => {
+    event.preventDefault();
+    openTagPanel();
+});
+
+replyMediaAltTrigger?.addEventListener("click", (event) => {
+    event.preventDefault();
+    openMediaEditor();
+});
+
 replyLocationDisplayButton?.addEventListener("click", (event) => {
     event.preventDefault();
     openLocationPanel();
@@ -1724,6 +2228,51 @@ replyEmojiSearchInput?.addEventListener("input", () => {
 
 replyLocationSearchInput?.addEventListener("input", () => {
     renderLocationList();
+});
+
+replyTagSearchForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+});
+
+replyTagSearchInput?.addEventListener("input", () => {
+    runTagSearch();
+});
+
+replyMediaBackButton?.addEventListener("click", () => {
+    closeMediaEditor();
+});
+
+replyMediaSaveButton?.addEventListener("click", () => {
+    saveReplyMediaEdits();
+});
+
+replyMediaPrevButton?.addEventListener("click", () => {
+    if (activeReplyMediaIndex === 0) {
+        return;
+    }
+
+    activeReplyMediaIndex -= 1;
+    renderMediaEditor();
+});
+
+replyMediaNextButton?.addEventListener("click", () => {
+    if (activeReplyMediaIndex >= pendingReplyMediaEdits.length - 1) {
+        return;
+    }
+
+    activeReplyMediaIndex += 1;
+    renderMediaEditor();
+});
+
+replyMediaAltInput?.addEventListener("input", () => {
+    const currentEdit = pendingReplyMediaEdits[activeReplyMediaIndex];
+
+    if (!currentEdit) {
+        return;
+    }
+
+    currentEdit.alt = replyMediaAltInput.value.slice(0, maxReplyMediaAltLength);
+    renderMediaEditor();
 });
 
 replyEmojiTabs.forEach((tab) => {
@@ -1777,6 +2326,15 @@ replyLocationCloseButton?.addEventListener("click", () => {
     closeLocationPanel();
 });
 
+replyTagCloseButton?.addEventListener("click", () => {
+    closeTagPanel();
+});
+
+replyTagCompleteButton?.addEventListener("click", () => {
+    applyPendingTaggedUsers();
+    closeTagPanel();
+});
+
 replyLocationDeleteButton?.addEventListener("click", () => {
     resetLocationState();
     closeLocationPanel();
@@ -1792,13 +2350,15 @@ replyLocationCompleteButton?.addEventListener("click", () => {
 });
 
 replyLocationList?.addEventListener("click", (event) => {
-    const locationButton = event.target.closest("[data-location-value]");
+    const locationButton = event.target.closest(".tweet-modal__location-item");
 
     if (!locationButton) {
         return;
     }
 
-    const location = locationButton.getAttribute("data-location-value");
+    const location = getTextContent(
+        locationButton.querySelector(".tweet-modal__location-item-label"),
+    );
 
     if (!location) {
         return;
@@ -1806,6 +2366,46 @@ replyLocationList?.addEventListener("click", (event) => {
 
     applyLocation(location);
     closeLocationPanel();
+});
+
+replyTagChipList?.addEventListener("click", (event) => {
+    const chipButton = event.target.closest("[data-tag-remove-id]");
+
+    if (!chipButton) {
+        return;
+    }
+
+    const userId = chipButton.getAttribute("data-tag-remove-id");
+
+    pendingTaggedUsers = pendingTaggedUsers.filter((user) => user.id !== userId);
+    renderTagChipList();
+    runTagSearch();
+    replyTagSearchInput?.focus();
+});
+
+replyTagResults?.addEventListener("click", (event) => {
+    const userButton = event.target.closest("[data-tag-user-id]");
+
+    if (!userButton || userButton.hasAttribute("disabled")) {
+        return;
+    }
+
+    const userId = userButton.getAttribute("data-tag-user-id");
+    const user = currentTagResults.find((entry) => entry.id === userId);
+
+    if (!user || pendingTaggedUsers.some((entry) => entry.id === user.id)) {
+        return;
+    }
+
+    pendingTaggedUsers = [...pendingTaggedUsers, { ...user }];
+    renderTagChipList();
+
+    if (replyTagSearchInput) {
+        replyTagSearchInput.value = "";
+    }
+
+    renderTagResults([]);
+    replyTagSearchInput?.focus();
 });
 
 // 답글 제출은 데모용으로 count만 갱신하고 모달을 닫는다.
@@ -1865,69 +2465,416 @@ window.addEventListener(
     { passive: true },
 );
 
-// 초안 패널 요소
-const draftBtn = replyModalOverlay?.querySelector("[data-testid='unsentButton']");
+// 초안 패널 연결
+// ===== 초안 패널 섹션 시작 =====
+// 아래는 "임시저장" 뷰 전용 로직이다.
+// 초안 목록 열기/닫기, 수정 모드, 선택/삭제, 에디터 복원까지 모두 이 구역에서 처리한다.
 
-// 초안 뷰 / 작성 뷰 (같은 .tweet-modal 안에서 hidden 토글)
+// 초안 패널에 필요한 DOM을 한 번만 잡아두고 재사용한다.
 const draftView = replyModalOverlay?.querySelector(".tweet-modal__draft-view");
-const draftBackBtn = draftView?.querySelector("[data-testid='app-bar-back']");
-const draftTabs = draftView?.querySelectorAll("[data-draft-tab]") ?? [];
+const draftButton = replyModalOverlay?.querySelector(".tweet-modal__draft");
+const draftBackButton = draftView?.querySelector(".draft-panel__back");
+const draftActionButton = draftView?.querySelector(".draft-panel__action");
+const draftList = draftView?.querySelector(".draft-panel__list");
+const draftEmpty = draftView?.querySelector(".draft-panel__empty");
+const draftEmptyTitle = draftView?.querySelector(".draft-panel__empty-title");
+const draftEmptyBody = draftView?.querySelector(".draft-panel__empty-body");
+const draftFooter = draftView?.querySelector(".draft-panel__footer");
+const draftSelectAllButton = draftView?.querySelector(".draft-panel__select-all");
+const draftDeleteButton = draftView?.querySelector(".draft-panel__footer-delete");
+const draftConfirmOverlay = draftView?.querySelector(".draft-panel__confirm-overlay");
+const draftConfirmBackdrop = draftView?.querySelector(".draft-panel__confirm-backdrop");
+const draftConfirmTitle = draftView?.querySelector(".draft-panel__confirm-title");
+const draftConfirmDesc = draftView?.querySelector(".draft-panel__confirm-desc");
+const draftConfirmDeleteButton = draftView?.querySelector(".draft-panel__confirm-primary");
+const draftConfirmCancelButton = draftView?.querySelector(".draft-panel__confirm-secondary");
 
-// 초안 목록을 열 때도 주소를 바꾸지 않고 화면 전환만 수행한다.
+// 초안 패널 상태는 "수정 중인지", "삭제 확인창이 열렸는지", "무엇을 선택했는지"만 관리한다.
+// 실제 목록 데이터는 HTML에 있는 .draft-panel__item 을 그대로 읽어서 사용한다.
+const draftPanelState = {
+    isEditMode: false,
+    confirmOpen: false,
+    selectedItems: new Set(),
+};
+
+// 현재 화면에 보이는 임시저장 카드 DOM 목록을 배열로 돌려준다.
+function getDraftItems() {
+    if (!draftList) {
+        return [];
+    }
+
+    return Array.from(draftList.querySelectorAll(".draft-panel__item"));
+}
+
+// 선택 집합과 삭제 확인창 상태를 같이 초기화한다.
+function clearDraftSelection() {
+    draftPanelState.selectedItems.clear();
+    draftPanelState.confirmOpen = false;
+}
+
+// 수정 모드를 종료하고 선택 상태도 비운다.
+function exitDraftEditMode() {
+    draftPanelState.isEditMode = false;
+    clearDraftSelection();
+}
+
+// 초안이 하나라도 있을 때만 수정 모드로 들어간다.
+function enterDraftEditMode() {
+    if (getDraftItems().length === 0) {
+        return;
+    }
+
+    draftPanelState.isEditMode = true;
+    draftPanelState.confirmOpen = false;
+}
+
+// 삭제되지 않고 현재 목록 안에 살아 있는 카드인지 확인한다.
+function hasDraftItem(item) {
+    return item instanceof HTMLElement && getDraftItems().includes(item);
+}
+
+// 수정 모드에서만 개별 항목 선택/해제를 처리한다.
+function toggleDraftSelection(item) {
+    if (!draftPanelState.isEditMode || !hasDraftItem(item)) {
+        return;
+    }
+
+    if (draftPanelState.selectedItems.has(item)) {
+        draftPanelState.selectedItems.delete(item);
+    } else {
+        draftPanelState.selectedItems.add(item);
+    }
+
+    draftPanelState.confirmOpen = false;
+}
+
+// 현재 탭의 모든 아이템이 선택되었는지 확인한다.
+function areAllDraftItemsSelected() {
+    const items = getDraftItems();
+
+    return items.length > 0 && items.every((item) => draftPanelState.selectedItems.has(item));
+}
+
+// 모두 선택 / 모두 선택 해제 토글을 담당한다.
+function toggleDraftSelectAll() {
+    if (!draftPanelState.isEditMode) {
+        return;
+    }
+
+    const items = getDraftItems();
+
+    if (items.length === 0) {
+        return;
+    }
+
+    if (areAllDraftItemsSelected()) {
+        draftPanelState.selectedItems.clear();
+    } else {
+        draftPanelState.selectedItems = new Set(items);
+    }
+
+    draftPanelState.confirmOpen = false;
+}
+
+// 삭제 가능한 선택이 있는지 여부를 버튼 활성화에 사용한다.
+function hasDraftSelection() {
+    return draftPanelState.selectedItems.size > 0;
+}
+
+// 삭제 확인 레이어를 연다.
+function openDraftConfirm() {
+    if (!draftPanelState.isEditMode || !hasDraftSelection()) {
+        return;
+    }
+
+    draftPanelState.confirmOpen = true;
+}
+
+// 삭제 확인 레이어를 닫는다.
+function closeDraftConfirm() {
+    draftPanelState.confirmOpen = false;
+}
+
+// 선택된 초안을 목록 DOM에서 직접 제거한다.
+function deleteSelectedDrafts() {
+    if (!hasDraftSelection()) {
+        return;
+    }
+
+    getDraftItems().forEach((item) => {
+        if (draftPanelState.selectedItems.has(item)) {
+            item.remove();
+        }
+    });
+
+    exitDraftEditMode();
+}
+
+// 패널을 닫을 때 기본 상태로 되돌린다.
+function resetDraftPanel() {
+    exitDraftEditMode();
+    closeDraftConfirm();
+}
+
+// ESC 처리에서 초안 패널이 열려 있는지 판단할 때 사용한다.
+function isDraftPanelOpen() {
+    return Boolean(draftView && !draftView.hidden);
+}
+
+// ESC 처리에서 삭제 확인창이 떠 있는지 판단할 때 사용한다.
+function isDraftConfirmOpen() {
+    return draftPanelState.confirmOpen;
+}
+
+// 빈 상태 문구는 현재 단일 임시저장 화면용 고정 문구만 사용한다.
+function getDraftEmptyCopy() {
+    return {
+        title: "잠시 생각을 정리합니다",
+        body: "아직 게시할 준비가 되지 않았나요? 임시저장해 두고 나중에 이어서 작성하세요.",
+    };
+}
+
+// 삭제 확인 문구도 단일 임시저장 화면 기준으로 고정한다.
+function getDraftConfirmCopy() {
+    return {
+        title: "전송하지 않은 게시물 삭제하기",
+        body: "이 작업은 취소할 수 없으며 선택한 전송하지 않은 게시물이 삭제됩니다.",
+    };
+}
+
+// 수정 모드에서만 보이는 동그란 체크 UI를 만든다.
+function buildDraftCheckbox(isSelected) {
+    const checkbox = document.createElement("span");
+    checkbox.className = `draft-panel__checkbox${isSelected ? " draft-panel__checkbox--checked" : ""}`;
+    checkbox.setAttribute("aria-hidden", "true");
+    checkbox.innerHTML =
+        '<svg viewBox="0 0 24 24"><g><path d="M9.86 18a1 1 0 01-.73-.31l-3.9-4.11 1.45-1.38 3.2 3.38 7.46-8.1 1.47 1.36-8.19 8.9A1 1 0 019.86 18z"></path></g></svg>';
+
+    return checkbox;
+}
+
+// 초안 목록 카드는 HTML에 이미 있으므로, 선택 상태와 체크 UI만 다시 맞춘다.
+function renderDraftItems() {
+    if (!draftList) {
+        return;
+    }
+
+    const items = getDraftItems();
+
+    items.forEach((item) => {
+        const isSelected = draftPanelState.selectedItems.has(item);
+        const oldCheckbox = item.querySelector(".draft-panel__checkbox");
+
+        if (oldCheckbox) {
+            oldCheckbox.remove();
+        }
+
+        item.className = [
+            "draft-panel__item",
+            draftPanelState.isEditMode ? "draft-panel__item--selectable" : "",
+            isSelected ? "draft-panel__item--selected" : "",
+        ]
+            .filter(Boolean)
+            .join(" ");
+        item.setAttribute("aria-pressed", draftPanelState.isEditMode ? String(isSelected) : "false");
+
+        if (draftPanelState.isEditMode) {
+            item.prepend(buildDraftCheckbox(isSelected));
+        }
+    });
+}
+
+// 초안 패널 전체 UI를 한 번에 다시 그린다.
+function renderDraftPanel() {
+    if (!draftView) {
+        return;
+    }
+
+    /*
+    임시저장 목록이 아예 없을 때만 강제로 빈 상태를 보여주는 예시
+
+    draftList?.replaceChildren();
+    if (draftEmpty) {
+        draftEmpty.hidden = false;
+    }
+    if (draftFooter) {
+        draftFooter.hidden = true;
+    }
+    return;
+    */
+
+    const hasItems = getDraftItems().length > 0;
+    const emptyCopy = getDraftEmptyCopy();
+    const confirmCopy = getDraftConfirmCopy();
+
+    if (draftActionButton) {
+        draftActionButton.textContent = draftPanelState.isEditMode ? "완료" : "수정";
+        draftActionButton.disabled = !hasItems;
+        draftActionButton.classList.toggle("draft-panel__action--done", draftPanelState.isEditMode);
+    }
+
+    renderDraftItems();
+
+    if (draftEmpty) {
+        draftEmpty.hidden = hasItems;
+    }
+
+    if (draftEmptyTitle) {
+        draftEmptyTitle.textContent = emptyCopy.title;
+    }
+
+    if (draftEmptyBody) {
+        draftEmptyBody.textContent = emptyCopy.body;
+    }
+
+    if (draftFooter) {
+        draftFooter.hidden = !draftPanelState.isEditMode;
+    }
+
+    if (draftSelectAllButton) {
+        draftSelectAllButton.textContent = areAllDraftItemsSelected() ? "모두 선택 해제" : "모두 선택";
+    }
+
+    if (draftDeleteButton) {
+        draftDeleteButton.disabled = !hasDraftSelection();
+    }
+
+    if (draftConfirmOverlay) {
+        draftConfirmOverlay.hidden = !draftPanelState.confirmOpen;
+    }
+
+    if (draftConfirmTitle) {
+        draftConfirmTitle.textContent = confirmCopy.title;
+    }
+
+    if (draftConfirmDesc) {
+        draftConfirmDesc.textContent = confirmCopy.body;
+    }
+}
+
+// 초안 패널을 열면 작성 뷰를 숨기고 초안 뷰를 보여준다.
 function openDraftPanel() {
     if (!composeView || !draftView) {
         return;
     }
 
+    renderDraftPanel();
     composeView.hidden = true;
     draftView.hidden = false;
-
-    // 서버/주소 연동 로직은 비활성화한다.
-    // history.pushState({ modal: "drafts" }, "", "/compose/post/unsent/drafts");
 }
 
-function closeDraftPanel() {
+// 초안 패널을 닫으면 기본 상태로 되돌리고 작성 뷰로 복귀한다.
+function closeDraftPanel({ restoreFocus = true } = {}) {
     if (!composeView || !draftView) {
         return;
     }
 
+    resetDraftPanel();
+    renderDraftPanel();
     draftView.hidden = true;
     composeView.hidden = false;
 
-    // 서버/주소 연동 로직은 비활성화한다.
-    // history.pushState({ modal: "compose" }, "", "/compose/post");
+    if (restoreFocus) {
+        draftButton?.focus();
+    }
 }
 
-// 초안 버튼 클릭 → 초안 패널 표시
-draftBtn?.addEventListener("click", (e) => {
+// 클릭한 DOM이 목록의 몇 번째 초안 카드인지 계산해서 실제 데이터를 찾는다.
+function getDraftItemByElement(target) {
+    return target.closest(".draft-panel__item");
+}
+
+// 목록에서 초안을 누르면 카드 안의 본문 텍스트를 에디터로 다시 넣는다.
+function loadDraftIntoComposer(item) {
+    if (!item || !replyEditor) {
+        return;
+    }
+
+    replyEditor.textContent = getTextContent(item.querySelector(".draft-panel__text"));
+    closeDraftPanel({ restoreFocus: false });
+    syncReplySubmitState();
+    saveReplySelection();
+
+    window.requestAnimationFrame(() => {
+        replyEditor.focus();
+    });
+}
+
+// 초안 버튼 클릭 시 임시저장 뷰를 연다.
+draftButton?.addEventListener("click", (e) => {
     e.preventDefault();
     openDraftPanel();
 });
 
-// 돌아가기 버튼 → 작성 뷰 복귀
-draftBackBtn?.addEventListener("click", () => {
+// 초안 뷰 뒤로가기 버튼은 작성 뷰로 되돌린다.
+draftBackButton?.addEventListener("click", (e) => {
+    e.preventDefault();
     closeDraftPanel();
 });
 
-// 탭 전환 (전송하지 않은 게시물 / 예약됨)
-draftTabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-        const tabKey = tab.dataset.draftTab;
+// 수정/완료 버튼은 수정 모드를 토글한다.
+draftActionButton?.addEventListener("click", (e) => {
+    e.preventDefault();
 
-        draftTabs.forEach((t) => {
-            t.classList.remove("draft-panel__tab--active");
-            t.setAttribute("aria-selected", "false");
-        });
+    if (draftPanelState.isEditMode) {
+        exitDraftEditMode();
+    } else {
+        enterDraftEditMode();
+    }
 
-        tab.classList.add("draft-panel__tab--active");
-        tab.setAttribute("aria-selected", "true");
+    renderDraftPanel();
+});
 
-        // 탭 상태는 클래스와 aria만 바꾸고 주소는 건드리지 않는다.
-        // const path = tabKey === "scheduled"
-        //     ? "/compose/post/unsent/scheduled"
-        //     : "/compose/post/unsent/drafts";
-        // history.replaceState({ modal: "drafts", tab: tabKey }, "", path);
-    });
+// 모두 선택은 현재 임시저장 목록 전체를 기준으로 처리한다.
+draftSelectAllButton?.addEventListener("click", (e) => {
+    e.preventDefault();
+    toggleDraftSelectAll();
+    renderDraftPanel();
+});
+
+// 삭제 버튼은 실제 삭제 전에 확인 레이어만 연다.
+draftDeleteButton?.addEventListener("click", (e) => {
+    e.preventDefault();
+    openDraftConfirm();
+    renderDraftPanel();
+});
+
+// 확인창의 삭제 버튼은 선택 항목을 제거한다.
+draftConfirmDeleteButton?.addEventListener("click", (e) => {
+    e.preventDefault();
+    deleteSelectedDrafts();
+    renderDraftPanel();
+});
+
+// 확인창의 취소 버튼은 확인 레이어만 닫는다.
+draftConfirmCancelButton?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeDraftConfirm();
+    renderDraftPanel();
+});
+
+// 확인창 바깥 배경 클릭도 취소와 같은 동작으로 처리한다.
+draftConfirmBackdrop?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeDraftConfirm();
+    renderDraftPanel();
+});
+
+// 목록 클릭은 일반 모드/수정 모드에 따라 다르게 처리한다.
+draftList?.addEventListener("click", (e) => {
+    const item = getDraftItemByElement(e.target);
+
+    if (!item) {
+        return;
+    }
+
+    if (draftPanelState.isEditMode) {
+        toggleDraftSelection(item);
+        renderDraftPanel();
+        return;
+    }
+
+    loadDraftIntoComposer(item);
 });
 
 // 브라우저 주소/뒤로가기 연동은 데모 범위 밖이라 비활성화한다.
@@ -1936,8 +2883,11 @@ draftTabs.forEach((tab) => {
 //     if (state?.modal === "drafts") {
 //         openDraftPanel();
 //     } else if (state?.modal === "compose") {
-//         closeDraftPanel();
+//         closeDraftPanel({ restoreFocus: false });
 //     } else {
 //         closeReplyModal({ skipConfirm: true });
 //     }
 // });
+
+// ===== 초안 패널 섹션 끝 =====
+});

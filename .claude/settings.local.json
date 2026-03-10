@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(node:*)",
-      "Bash(\"C:\\\\Users\\\\pigch\\\\Desktop\\\\gb_0900_kyc\\\\globalgates\\\\static\\\\css\\\\Notification\\\\Notification.css\":*)"
-    ]
-  }
-}
