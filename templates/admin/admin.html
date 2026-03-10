@@ -29,24 +29,54 @@
 
       <div class="each-box">
         <div class="box-title">회원</div>
-        <a class="each-menu active" data-page="member-list">회원 목록</a>
+        <div class="each-menu active">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+          </svg>
+          회원 목록
+        </div>
       </div>
 
       <div class="each-box">
         <div class="box-title">게시물</div>
-        <a class="each-menu" data-page="post-list">게시물 관리</a>
+        <div class="each-menu">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>
+          </svg>
+          게시물 관리
+        </div>
       </div>
 
       <div class="each-box">
         <div class="box-title">뉴스</div>
-        <a class="each-menu" data-page="news-list">뉴스 목록</a>
-        <a class="each-menu" data-page="news-write">뉴스 등록</a>
+        <div class="each-menu">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/>
+          </svg>
+          뉴스 목록
+        </div>
+        <div class="each-menu">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+          </svg>
+          뉴스 등록
+        </div>
       </div>
 
       <div class="each-box">
         <div class="box-title">신고</div>
-        <a class="each-menu" data-page="report-member">회원 신고</a>
-        <a class="each-menu" data-page="report-post">글 신고</a>
+        <div class="each-menu">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>
+          </svg>
+          회원 신고
+        </div>
+        <div class="each-menu">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+          </svg>
+          글 신고
+        </div>
       </div>
 
     </nav>
@@ -60,444 +90,557 @@
 
     <!-- 회원 목록/기본탭/1번탭 -->
     <div class="page active" id="page-member-list">
-      <h2 class="page-title">회원 목록</h2>
-      <div class="toolbar">
-        <input class="search-input" type="text" placeholder="이름 또는 이메일 검색" />
-        <button class="btn btn-primary">검색</button>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>번호</th><th>이름</th><th>이메일</th><th>회사</th><th>회원종류</th><th>가입일</th><th>상태</th>
-            </tr>
-          </thead>
-          <tbody id="member-tbody">
-            <tr>
-              <td>1</td><td>이정식</td><td style="color:#1d9bf0">sokkomann@gmail.com</td>
-              <td>GG무역</td>
-              <td><span class="badge badge-normal">일반</span></td>
-              <td>2025-01-15</td>
-              <td><span class="badge badge-active">active</span></td>
-            </tr>
-            <tr>
-              <td>2</td><td>박하민</td><td style="color:#1d9bf0">sokkomann@gmail.com</td>
-              <td>한국무역</td>
-              <td><span class="badge badge-expert">전문가</span></td>
-              <td>2025-02-03</td>
-              <td><span class="badge badge-active">active</span></td>
-            </tr>
-            <tr>
-              <td>3</td><td>김민중</td><td style="color:#1d9bf0">sokkomann@gmail.com</td>
-              <td>망고상사</td>
-              <td><span class="badge badge-normal">일반</span></td>
-              <td>2025-02-18</td>
-              <td><span class="badge badge-active">active</span></td>
-            </tr>
-            <tr>
-              <td>4</td><td>김윤찬</td><td style="color:#1d9bf0">sokkomann@gmail.com</td>
-              <td>글로벌물산</td>
-              <td><span class="badge badge-expert">전문가</span></td>
-              <td>2025-03-01</td>
-              <td><span class="badge badge-pending">pending</span></td>
-            </tr>
-            <tr>
-              <td>5</td><td>홍성호</td><td style="color:#1d9bf0">sokkomann@gmail.com</td>
-              <td>밥먹고수출</td>
-              <td><span class="badge badge-normal">일반</span></td>
-              <td>2025-03-05</td>
-              <td><span class="badge badge-reject">inactive</span></td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="nw-module">
+        <div class="nw-module-header">
+          <div class="nw-module-title">회원 목록</div>
+          <div class="nw-module-header-actions">
+            <input class="search-input" type="text" placeholder="이름 또는 이메일 검색" />
+            <button class="btn btn-primary">검색</button>
+          </div>
+        </div>
+        <div class="table-wrap nw-table">
+          <table>
+            <thead>
+              <tr>
+                <th>번호</th><th>이름</th><th>이메일</th><th>회사</th><th>회원종류</th><th>가입일</th><th>상태</th>
+              </tr>
+            </thead>
+            <tbody id="memberTbody">
+              <tr>
+                <td>1</td><td>이정식</td><td style="color:#1d9bf0">sokkomann@gmail.com</td>
+                <td>GG무역</td>
+                <td><span class="badge badge-normal">일반</span></td>
+                <td>2025-01-15</td>
+                <td><span class="badge badge-active">active</span></td>
+              </tr>
+              <tr>
+                <td>2</td><td>박하민</td><td style="color:#1d9bf0">sokkomann@gmail.com</td>
+                <td>한국무역</td>
+                <td><span class="badge badge-expert">전문가</span></td>
+                <td>2025-02-03</td>
+                <td><span class="badge badge-active">active</span></td>
+              </tr>
+              <tr>
+                <td>3</td><td>김민중</td><td style="color:#1d9bf0">sokkomann@gmail.com</td>
+                <td>망고상사</td>
+                <td><span class="badge badge-normal">일반</span></td>
+                <td>2025-02-18</td>
+                <td><span class="badge badge-active">active</span></td>
+              </tr>
+              <tr>
+                <td>4</td><td>김윤찬</td><td style="color:#1d9bf0">sokkomann@gmail.com</td>
+                <td>글로벌물산</td>
+                <td><span class="badge badge-expert">전문가</span></td>
+                <td>2025-03-01</td>
+                <td><span class="badge badge-pending">pending</span></td>
+              </tr>
+              <tr>
+                <td>5</td><td>홍성호</td><td style="color:#1d9bf0">sokkomann@gmail.com</td>
+                <td>밥먹고수출</td>
+                <td><span class="badge badge-normal">일반</span></td>
+                <td>2025-03-05</td>
+                <td><span class="badge badge-reject">inactive</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!--게시물 관리/2번탭 -->
     <div class="page" id="page-post-list">
-      <h2 class="page-title">게시물 관리</h2>
-      <div class="toolbar">
-        <input class="search-input" type="text" placeholder="제목 또는 작성자 검색" />
-        <button class="btn btn-primary">검색</button>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>번호</th><th>제목</th><th>작성자</th><th>글종류</th><th>물품종류</th><th>작성일</th><th>관리</th>
-            </tr>
-          </thead>
-          <tbody id="post-tbody">
-            <tr>
-              <td>1</td><td>철강 원자재 수입 철강 원자재 수입</td><td>김윤찬</td>
-              <td><span class="badge badge-buy">구매글</span></td><td>원자재</td><td>2025-03-05</td>
-              <td>
-                <button class="btn btn-outline btn-sm" data-action="edit-post">수정</button>
-                <button class="btn btn-danger btn-sm" data-action="del-post">삭제</button>
-              </td>
-            </tr>
-            <tr>
-              <td>2</td><td>수출할게요수출할게요수출할게요수출할게요수출할게요</td><td>김민중</td>
-              <td><span class="badge badge-sale">판매글</span></td><td>전자</td><td>2025-03-04</td>
-              <td>
-                <button class="btn btn-outline btn-sm" data-action="edit-post">수정</button>
-                <button class="btn btn-danger btn-sm" data-action="del-post">삭제</button>
-              </td>
-            </tr>
-            <tr>
-              <td>3</td><td>통관 절차 문의드림통관 절차 문의드림</td><td>누구1</td>
-              <td><span class="badge badge-qna">Q&amp;A</span></td><td>기타</td><td>2025-03-03</td>
-              <td>
-                <button class="btn btn-outline btn-sm" data-action="edit-post">수정</button>
-                <button class="btn btn-danger btn-sm" data-action="del-post">삭제</button>
-              </td>
-            </tr>
-            <tr>
-              <td>4</td><td>원두사요</td><td>홍성호</td>
-              <td><span class="badge badge-buy">구매글</span></td><td>식품</td><td>2025-03-02</td>
-              <td>
-                <button class="btn btn-outline btn-sm" data-action="edit-post">수정</button>
-                <button class="btn btn-danger btn-sm" data-action="del-post">삭제</button>
-              </td>
-            </tr>
-            <tr>
-              <td>5</td><td>의류 OEM 생산 제안합니다</td><td>박하민</td>
-              <td><span class="badge badge-sale">판매글</span></td><td>섬유/의류</td><td>2025-03-01</td>
-              <td>
-                <button class="btn btn-outline btn-sm" data-action="edit-post">수정</button>
-                <button class="btn btn-danger btn-sm" data-action="del-post">삭제</button>
-              </td>
-            </tr>
-            <tr>
-              <td>6</td><td>HS코드 분류 기준 질문</td><td>이정식</td>
-              <td><span class="badge badge-qna">Q&amp;A</span></td><td>기타</td><td>2025-02-28</td>
-              <td>
-                <button class="btn btn-outline btn-sm" data-action="edit-post">수정</button>
-                <button class="btn btn-danger btn-sm" data-action="del-post">삭제</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="nw-module">
+        <div class="nw-module-header">
+          <div class="nw-module-title">게시물 관리</div>
+          <div class="nw-module-header-actions">
+            <input class="search-input" type="text" placeholder="제목 또는 작성자 검색" />
+            <button class="btn btn-primary">검색</button>
+          </div>
+        </div>
+        <div class="table-wrap nw-table">
+          <table>
+            <thead>
+              <tr>
+                <th>번호</th><th>제목</th><th>작성자</th><th>글종류</th><th>물품종류</th><th>작성일</th><th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="postTbody">
+              <tr>
+                <td>1</td><td>철강 원자재 수입 철강 원자재 수입</td><td>김윤찬</td>
+                <td><span class="badge badge-buy">구매글</span></td><td>원자재</td><td>2025-03-05</td>
+                <td>
+                  <button class="btn btn-outline btn-sm btn-edit-post">수정</button>
+                  <button class="btn btn-outline btn-sm btn-toggle-post">비활성화</button>
+                  <button class="btn btn-danger btn-sm btn-del-post">삭제</button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td><td>수출할게요수출할게요수출할게요수출할게요수출할게요</td><td>김민중</td>
+                <td><span class="badge badge-sale">판매글</span></td><td>전자</td><td>2025-03-04</td>
+                <td>
+                  <button class="btn btn-outline btn-sm btn-edit-post">수정</button>
+                  <button class="btn btn-outline btn-sm btn-toggle-post">비활성화</button>
+                  <button class="btn btn-danger btn-sm btn-del-post">삭제</button>
+                </td>
+              </tr>
+              <tr>
+                <td>3</td><td>통관 절차 문의드림통관 절차 문의드림</td><td>누구1</td>
+                <td><span class="badge badge-qna">Q&amp;A</span></td><td>기타</td><td>2025-03-03</td>
+                <td>
+                  <button class="btn btn-outline btn-sm btn-edit-post">수정</button>
+                  <button class="btn btn-outline btn-sm btn-toggle-post">비활성화</button>
+                  <button class="btn btn-danger btn-sm btn-del-post">삭제</button>
+                </td>
+              </tr>
+              <tr>
+                <td>4</td><td>원두사요</td><td>홍성호</td>
+                <td><span class="badge badge-buy">구매글</span></td><td>식품</td><td>2025-03-02</td>
+                <td>
+                  <button class="btn btn-outline btn-sm btn-edit-post">수정</button>
+                  <button class="btn btn-outline btn-sm btn-toggle-post">비활성화</button>
+                  <button class="btn btn-danger btn-sm btn-del-post">삭제</button>
+                </td>
+              </tr>
+              <tr>
+                <td>5</td><td>의류 OEM 생산 제안합니다</td><td>박하민</td>
+                <td><span class="badge badge-sale">판매글</span></td><td>섬유/의류</td><td>2025-03-01</td>
+                <td>
+                  <button class="btn btn-outline btn-sm btn-edit-post">수정</button>
+                  <button class="btn btn-outline btn-sm btn-toggle-post">비활성화</button>
+                  <button class="btn btn-danger btn-sm btn-del-post">삭제</button>
+                </td>
+              </tr>
+              <tr>
+                <td>6</td><td>HS코드 분류 기준 질문</td><td>이정식</td>
+                <td><span class="badge badge-qna">Q&amp;A</span></td><td>기타</td><td>2025-02-28</td>
+                <td>
+                  <button class="btn btn-outline btn-sm btn-edit-post">수정</button>
+                  <button class="btn btn-outline btn-sm btn-toggle-post">비활성화</button>
+                  <button class="btn btn-danger btn-sm btn-del-post">삭제</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- 뉴스 목록/3번탭 -->
     <div class="page" id="page-news-list">
-      <h2 class="page-title">뉴스 목록</h2>
-      <div class="toolbar">
-        <input class="search-input" type="text" placeholder="뉴스 제목 검색" />
-        <button class="btn btn-primary">검색</button>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>번호</th><th>제목</th><th>출처</th><th>뉴스 카테고리</th><th>작성일</th><th>조회수</th><th>관리</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td><td>뉴스제목1</td><td>BBC</td><th>무역동향</th><td>2025-03-08</td><td>1,240</td>
-              <td>
-                <button class="btn btn-outline btn-sm">수정</button>
-                <button class="btn btn-danger btn-sm">삭제</button>
-              </td>
-            </tr>
-            <tr>
-              <td>2</td><td>뉴스제목2</td><td>CNN</td><th>원자재</th><td>2025-03-07</td><td>890</td>
-              <td>
-                <button class="btn btn-outline btn-sm">수정</button>
-                <button class="btn btn-danger btn-sm">삭제</button>
-              </td>
-            </tr>
-            <tr>
-              <td>3</td><td>뉴스제목3</td><td>BBC</td><th>정책</th><td>2025-03-06</td><td>654</td>
-              <td>
-                <button class="btn btn-outline btn-sm">수정</button>
-                <button class="btn btn-danger btn-sm">삭제</button>
-              </td>
-            </tr>
-            <tr>
-              <td>4</td><td>뉴스제목4</td><td>Bloomberg</td><th>수출입</th><td>2025-03-06</td><td>654</td>
-              <td>
-                <button class="btn btn-outline btn-sm">수정</button>
-                <button class="btn btn-danger btn-sm">삭제</button>
-              </td>
-            </tr>
-            <tr>
-              <td>5</td><td>뉴스제목5</td><td>CNN</td><th>경제</th><td>2025-03-07</td><td>890</td>
-              <td>
-                <button class="btn btn-outline btn-sm">수정</button>
-                <button class="btn btn-danger btn-sm">삭제</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="nw-module">
+        <div class="nw-module-header">
+          <div class="nw-module-title">뉴스 목록</div>
+          <div class="nw-module-header-actions">
+            <input class="search-input" type="text" placeholder="뉴스 제목 검색" />
+            <button class="btn btn-primary">검색</button>
+            <button class="btn btn-outline" id="newsWriteBtn">뉴스 등록</button>
+          </div>
+        </div>
+        <div class="table-wrap nw-table">
+          <table>
+            <thead>
+              <tr>
+                <th>번호</th><th>제목</th><th>출처</th><th>뉴스 카테고리</th><th>작성일</th><th>조회수</th><th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="newsTbody">
+              <tr>
+                <td>1</td><td>뉴스제목1</td><td>BBC</td><td>무역동향</td><td>2025-03-08</td><td>1,240</td>
+                <td>
+                  <button class="btn btn-outline btn-sm btn-edit-news">수정</button>
+                  <button class="btn btn-outline btn-sm btn-toggle-news">비활성화</button>
+                  <button class="btn btn-danger btn-sm btn-del-news">삭제</button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td><td>뉴스제목2</td><td>CNN</td><td>원자재</td><td>2025-03-07</td><td>890</td>
+                <td>
+                  <button class="btn btn-outline btn-sm btn-edit-news">수정</button>
+                  <button class="btn btn-outline btn-sm btn-toggle-news">비활성화</button>
+                  <button class="btn btn-danger btn-sm btn-del-news">삭제</button>
+                </td>
+              </tr>
+              <tr>
+                <td>3</td><td>뉴스제목3</td><td>BBC</td><td>정책</td><td>2025-03-06</td><td>654</td>
+                <td>
+                  <button class="btn btn-outline btn-sm btn-edit-news">수정</button>
+                  <button class="btn btn-outline btn-sm btn-toggle-news">비활성화</button>
+                  <button class="btn btn-danger btn-sm btn-del-news">삭제</button>
+                </td>
+              </tr>
+              <tr>
+                <td>4</td><td>뉴스제목4</td><td>Bloomberg</td><td>수출입</td><td>2025-03-06</td><td>654</td>
+                <td>
+                  <button class="btn btn-outline btn-sm btn-edit-news">수정</button>
+                  <button class="btn btn-outline btn-sm btn-toggle-news">비활성화</button>
+                  <button class="btn btn-danger btn-sm btn-del-news">삭제</button>
+                </td>
+              </tr>
+              <tr>
+                <td>5</td><td>뉴스제목5</td><td>CNN</td><td>경제</td><td>2025-03-07</td><td>890</td>
+                <td>
+                  <button class="btn btn-outline btn-sm btn-edit-news">수정</button>
+                  <button class="btn btn-outline btn-sm btn-toggle-news">비활성화</button>
+                  <button class="btn btn-danger btn-sm btn-del-news">삭제</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- 뉴스 등록/4번탭 -->
     <div class="page" id="page-news-write">
-      <h2 class="page-title">뉴스 등록</h2>
+      <div class="news-write-layout">
 
-      <div class="form-group">
-        <label class="form-label">뉴스 원문 URL</label>
-        <div style="display:flex; gap:8px">
-          <input class="form-input" type="url" id="news-url" placeholder="요약할 뉴스의 링크를 입력하세요" style="flex:1" />
-          <button class="btn btn-ai" id="ai-btn">AI 요약 적용</button>
-        </div>
-        <span style="font-size:12px; color:#536471; margin-top:4px">
-         뉴스 URL을 붙여넣으면 AI가 요약합니다.
-        </span>
-      </div>
+        <!-- 왼쪽: 등록 폼 -->
+        <div class="news-write-form">
+          <div class="nw-module">
+            <div class="nw-module-header">
+              <div class="nw-module-title">뉴스 등록</div>
+            </div>
+            <div class="nw-module-body">
 
-      <div class="ai-box" id="ai-box">
-        <div class="ai-loading" id="ai-loading">
-          <div class="spinner"></div>
-          <span>AI가 뉴스를 분석, 요약하는 중입니다...</span>
-        </div>
-        <div id="ai-result" style="display:none">
-          <div class="ai-done-badge">AI 요약 완료</div>
-          <div class="ai-summary-text" id="ai-summary-preview"></div>
-          <div style="margin-top:10px; font-size:12px; color:#7c3aed; font-weight:600">
-            아래 제목과 내용에 자동으로 적용되었습니다. 수정 후 등록하세요.
+              <div class="form-group">
+                <label class="form-label">뉴스 원문 URL</label>
+                <div style="display:flex; gap:8px">
+                  <input class="form-input" type="url" id="newsUrl" placeholder="요약할 뉴스의 링크를 입력하세요" style="flex:1" />
+                  <button class="btn btn-ai" id="aiBtn">AI 요약 적용</button>
+                </div>
+                <span class="nw-hint">뉴스 URL을 붙여넣으면 AI가 요약합니다.</span>
+              </div>
+
+              <div class="ai-box" id="aiBox">
+                <div class="ai-loading" id="aiLoading">
+                  <span id="aiLoadingText">AI가 뉴스를 분석, 요약하는 중입니다.</span>
+                </div>
+                <div id="aiResult" style="display:none">
+                  <div class="ai-done-badge">AI 요약 완료</div>
+                  <div class="ai-summary-text" id="aiSummaryPreview"></div>
+                  <span class="nw-hint" style="margin-top:10px">아래 제목과 내용에 자동으로 적용되었습니다. 수정 후 등록하세요.</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">제목</label>
+                <input class="form-input" type="text" id="newsTitle" placeholder="제목을 입력하거나 AI 요약을 적용하세요" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">카테고리</label>
+                <select class="form-select" id="newsCategory">
+                  <option>무역동향</option>
+                  <option>수출입</option>
+                  <option>원자재</option>
+                  <option>정책</option>
+                  <option>경제</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">내용 <span class="nw-hint">(AI 요약 결과가 여기에 채워집니다)</span></label>
+                <textarea class="form-textarea" id="newsContent" placeholder="내용을 입력하거나 AI 요약을 적용하세요"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">원문 출처</label>
+                <input class="form-input" type="text" id="newsSource" placeholder="원문 URL이 자동으로 기록됩니다" readonly />
+              </div>
+
+            </div>
+          </div>
+
+          <div class="nw-actions">
+            <button class="btn btn-outline" id="newsCancelBtn">취소</button>
+            <button class="btn btn-primary" id="newsSubmitBtn">등록</button>
           </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label class="form-label">제목</label>
-        <input class="form-input" type="text" id="news-title" placeholder="제목을 입력하거나 AI 요약을 적용하세요" />
-      </div>
+        <!-- 오른쪽: 미리보기 -->
+        <div class="news-write-preview">
+          <div class="nw-module preview-sticky">
+            <div class="nw-module-header">
+              <div class="nw-module-title">미리보기</div>
+            </div>
+            <div class="nw-module-body">
+              <div class="preview-card">
+                <div class="preview-meta">
+                  <span class="preview-category-badge" id="previewCategory">무역동향</span>
+                  <span class="preview-date" id="previewDate"></span>
+                </div>
+                <div class="preview-title" id="previewTitle">제목이 여기에 표시됩니다</div>
+                <div class="preview-content" id="previewContent">내용이 여기에 표시됩니다. AI 요약 또는 직접 입력하면 이곳에 미리보기가 나타납니다.</div>
+                <div class="preview-source-row">
+                  <span class="preview-source-label">출처</span>
+                  <span class="preview-source-value" id="previewSource">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <div class="form-group">
-        <label class="form-label">카테고리</label>
-        <select class="form-select" id="news-category">
-          <option>무역동향</option>
-          <option>수출입</option>
-          <option>원자재</option>
-          <option>정책</option>
-          <option>경제</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">내용 <span style="font-size:12px; color:#536471; font-weight:400">(AI 요약 결과가 여기에 채워집니다)</span></label>
-        <textarea class="form-textarea" id="news-content" placeholder="내용을 입력하거나 AI 요약을 적용하세요"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">원문 출처</label>
-        <input class="form-input" type="text" id="news-source" placeholder="원문 URL이 자동으로 기록됩니다" readonly />
-      </div>
-
-      <div class="form-actions">
-        <button class="btn btn-outline" id="news-cancel-btn">취소</button>
-        <button class="btn btn-primary" id="news-submit-btn">등록</button>
       </div>
     </div>
 
     <!-- 회원 신고/5번탭 -->
     <div class="page" id="page-report-member">
-      <h2 class="page-title">회원 신고</h2>
-      <div class="toolbar">
-        <input class="search-input" type="text" placeholder="신고자 또는 피신고자 검색" />
-        <button class="btn btn-primary">검색</button>
-        <select class="filter-select" id="filter-report-member">
-          <option value="all">전체</option>
-          <option value="pending">심사중</option>
-          <option value="done">처리됨</option>
-          <option value="rejected">반려됨</option>
-        </select>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>번호</th><th>신고자</th><th>피신고자</th><th>신고 사유</th><th>신고일</th><th>상태</th><th>관리</th>
-            </tr>
-          </thead>
-          <tbody id="report-member-tbody">
-            <tr>
-              <td>1</td><td>김민중</td><td>김망고</td>
-              <td>부적절한 언어를 사용함</td>
-              <td>2025-03-08</td>
-              <td><span class="badge badge-pending">심사중</span></td>
-              <td><button class="btn btn-primary btn-sm">심사하기</button></td>
-            </tr>
-            <tr>
-              <td>2</td><td>김민중</td><td>정보성</td>
-              <td>신원 불일치 혹은 허위기재</td>
-              <td>2025-03-07</td>
-              <td><span class="badge badge-pending">심사중</span></td>
-              <td><button class="btn btn-primary btn-sm">심사하기</button></td>
-            </tr>
-            <tr>
-              <td>3</td><td>김윤찬</td><td>박하민</td>
-              <td>권한 남용 및 부정 경쟁</td>
-              <td>2025-03-06</td>
-              <td><span class="badge badge-done">처리됨</span></td>
-              <td><button class="btn btn-outline btn-sm">보기</button></td>
-            </tr>
-            <tr>
-              <td>4</td><td>이정식</td><td>홍성호</td>
-              <td>타인 혹은 기업을 사칭함</td>
-              <td>2025-03-05</td>
-              <td><span class="badge badge-reject">반려됨</span></td>
-              <td><button class="btn btn-outline btn-sm">보기</button></td>
-            </tr>
-            <tr>
-              <td>5</td><td>홍성호</td><td>박하민</td>
-              <td>부적절한 언어를 사용함</td>
-              <td>2025-03-04</td>
-              <td><span class="badge badge-pending">심사중</span></td>
-              <td><button class="btn btn-primary btn-sm">심사하기</button></td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="nw-module">
+        <div class="nw-module-header">
+          <div class="nw-module-title">회원 신고</div>
+          <div class="nw-module-header-actions">
+            <input class="search-input" type="text" placeholder="신고자 또는 피신고자 검색" />
+            <button class="btn btn-primary">검색</button>
+            <select class="filter-select" id="filterReportMember">
+              <option value="all">전체</option>
+              <option value="pending">심사중</option>
+              <option value="done">처리됨</option>
+              <option value="rejected">반려됨</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap nw-table">
+          <table>
+            <thead>
+              <tr>
+                <th>번호</th><th>신고자</th><th>피신고자</th><th>신고 사유</th><th>신고일</th><th>상태</th><th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="reportMemberTbody">
+              <tr>
+                <td>1</td><td>김민중</td><td>김망고</td>
+                <td>부적절한 언어를 사용함</td>
+                <td>2025-03-08</td>
+                <td><span class="badge badge-pending">심사중</span></td>
+                <td><button class="btn btn-primary btn-sm btn-review">심사하기</button></td>
+              </tr>
+              <tr>
+                <td>2</td><td>김민중</td><td>정보성</td>
+                <td>신원 불일치 혹은 허위기재</td>
+                <td>2025-03-07</td>
+                <td><span class="badge badge-pending">심사중</span></td>
+                <td><button class="btn btn-primary btn-sm btn-review">심사하기</button></td>
+              </tr>
+              <tr>
+                <td>3</td><td>김윤찬</td><td>박하민</td>
+                <td>권한 남용 및 부정 경쟁</td>
+                <td>2025-03-06</td>
+                <td><span class="badge badge-done">처리됨</span></td>
+                <td><button class="btn btn-outline btn-sm btn-review">보기</button></td>
+              </tr>
+              <tr>
+                <td>4</td><td>이정식</td><td>홍성호</td>
+                <td>타인 혹은 기업을 사칭함</td>
+                <td>2025-03-05</td>
+                <td><span class="badge badge-reject">반려됨</span></td>
+                <td><button class="btn btn-outline btn-sm btn-review">보기</button></td>
+              </tr>
+              <tr>
+                <td>5</td><td>홍성호</td><td>박하민</td>
+                <td>부적절한 언어를 사용함</td>
+                <td>2025-03-04</td>
+                <td><span class="badge badge-pending">심사중</span></td>
+                <td><button class="btn btn-primary btn-sm btn-review">심사하기</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- 글 신고/6번탭 -->
     <div class="page" id="page-report-post">
-      <h2 class="page-title">글 신고</h2>
-      <div class="toolbar">
-        <input class="search-input" type="text" placeholder="신고자 또는 글 제목 검색" />
-        <button class="btn btn-primary">검색</button>
-        <select class="filter-select" id="filter-report-post">
-          <option value="all">전체</option>
-          <option value="pending">심사중</option>
-          <option value="done">처리됨</option>
-          <option value="rejected">반려</option>
-        </select>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>번호</th><th>신고자</th><th>신고 글 제목</th><th>신고 사유</th><th>신고일</th><th>상태</th><th>관리</th>
-            </tr>
-          </thead>
-          <tbody id="report-post-tbody">
-            <tr>
-              <td>1</td><td>김민중</td>
-              <td>철강 원자재 수입 업체 찾습니다</td>
-              <td>실제 존재하지 않는 허위 매물 게시</td>
-              <td>2025-03-08</td>
-              <td><span class="badge badge-pending">심사중</span></td>
-              <td><button class="btn btn-primary btn-sm">심사하기</button></td>
-            </tr>
-            <tr>
-              <td>2</td><td>이정식</td>
-              <td>HS코드 분류 기준 질문</td>
-              <td>동일 내용 반복 게시 (스팸)</td>
-              <td>2025-03-07</td>
-              <td><span class="badge badge-pending">심사중</span></td>
-              <td><button class="btn btn-primary btn-sm">심사하기</button></td>
-            </tr>
-            <tr>
-              <td>3</td><td>박하민</td>
-              <td>의류 OEM 생산 제안합니다</td>
-              <td>수출 금지 품목 거래 시도</td>
-              <td>2025-03-06</td>
-              <td><span class="badge badge-done">처리됨</span></td>
-              <td><button class="btn btn-outline btn-sm">보기</button></td>
-            </tr>
-            <tr>
-              <td>4</td><td>김윤찬</td>
-              <td>전자부품 수출 파트너 모집</td>
-              <td>가격 허위 표기 의심</td>
-              <td>2025-03-05</td>
-              <td><span class="badge badge-reject">반려됨</span></td>
-              <td><button class="btn btn-outline btn-sm">보기</button></td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="nw-module">
+        <div class="nw-module-header">
+          <div class="nw-module-title">글 신고</div>
+          <div class="nw-module-header-actions">
+            <input class="search-input" type="text" placeholder="신고자 또는 글 제목 검색" />
+            <button class="btn btn-primary">검색</button>
+            <select class="filter-select" id="filterReportPost">
+              <option value="all">전체</option>
+              <option value="pending">심사중</option>
+              <option value="done">처리됨</option>
+              <option value="rejected">반려</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap nw-table">
+          <table>
+            <thead>
+              <tr>
+                <th>번호</th><th>신고자</th><th>신고 글 제목</th><th>신고 사유</th><th>신고일</th><th>상태</th><th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="reportPostTbody">
+              <tr>
+                <td>1</td><td>김민중</td>
+                <td>철강 원자재 수입 업체 찾습니다</td>
+                <td>실제 존재하지 않는 허위 매물 게시</td>
+                <td>2025-03-08</td>
+                <td><span class="badge badge-pending">심사중</span></td>
+                <td><button class="btn btn-primary btn-sm btn-review">심사하기</button></td>
+              </tr>
+              <tr>
+                <td>2</td><td>이정식</td>
+                <td>HS코드 분류 기준 질문</td>
+                <td>동일 내용 반복 게시 (스팸)</td>
+                <td>2025-03-07</td>
+                <td><span class="badge badge-pending">심사중</span></td>
+                <td><button class="btn btn-primary btn-sm btn-review">심사하기</button></td>
+              </tr>
+              <tr>
+                <td>3</td><td>박하민</td>
+                <td>의류 OEM 생산 제안합니다</td>
+                <td>수출 금지 품목 거래 시도</td>
+                <td>2025-03-06</td>
+                <td><span class="badge badge-done">처리됨</span></td>
+                <td><button class="btn btn-outline btn-sm btn-review">보기</button></td>
+              </tr>
+              <tr>
+                <td>4</td><td>김윤찬</td>
+                <td>전자부품 수출 파트너 모집</td>
+                <td>가격 허위 표기 의심</td>
+                <td>2025-03-05</td>
+                <td><span class="badge badge-reject">반려됨</span></td>
+                <td><button class="btn btn-outline btn-sm btn-review">보기</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
   </main>
 </div>
 
-<!-- 회원 상세 모달 -->
-<div class="modal-overlay off" id="modal-overlay">
-  <div class="modal">
+<!-- 뉴스 수정 모달 -->
+<div class="modal-overlay off" id="modalNewsDetail">
+  <div class="modal" style="width:600px">
     <div class="modal-header">
-      <h3>회원 상세보기</h3>
-      <button class="modal-close" id="member-modal-close">✕</button>
+      <h3>뉴스 수정</h3>
+      <button class="modal-close" id="modalNewsClose">✕</button>
     </div>
     <div class="modal-body">
-      <div class="info-row">
-        <span class="info-label">닉네임</span>
-        <span class="info-value" id="m-name"></span>
+      <p class="modal-section-title">News Information</p>
+      <div class="modal-field-row">
+        <div class="modal-field-label">제목</div>
+        <div class="modal-field-value"><input class="form-input" type="text" id="newsDetailTitle" /></div>
       </div>
-      <div class="info-row">
-        <span class="info-label">나이</span>
-        <span class="info-value" id="m-age"></span>
+      <div class="modal-field-row">
+        <div class="modal-field-label">출처</div>
+        <div class="modal-field-value"><input class="form-input" type="text" id="newsDetailSource" /></div>
       </div>
-      <div class="info-row">
-        <span class="info-label">이메일</span>
-        <span class="info-value modal-email" id="m-email"></span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">전화번호</span>
-        <span class="info-value" id="m-phone"></span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">회사</span>
-        <span class="info-value" id="m-company"></span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">계정유형</span>
-        <span class="info-value" id="m-membertype"></span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">가입날짜</span>
-        <span class="info-value" id="m-joindate"></span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">계정유형 변경</span>
-        <span class="info-value">
-          <select class="status-select" id="m-status-select">
-            <option value="active">활동중</option>
-            <option value="pending">심사중</option>
-            <option value="suspended">정지됨</option>
+      <div class="modal-field-row">
+        <div class="modal-field-label">카테고리</div>
+        <div class="modal-field-value">
+          <select class="form-select" id="newsDetailCategory">
+            <option>무역동향</option>
+            <option>수출입</option>
+            <option>원자재</option>
+            <option>정책</option>
+            <option>경제</option>
           </select>
-        </span>
+        </div>
+      </div>
+      <div class="modal-field-row modal-field-row--top">
+        <div class="modal-field-label">내용</div>
+        <div class="modal-field-value"><textarea class="form-textarea" id="newsDetailContent"></textarea></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" id="member-modal-cancel">닫기</button>
-      <button class="btn btn-primary" id="member-modal-save">저장</button>
+      <button class="btn btn-outline" id="modalNewsCancel">취소</button>
+      <button class="btn btn-primary" id="modalNewsSave">저장</button>
     </div>
   </div>
 </div>
 
-<!--게시물 수정 모달 -->
-<div class="modal-overlay off" id="post-edit-overlay">
-  <div class="modal" style="width:560px">
+<!-- 회원 상세 모달 -->
+<div class="modal-overlay off" id="modalMemberDetail">
+  <div class="modal" style="width:600px">
     <div class="modal-header">
-      <h3>게시물 수정</h3>
-      <button class="modal-close" id="post-modal-close">✕</button>
+      <h3>회원 상세보기</h3>
+      <button class="modal-close" id="modalMemberClose">✕</button>
     </div>
     <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">제목</label>
-        <input class="form-input" type="text" id="pe-title" />
+      <p class="modal-section-title">Member Information</p>
+      <div class="modal-field-row">
+        <div class="modal-field-label">Name</div>
+        <div class="modal-field-value" id="name"></div>
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
-        <div class="form-group">
-          <label class="form-label">글종류</label>
-          <select class="form-select" id="pe-type">
+      <div class="modal-field-row">
+        <div class="modal-field-label">Age</div>
+        <div class="modal-field-value" id="age"></div>
+      </div>
+      <div class="modal-field-row">
+        <div class="modal-field-label">Email</div>
+        <div class="modal-field-value modal-email" id="email"></div>
+      </div>
+      <div class="modal-field-row">
+        <div class="modal-field-label">Phone</div>
+        <div class="modal-field-value" id="phone"></div>
+      </div>
+      <div class="modal-field-row">
+        <div class="modal-field-label">Company</div>
+        <div class="modal-field-value" id="company"></div>
+      </div>
+      <div class="modal-field-row">
+        <div class="modal-field-label">JoinedDate</div>
+        <div class="modal-field-value" id="joinDate"></div>
+      </div>
+      <div class="modal-field-row">
+        <div class="modal-field-label">MemberType</div>
+        <div class="modal-field-value">
+          <select class="status-select" id="memberTypeSelect">
+            <option value="normal">일반</option>
+            <option value="expert">전문가</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-field-row">
+        <div class="modal-field-label">Status</div>
+        <div class="modal-field-value">
+          <select class="status-select" id="statusSelect">
+            <option value="active">활동중</option>
+            <option value="pending">심사중</option>
+            <option value="suspended">정지됨</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" id="modalMemberCancel">닫기</button>
+      <button class="btn btn-primary" id="modalMemberSave">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 게시물 수정 모달 -->
+<div class="modal-overlay off" id="modalPostEdit">
+  <div class="modal" style="width:600px">
+    <div class="modal-header">
+      <h3>게시물 수정</h3>
+      <button class="modal-close" id="modalPostClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-section-title">Post Information</p>
+      <div class="modal-field-row">
+        <div class="modal-field-label">제목</div>
+        <div class="modal-field-value modal-field-readonly" id="peTitle"></div>
+      </div>
+      <div class="modal-field-row">
+        <div class="modal-field-label">글종류</div>
+        <div class="modal-field-value">
+          <select class="status-select" id="peType">
             <option value="판매글">판매글</option>
             <option value="구매글">구매글</option>
             <option value="Q&A">Q&amp;A</option>
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">물품종류</label>
-          <select class="form-select" id="pe-category">
-            <option>서버에서 정할 카테고리들</option>
+      </div>
+      <div class="modal-field-row">
+        <div class="modal-field-label">물품종류</div>
+        <div class="modal-field-value">
+          <select class="status-select" id="peCategory">
             <option>원자재</option>
             <option>전자</option>
             <option>농산물</option>
@@ -509,66 +652,52 @@
           </select>
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">내용</label>
-        <textarea class="form-textarea" id="pe-content" style="min-height:120px"></textarea>
+      <div class="modal-field-row modal-field-row--top">
+        <div class="modal-field-label">내용</div>
+        <div class="modal-field-value modal-field-readonly" id="peContent"></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" id="post-modal-cancel">취소</button>
-      <button class="btn btn-primary" id="post-modal-save">저장</button>
+      <button class="btn btn-outline" id="modalPostCancel">취소</button>
+      <button class="btn btn-primary" id="modalPostSave">저장</button>
     </div>
   </div>
 </div>
 
 <!-- 신고 심사 모달 -->
-<div class="modal-overlay off" id="review-modal-overlay">
-  <div class="modal" style="width:540px">
+<div class="modal-overlay off" id="modalReportDetail">
+  <div class="modal" style="width:600px">
     <div class="modal-header">
-      <h3 id="review-modal-title">신고 심사</h3>
-      <button class="modal-close" id="review-modal-close">✕</button>
+      <h3 id="modalReportTitle">신고 심사</h3>
+      <button class="modal-close" id="modalReportClose">✕</button>
     </div>
     <div class="modal-body">
-
-      <div class="review-section">
-        <div class="review-section-title">신고자</div>
-        <div class="review-card">
-          <div class="review-row">
-            <span class="review-label">이름</span>
-            <span class="review-value" id="rv-reporter"></span>
-          </div>
-          <div class="review-row">
-            <span class="review-label">신고일</span>
-            <span class="review-value" id="rv-date"></span>
-          </div>
-        </div>
+      <p class="modal-section-title">Report Information</p>
+      <div class="modal-field-row">
+        <div class="modal-field-label">신고자</div>
+        <div class="modal-field-value" id="reportReporter"></div>
       </div>
-
-      <div class="review-section">
-        <div class="review-section-title" id="rv-target-label">피신고자</div>
-        <div class="review-card">
-          <div class="review-row">
-            <span class="review-label" id="rv-target-key">이름</span>
-            <span class="review-value" id="rv-target"></span>
-          </div>
-        </div>
+      <div class="modal-field-row">
+        <div class="modal-field-label">신고일</div>
+        <div class="modal-field-value" id="reportDate"></div>
       </div>
-
-      <div class="review-section">
-        <div class="review-section-title">신고 사유</div>
-        <div class="reason-box" id="rv-reason"></div>
+      <div class="modal-field-row">
+        <div class="modal-field-label" id="reportTargetLabel">피신고자</div>
+        <div class="modal-field-value" id="reportTarget"></div>
       </div>
-
-      <div class="review-section">
-        <div class="review-section-title">현재 상태</div>
-        <div id="rv-status-badge"></div>
+      <div class="modal-field-row modal-field-row--top">
+        <div class="modal-field-label">신고 사유</div>
+        <div class="modal-field-value reason-box" id="reportReason"></div>
       </div>
-
+      <div class="modal-field-row">
+        <div class="modal-field-label">현재 상태</div>
+        <div class="modal-field-value" id="reportStatusBadge"></div>
+      </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" id="review-modal-cancel">닫기</button>
-      <button class="btn btn-outline off" id="rv-rejected-btn" style="border-color:#f4212e; color:#f4212e">반려</button>
-      <button class="btn btn-primary off" id="rv-done-btn">처리 완료</button>
+      <button class="btn btn-outline" id="modalReportCancel">닫기</button>
+      <button class="btn btn-outline off" id="reportRejectedBtn" style="border-color:#f4212e; color:#f4212e">반려</button>
+      <button class="btn btn-primary off" id="reportDoneBtn">처리 완료</button>
     </div>
   </div>
 </div>
