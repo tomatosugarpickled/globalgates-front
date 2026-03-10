@@ -194,6 +194,7 @@ body {
 }
 
 .UserList-Wrapper {
+    margin-top: 20px;
     padding-bottom: 4px;
     border-top-width: 1px;
     border-color: transparent;
@@ -223,6 +224,15 @@ body {
     left: 0px;
     top: 0px;
     visibility: visible;
+    background-color: white;
+}
+
+.UserList-EachUser:hover {
+    background-color: #f6f8f8;
+}
+
+.current {
+    background-color: #f6f8f8;
 }
 
 .EachUser-UserInfo {
@@ -674,11 +684,13 @@ body {
     color: #6b7f8e;
 }
 
-.Left {
+.Left{
+    flex-direction: column;
     align-items: flex-start;
 }
 
-.Right {
+.Right, .MyReply, .Reply {
+    flex-direction: column-reverse;
     align-items: flex-end;
 }
 
@@ -735,6 +747,38 @@ body {
     list-style: 20px;
     font-weight: 400;
     color: inherit;
+}
+
+.MyReply-Wrapper {
+    position: relative;
+    display: flex;
+    padding: 4px 12px;
+    justify-content: flex-end;
+    border-radius: 1rem;
+    border: 1px solid #1e9cf1;
+    background-color: white;
+}
+
+.opponent {
+    border: none;
+    background-color: #f0f4f5;
+}
+
+.MyReply-Container {
+    display: inline-flex;
+    position: relative;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    color: #0f141a;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.MyReply-Content {
+    font-size: 12px;
+    list-style: 15px;
+    font-weight: 400;
+    color: inherit; 
 }
 
 .Message-SendTime {
@@ -799,6 +843,38 @@ body {
     background-color: #f0f4f5;
 }
 
+.Message-Reply {
+    display: flex;
+    flex-direction: column;
+    margin-top: 8px;
+    align-items: flex-end;
+    gap: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    cursor: pointer;
+}
+
+.Reply-User-Info {
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    padding-right: 8px;
+    text-align: end;
+    gap: 4px;
+}
+
+.Reply-User-Info svg {
+    display: inline-block;
+    color: #52636f;
+}
+
+.Reply-User-Info span {
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 16px;
+    color: #52636f;
+}
+
 .CallEnd-Wrapper {
     display: flex;
     align-items: center;
@@ -860,7 +936,7 @@ body {
     flex: 1 1 0%;
 }
 
-.Input-TextArea-Wrapper {
+.Input-Area-Wrapper {
     display: flex;
     width: 100%;
     flex-direction: column;
@@ -873,13 +949,72 @@ body {
     line-height: 1.5rem;
 }
 
+.Input-Image-Container {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    width: 95%;
+    max-height: 200px;
+    padding: 8px;
+    gap: 8px;
+    border-bottom: 1px solid #ced9de;
+}
+
+.Input-Image-Card {
+    position: relative;
+    max-width: 100%;
+    align-self: flex-start;
+}
+
+.Input-Image-Card img {
+    max-width: 100%;
+    max-height: 400px;
+    border: 1px solid #ced9de;
+    border-radius: 0.5rem;
+    background-color: transparent;
+}
+
+.remove-image {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+
+.Remove-Image-Button {
+    display: inline-flex;
+    height: 24px;
+    min-width: 24px;
+    align-items: center;
+    justify-content: center;
+    padding-left: 0px;
+    padding-right: 0px;
+    gap: 4px;
+    border: 1px solid transparent;
+    border-radius: 9999px;
+    background-color: rgba(0, 0, 0, 0.8);
+    font-size: 14px;
+    line-height: 16px;
+
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+
+    cursor: pointer;
+}
+
+.Remove-Image-Button svg {
+    padding: 0;
+    width: 16px;
+    height: 16px;
+    fill: white;
+}
+
 .Input-TextArea-Container {
     display: flex;
     width: 100%;
     padding: 0px 8px;
     align-items: center;
     justify-self: flex-end;
-
 }
 
 .Input-TextArea-Container textarea {
@@ -1206,7 +1341,7 @@ body {
     line-height: 20px;
 }
 
-.ChatUser-Modal {
+.Big-Modal {
     display: flex;
     position: fixed;
     flex-direction: column;
@@ -1234,7 +1369,7 @@ body {
     box-shadow: var(0 0 #0000, 0 0 #0000), var(0 0 #0000, 0 0 #0000), var(0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1));
 }
 
-.ChatUser-Modal-Wrapper {
+.Big-Modal-Wrapper {
     position: absolute;
     display: flex;
     flex-direction: column;
@@ -1242,7 +1377,7 @@ body {
     inset: 0;
 }
 
-.ChatUser-Modal-Container {
+.Big-Modal-Container {
     display: flex;
     position: relative;
     width: 100%;
@@ -1253,18 +1388,31 @@ body {
     scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
 }
 
-.ChatUser-Modal-Header {
+.Big-Modal-Header {
     display: flex;
     position: static;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    height: 64px;
     padding: 8px 16px;
     top: 0px;
     z-index: 10;
 }
 
-.ChatUser-Modal-Button {
+.Big-Modal-Text {
+    flex: 1 1 0%;
+}
+
+.Modal-HeaderText {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 20px;
+    color: #0f141a;
+    text-align: center;
+}
+
+.Big-Modal-Button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1291,24 +1439,24 @@ body {
     transition-duration: 150ms;
 }
 
-.ChatUser-Modal-Button:hover {
+.Big-Modal-Button:hover {
     background-color: #bacbd4;
 }
 
-.ChatUser-Modal-Button svg {
+.Big-Modal-Button svg {
     width: 20px;
     height: 20px;
     font-size: 24px;
 }
 
-.ChatUser-Change-Alias {
+.Big-Change-Alias {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 4px;
 }
 
-.ChatUser-Modal-Info {
+.Big-Modal-Info {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1502,10 +1650,181 @@ body {
     color: inherit;
 }
 
+.RemovedMsg-Setting-Area {
+    flex: 1 1 0%;
+    overflow-y: auto;
+    padding: 24px 16px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+
+}
+
+.Setting-Area-Header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.Area-Header-Text {
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 20px;
+    color: #0f141a;
+}
+
+.Setting-Area-Content {
+    display: flex;
+    flex-direction: column;
+}
+
+.Set-Remove-Time {
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 48px;
+    border-radius: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding: 0px 16px;
+    border: none;
+    background-color: #f0f4f5;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.Set-Remove-Time:hover {
+    filter: brightness(.9);
+}
+
+.Set-Remove-Time svg {
+    fill: #1e9cf1;
+}
+
+.Top {
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+}
+
+.Bottom {
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+}
+
+.Setting-Area-Footer {
+    flex-shrink: 0;
+    padding: 0px 16px 16px 16px;
+}
+
+.Remove-All-Button {
+    display: inline-flex;
+    width: 100%;
+    height: 40px;
+    min-width: 40px;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 9999px;
+    padding: 0px 24px;
+    font-size: 15px;
+    line-height: 20px;
+
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.Remove-All-Button:hover {
+    filter: brightness(.9);
+}
+
+.Remove-All-Button-Text {
+    font-size: inherit;
+    font-weight: 700;
+    color: inherit;
+}
+
+.Set-Toggle-Wrapper {
+    flex: 1 1 0%;
+    overflow-y: auto;
+    padding: 24px 16px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.Set-Toggle-Container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.Set-Toggle-Content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.Toggle-Setting-Area {
+    border-radius: 0.75rem;
+    padding: 16px;
+    background-color: #f0f4f5;
+}
+
+.Setting-Area {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.Setting-Area-Text {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 20px;
+    color: #0f141a;
+}
+
+.Toggle-Button {
+    display: inline-flex;
+    padding: 0;
+    width: 40px;
+    height: 12px;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    align-items: center;
+    border: 1px solid transparent;
+    background-color: #829aab;
+
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+
+    cursor: pointer;
+}
+
+.Toggle-Switch {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 9999px;
+    pointer-events: none;
+    background-color: #f0f4f5;
+    box-shadow: rgb(255, 255, 255) 0px 0px 0px 0px, rgba(30, 156, 241, 0.5) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px;
+    
+    transition-property: transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.clicked {
+    background-color: #1e9cf1;
+}
+
 /* 모달 메뉴바 */
 .Extend-Menu-Wrapper {
     position: absolute;
-    left: 380px;
+    left: 373px;
     top: 120px;
     min-width: max-content;
     z-index: 50;
@@ -1549,13 +1868,23 @@ body {
     color: inherit;
 }
 
+.Mute {
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+}
+
+.Delete {
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+    color: red;
+}
+
 .Menu-Icon {
     display: flex;
     width: 100%;
     height: 48px;
     padding: 0px 16px;
     align-items: center;
-    border-radius: 0px;
     gap: 12px;
     background-color: #f0f4f5;
     border: none;
@@ -1564,6 +1893,193 @@ body {
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
+}
+
+.Menu-Icon:hover {
+    background-color: #ced9de;
+}
+
+.Menu-Icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* 사라진 메세지 */
+.ChaUser-RemovedMsg-Modal {
+    display: flex;
+    position: fixed;
+    flex-direction: column;
+    width: 100%;
+    height: 772px;
+    max-width: 640px;
+    max-height: 85vh;
+    left: 50%;
+    top: 50%;
+    padding: 0px;
+    padding-bottom: 0px;
+    gap: 0px;
+    overflow: hidden;
+    border-radius: 1.5rem;
+    border-width: 1px;
+    border-color: #f0f4f5;
+    background-color: #f6f8f8;
+    z-index: 50;
+
+    pointer-events: auto;
+
+    transform: translate(-50%, -50%);
+    transition-duration: 200ms;
+    animation-duration: 200ms;
+    box-shadow: var(0 0 #0000, 0 0 #0000), var(0 0 #0000, 0 0 #0000), var(0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1));
+}
+
+/* 유저 차단 모달 */
+.Small-Modal {
+    display: grid;
+    position: fixed;
+    max-width: 19.5rem;
+    width: 100%;
+    min-height: 238px;
+    left: 50%;
+    top: 50%;
+    padding: 24px;
+    gap: 16px;
+    border-radius: 0.75rem;
+    border-width: 1px;
+    border-color: #e4eaec;
+    background-color: white;
+    z-index: 60;
+    transform: translate(-50%, -50%);
+}
+
+.Small-Header {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.Small-Header h2 {
+    margin: 0;
+    font-size: 23px;
+    line-height: 28px;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    color: #0f141a;
+}
+
+.Small-Message {
+    margin: 0;
+    color: #52636f;
+}
+
+.Small-Buttons {
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.Small-Button {
+    display: inline-flex;
+    min-width: 36px;
+    height: 36px;
+    padding: 0px 16px;
+    font-size: 15px;
+    line-height: 20px;
+    border-radius: 9999px;
+    margin-left: 0px !important;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border: 1px none transparent;
+    outline: none;
+    cursor: pointer;
+}
+
+.Ban {
+    background-color: #f41f2d;
+    color: white;
+}
+
+.Cancel {
+    background-color: #e4eaec;
+    color: #0f141a;
+}
+
+.Small-Button:hover {
+    filter: brightness(.9);
+}
+
+.Close-Button {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    border-radius: 0.25rem;
+    opacity: 0.7;
+    cursor: pointer;
+    text-transform: none;
+    background-color: transparent;
+    border: 1px none transparent;
+
+    transition-property: opacity;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.Close-Button svg {
+    width: 16px;
+    height: 16px;
+}
+
+.Close-Button:hover {
+    opacity: 1;
+}
+
+/* 채팅 추가 메뉴 */
+.Chat-Extend-Menu {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    min-width: max-content;
+}
+
+.Chat-Extend-Menu-Wrapper {
+    overflow: hidden;
+    background-color: transparent;
+    border-radius: 1.5rem;
+    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px;
+}
+
+.Chat-Extend-Menu-Container {
+    display: flex;
+    flex-direction: column;
+    border-radius: 1.5rem !important;
+    padding: 8px;
+    background-color: #f6f8f8;
+    border-width: 1px;
+    border-color: #e4eaec;
+}
+
+.Extend-Menu-Button {
+    width: 100%;
+    min-width: 40px;
+    height: auto;
+    padding: 12px 16px;
+    border-color: transparent;
+    border-radius: 1rem;
+    cursor: pointer;
+}
+
+.Menu-Button-Text {
+    color: #0f141a;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 20px;
+}
+
+.Menu-Button-Text svg {
+    width: 20px;
+    height: 20px;
 }
 
 /* 토글용 css */
