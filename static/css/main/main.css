@@ -346,6 +346,11 @@ textarea {
     border-bottom: 1px solid #eff3f4;
 }
 
+<<<<<<< HEAD
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> feature/main/main.v1.2
 .composerModalOverlay {
     position: fixed;
     inset: 0;
@@ -354,6 +359,11 @@ textarea {
 }
 
 .composerSection.isModalOpen {
+<<<<<<< HEAD
+=======
+    display: flex;
+    flex-direction: column;
+>>>>>>> feature/main/main.v1.2
     position: fixed;
     top: 28px;
     left: 50%;
@@ -368,6 +378,15 @@ textarea {
     transform: translateX(-50%);
 }
 
+<<<<<<< HEAD
+=======
+.composerSection.isModalOpen.isTagViewOpen {
+    height: min(90vh, calc(100vh - 56px));
+    max-height: min(90vh, calc(100vh - 56px));
+    overflow: hidden;
+}
+
+>>>>>>> feature/main/main.v1.2
 .composerModalHeader,
 .tweet-modal__header {
     display: none;
@@ -380,6 +399,13 @@ textarea {
     display: flex;
 }
 
+<<<<<<< HEAD
+=======
+.composerSection.isModalOpen.isTagViewOpen .composerModalHeader {
+    display: none;
+}
+
+>>>>>>> feature/main/main.v1.2
 .composerModalClose,
 .tweet-modal__close {
     display: inline-flex;
@@ -436,10 +462,28 @@ textarea {
     background-color: rgba(29, 155, 240, 0.08);
 }
 
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
+>>>>>>> feature/main/main.v1.2
 .composerForm {
     display: flex;
     gap: 12px;
     padding: 12px 16px 16px;
+}
+
+.tweet-modal__compose-view[hidden],
+.tweet-modal__tag-view[hidden] {
+    display: none;
+}
+
+.tweet-modal__compose-view,
+.tweet-modal__tag-view {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .composerBody {
@@ -880,6 +924,12 @@ textarea {
     border-radius: 9999px;
     cursor: pointer;
     color: #ffffff;
+<<<<<<< HEAD
+=======
+<<<<<<< Updated upstream
+    font-size: 18px;
+=======
+>>>>>>> feature/main/main.v1.2
     background-color: rgba(15, 20, 25, 0.75);
     backdrop-filter: blur(4px);
     transition: background-color 0.2s ease;
@@ -896,8 +946,60 @@ textarea {
     fill: #ffffff;
 }
 
+<<<<<<< HEAD
 .composerAttachmentRemove {
     display: none;
+=======
+.media-actions-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+    padding: 0 4px;
+}
+
+.media-action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    color: rgb(83, 100, 113);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 20px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    border: none;
+    padding: 0;
+    background: transparent;
+    font-family: inherit;
+}
+
+.media-action-link:hover {
+    color: rgb(29, 155, 240);
+}
+
+.media-action-link svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.tweet-modal__attachment-meta-btn[hidden] {
+    display: none;
+}
+
+.media-action-link span {
+    white-space: nowrap;
+}
+
+.composerAttachmentRemove {
+    display: none;
+>>>>>>> Stashed changes
+>>>>>>> feature/main/main.v1.2
 }
 
 .composerMeta {
@@ -1300,6 +1402,281 @@ textarea {
     padding: 16px;
     background: rgba(91, 112, 131, 0.4);
     z-index: 1300;
+}
+
+.tweet-modal__tag-modal {
+    width: 100%;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    background-color: #ffffff;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.tweet-modal__tag-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 10px 14px;
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+}
+
+.tweet-modal__tag-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-left: -4px;
+    border: none;
+    border-radius: 9999px;
+    background: transparent;
+    color: #0f1419;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tweet-modal__tag-close:hover {
+    background-color: rgba(15, 20, 25, 0.08);
+}
+
+.tweet-modal__tag-close svg {
+    fill: currentColor;
+}
+
+.tweet-modal__tag-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f1419;
+    line-height: 24px;
+}
+
+.tweet-modal__tag-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+}
+
+.tweet-modal__tag-action {
+    min-height: 32px;
+    padding: 0 16px;
+    border: 1px solid transparent;
+    border-radius: 9999px;
+    background: #0f1419;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 32px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.tweet-modal__tag-search {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+.tweet-modal__tag-search-form {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.tweet-modal__tag-search-shell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 0 16px 12px;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    background: #e7e9ea;
+    min-height: 44px;
+}
+
+.tweet-modal__tag-search-icon {
+    flex-shrink: 0;
+    color: #536471;
+    fill: currentColor;
+}
+
+.tweet-modal__tag-chip-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+}
+
+.tweet-modal__tag-search-input {
+    flex: 1 1 120px;
+    min-width: 120px;
+    min-height: 32px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #0f1419;
+    font-size: 15px;
+    line-height: 20px;
+    font-family: inherit;
+    caret-color: #1d9bf0;
+}
+
+.tweet-modal__tag-search-input::placeholder {
+    color: #536471;
+}
+
+.tweet-modal__tag-results {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-bottom: 12px;
+}
+
+.tweet-modal__tag-results:empty {
+    padding-bottom: 0;
+}
+
+.tweet-modal__tag-option {
+    display: block;
+}
+
+.tweet-modal__tag-checkbox {
+    display: flex;
+    width: 100%;
+    color: #0f1419;
+}
+
+.tweet-modal__tag-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.tweet-modal__tag-user:hover:not([disabled]) {
+    background: rgba(15, 20, 25, 0.03);
+}
+
+.tweet-modal__tag-user[disabled] {
+    cursor: default;
+}
+
+.tweet-modal__tag-checkbox[aria-disabled="true"] {
+    opacity: 0.55;
+}
+
+.tweet-modal__tag-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 9999px;
+    overflow: hidden;
+    background: #eff3f4;
+    flex-shrink: 0;
+}
+
+.tweet-modal__tag-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.tweet-modal__tag-user-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.tweet-modal__tag-user-name {
+    font-size: 15px;
+    line-height: 20px;
+    font-weight: 700;
+    color: #0f1419;
+}
+
+.tweet-modal__tag-user-handle {
+    font-size: 15px;
+    line-height: 20px;
+    color: #536471;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tweet-modal__tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 29px;
+    max-width: 220px;
+    padding: 3px 11px 3px 3px;
+    border: 1px solid #cfd9de;
+    border-radius: 9999px;
+    background: #ffffff;
+    color: #0f1419;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.tweet-modal__tag-chip:hover {
+    background: rgba(15, 20, 25, 0.06);
+}
+
+.tweet-modal__tag-chip-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 9999px;
+    overflow: hidden;
+    background: #eff3f4;
+    flex-shrink: 0;
+}
+
+.tweet-modal__tag-chip-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.tweet-modal__tag-chip-name {
+    min-width: 0;
+    font-size: 14px;
+    line-height: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tweet-modal__tag-chip-icon {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.tweet-modal__tag-empty {
+    margin: 0;
+    padding: 24px 16px 12px;
+    color: #536471;
+    font-size: 15px;
+    line-height: 20px;
 }
 
 .locationModal {
