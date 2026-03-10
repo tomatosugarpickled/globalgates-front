@@ -346,11 +346,6 @@ textarea {
     border-bottom: 1px solid #eff3f4;
 }
 
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> feature/main/main.v1.2
 .composerModalOverlay {
     position: fixed;
     inset: 0;
@@ -359,11 +354,6 @@ textarea {
 }
 
 .composerSection.isModalOpen {
-<<<<<<< HEAD
-=======
-    display: flex;
-    flex-direction: column;
->>>>>>> feature/main/main.v1.2
     position: fixed;
     top: 28px;
     left: 50%;
@@ -378,15 +368,6 @@ textarea {
     transform: translateX(-50%);
 }
 
-<<<<<<< HEAD
-=======
-.composerSection.isModalOpen.isTagViewOpen {
-    height: min(90vh, calc(100vh - 56px));
-    max-height: min(90vh, calc(100vh - 56px));
-    overflow: hidden;
-}
-
->>>>>>> feature/main/main.v1.2
 .composerModalHeader,
 .tweet-modal__header {
     display: none;
@@ -399,13 +380,6 @@ textarea {
     display: flex;
 }
 
-<<<<<<< HEAD
-=======
-.composerSection.isModalOpen.isTagViewOpen .composerModalHeader {
-    display: none;
-}
-
->>>>>>> feature/main/main.v1.2
 .composerModalClose,
 .tweet-modal__close {
     display: inline-flex;
@@ -462,10 +436,111 @@ textarea {
     background-color: rgba(29, 155, 240, 0.08);
 }
 
-<<<<<<< HEAD
+<<<<<<< Updated upstream
 =======
+.composerModalOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    background: rgba(15, 20, 25, 0.56);
+}
+
+.composerSection.isModalOpen {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 28px;
+    left: 50%;
+    z-index: 1110;
+    width: min(680px, calc(100vw - 32px));
+    max-height: calc(100vh - 56px);
+    overflow-y: auto;
+    border: 0;
+    border-radius: 24px;
+    background: #ffffff;
+    box-shadow: 0 24px 80px rgba(15, 20, 25, 0.28);
+    transform: translateX(-50%);
+}
+
+.composerSection.isModalOpen.isTagViewOpen {
+    height: min(90vh, calc(100vh - 56px));
+    max-height: min(90vh, calc(100vh - 56px));
+    overflow: hidden;
+}
+
+.composerModalHeader,
+.tweet-modal__header {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px 4px;
+}
+
+.composerSection.isModalOpen .composerModalHeader {
+    display: flex;
+}
+
+.composerSection.isModalOpen.isTagViewOpen .composerModalHeader {
+    display: none;
+}
+
+.composerModalClose,
+.tweet-modal__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #0f1419;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.composerModalClose:hover,
+.tweet-modal__close:hover {
+    background-color: rgba(15, 20, 25, 0.1);
+}
+
+.composerModalClose svg,
+.tweet-modal__close svg {
+    fill: currentColor;
+}
+
+.composerModalTitle,
+.tweet-modal__title {
+    margin: 0;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+.composerModalGhost,
+.tweet-modal__draft {
+    min-height: 32px;
+    margin-left: auto;
+    padding: 6px 8px;
+    border: 0;
+    background: transparent;
+    color: #1d9bf0;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 9999px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.composerModalGhost:hover,
+.tweet-modal__draft:hover {
+    background-color: rgba(29, 155, 240, 0.08);
+}
+
 >>>>>>> Stashed changes
->>>>>>> feature/main/main.v1.2
 .composerForm {
     display: flex;
     gap: 12px;
@@ -924,82 +999,7 @@ textarea {
     border-radius: 9999px;
     cursor: pointer;
     color: #ffffff;
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
     font-size: 18px;
-=======
->>>>>>> feature/main/main.v1.2
-    background-color: rgba(15, 20, 25, 0.75);
-    backdrop-filter: blur(4px);
-    transition: background-color 0.2s ease;
-    z-index: 10;
-}
-
-.media-btn-delete:hover {
-    background-color: rgba(15, 20, 25, 0.9);
-}
-
-.media-btn-delete svg {
-    width: 18px;
-    height: 18px;
-    fill: #ffffff;
-}
-
-<<<<<<< HEAD
-.composerAttachmentRemove {
-    display: none;
-=======
-.media-actions-bar {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 8px;
-    padding: 0 4px;
-}
-
-.media-action-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    text-decoration: none;
-    color: rgb(83, 100, 113);
-    font-size: 15px;
-    font-weight: 400;
-    line-height: 20px;
-    cursor: pointer;
-    transition: color 0.2s ease;
-    border: none;
-    padding: 0;
-    background: transparent;
-    font-family: inherit;
-}
-
-.media-action-link:hover {
-    color: rgb(29, 155, 240);
-}
-
-.media-action-link svg {
-    width: 20px;
-    height: 20px;
-    fill: currentColor;
-    flex-shrink: 0;
-}
-
-.tweet-modal__attachment-meta-btn[hidden] {
-    display: none;
-}
-
-.media-action-link span {
-    white-space: nowrap;
-}
-
-.composerAttachmentRemove {
-    display: none;
->>>>>>> Stashed changes
->>>>>>> feature/main/main.v1.2
 }
 
 .composerMeta {
