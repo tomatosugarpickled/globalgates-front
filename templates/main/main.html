@@ -181,11 +181,40 @@
                     </button>
                 </nav>
 
+                <div
+                    class="composerModalOverlay"
+                    id="composerModalOverlay"
+                    hidden
+                ></div>
                 <section
                     class="composerSection"
                     id="composerSection"
                     aria-label="게시물 작성"
                 >
+                    <div class="composerModalHeader tweet-modal__header" id="composerModalHeader">
+                        <button
+                            class="composerModalClose tweet-modal__close"
+                            id="composerModalClose"
+                            type="button"
+                            aria-label="닫기"
+                            data-testid="app-bar-close"
+                        >
+                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                                <g><path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path></g>
+                            </svg>
+                        </button>
+                        <h2 class="composerModalTitle tweet-modal__title" id="composerModalTitle">
+                            게시하기
+                        </h2>
+                        <button
+                            class="composerModalGhost tweet-modal__draft"
+                            id="composerModalGhost"
+                            type="button"
+                            data-testid="unsentButton"
+                        >
+                            초안
+                        </button>
+                    </div>
                     <form class="composerForm" id="postComposerForm">
                         <div class="composerAvatar" id="composerAvatar">K</div>
                         <div class="composerBody">
@@ -194,9 +223,99 @@
                                     class="audienceButton"
                                     id="audienceButton"
                                     type="button"
+                                    aria-haspopup="dialog"
+                                    aria-expanded="false"
                                 >
-                                    모든 사람
+                                    일반
                                 </button>
+                                <input type="hidden" id="boardType" name="boardType" value="general" />
+                                <input type="hidden" id="communityId" name="communityId" value="" />
+                                <div class="boardMenu" id="boardMenu" hidden>
+                                    <div class="boardMenuHeader">
+                                        <h3 class="boardMenuTitle" id="boardMenuTitle">게시판 선택</h3>
+                                    </div>
+                                    <div class="boardMenuOptions" id="boardMenuOptions" role="listbox" aria-labelledby="boardMenuTitle">
+                                        <button
+                                            class="boardMenuOption isSelected"
+                                            id="boardOptionGeneral"
+                                            type="button"
+                                            data-board-value="general"
+                                            data-board-label="일반"
+                                            role="option"
+                                            aria-selected="true"
+                                        >
+                                            <span class="boardMenuOptionInfo">
+                                                <span class="boardMenuOptionIcon boardMenuOptionIcon--general" aria-hidden="true">
+                                                    <svg viewBox="0 0 24 24" class="boardMenuOptionSvg">
+                                                        <g><path d="M12 2.25c-5.376 0-9.75 4.374-9.75 9.75s4.374 9.75 9.75 9.75 9.75-4.374 9.75-9.75-4.374-9.75-9.75-9.75zm6.88 8.75h-3.126a15.848 15.848 0 00-1.038-4.018A7.786 7.786 0 0118.88 11zm-6.13-6.59c.747.855 1.676 2.718 2.184 5.59H12.75V4.41zm-1.5 0V10H9.066c.508-2.872 1.437-4.735 2.184-5.59zM5.12 13h3.126c.134 1.468.487 2.85 1.038 4.018A7.786 7.786 0 015.12 13zm3.126-2H5.12a7.786 7.786 0 014.144-4.018A15.85 15.85 0 008.246 11zm1.52 2h2.484v5.59c-.747-.855-1.676-2.718-2.184-5.59zm2.484-2H9.766c.508-2.872 1.437-4.735 2.184-5.59V11zm1.5 7.59V13h2.184c-.508 2.872-1.437 4.735-2.184 5.59zm2.484-7.59H13.75V4.41c.747.855 1.676 2.718 2.184 5.59zM14.716 17.018c.551-1.168.904-2.55 1.038-4.018h3.126a7.786 7.786 0 01-4.164 4.018z"></path></g>
+                                                    </svg>
+                                                </span>
+                                                <span class="boardMenuOptionLabel">일반</span>
+                                            </span>
+                                            <span class="boardMenuOptionCheck" aria-hidden="true">✓</span>
+                                        </button>
+                                        <button
+                                            class="boardMenuOption"
+                                            id="boardOptionProduct"
+                                            type="button"
+                                            data-board-value="product"
+                                            data-board-label="상품"
+                                            role="option"
+                                            aria-selected="false"
+                                        >
+                                            <span class="boardMenuOptionInfo">
+                                                <span class="boardMenuOptionIcon boardMenuOptionIcon--product" aria-hidden="true">
+                                                    <svg viewBox="0 0 24 24" class="boardMenuOptionSvg">
+                                                        <g><path d="M3.5 7.75l8.5-5 8.5 5v8.5l-8.5 5-8.5-5v-8.5zm8.5-3.25L6.03 8 12 11.51 17.97 8 12 4.5zm-6.5 4.79v6.12l5.5 3.24v-6.12L5.5 9.29zm7 9.36l5.5-3.24V9.29l-5.5 3.23v6.13z"></path></g>
+                                                    </svg>
+                                                </span>
+                                                <span class="boardMenuOptionLabel">상품</span>
+                                            </span>
+                                            <span class="boardMenuOptionCheck" aria-hidden="true">✓</span>
+                                        </button>
+                                    </div>
+                                    <div class="boardMenuSection">
+                                        <h4 class="boardMenuSectionTitle">내 커뮤니티</h4>
+                                        <div class="communityMenuList" id="communityMenuList">
+                                            <button
+                                                class="communityMenuItem"
+                                                id="communityOptionMarket"
+                                                type="button"
+                                                data-community-id="market-talk"
+                                                data-community-label="무역 토크"
+                                            >
+                                                <img
+                                                    src="../../static/image/main/ad.png"
+                                                    alt="무역 토크"
+                                                    class="communityMenuAvatar"
+                                                />
+                                                <span class="communityMenuText">
+                                                    <span class="communityMenuName">무역 토크</span>
+                                                    <span class="communityMenuMeta">1.2만 멤버</span>
+                                                </span>
+                                                <span class="communityMenuCheck" aria-hidden="true">✓</span>
+                                            </button>
+                                            <button
+                                                class="communityMenuItem"
+                                                id="communityOptionProduct"
+                                                type="button"
+                                                data-community-id="product-lab"
+                                                data-community-label="상품 연구소"
+                                            >
+                                                <img
+                                                    src="../../static/image/main/ad.png"
+                                                    alt="상품 연구소"
+                                                    class="communityMenuAvatar"
+                                                />
+                                                <span class="communityMenuText">
+                                                    <span class="communityMenuName">상품 연구소</span>
+                                                    <span class="communityMenuMeta">8.7천 멤버</span>
+                                                </span>
+                                                <span class="communityMenuCheck" aria-hidden="true">✓</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="composerField" id="composerField">
@@ -219,13 +338,15 @@
                             </div>
 
                             <div
-                                class="composerAttachmentPreview"
+                                class="composerAttachmentPreview tweet-modal__attachment attachments"
                                 id="composerAttachmentPreview"
+                                data-attachment-preview
                                 hidden
                             >
                                 <div
-                                    class="composerAttachmentList"
+                                    class="composerAttachmentList tweet-modal__attachment-media media-grid-wrapper"
                                     id="composerAttachmentList"
+                                    data-attachment-media
                                 ></div>
                             </div>
 
@@ -804,14 +925,14 @@
                         data-post-id="203"
                     >
                         <div class="postAvatar postAvatar--image">
-                            <img src="../../static/image/main/ad.png" alt="프로필 이미지" class="postAvatarImage" id="postAvatar203" />
+                            <img src="../../static/image/main/lown1.jpg" alt="프로필 이미지" class="postAvatarImage" id="postAvatar203" />
                         </div>
                         <div class="postBody">
                             <header class="postHeader">
                                 <div class="postIdentity">
-                                    <strong class="postName" id="postName203">시장분석봇</strong>
-                                    <span class="postHandle" id="postHandle203">@marketwatch_kr</span>
-                                    <span class="postTime" id="postTime203">1시간</span>
+                                    <strong class="postName" id="postName203">로운이의 일상</strong>
+                                    <span class="postHandle" id="postHandle203">@lown_222</span>
+                                    <span class="postTime" id="postTime203">3시간</span>
                                 </div>
                                 <button class="postMoreButton" id="postMore203" type="button" aria-label="게시물 더 보기">
                                     <svg viewBox="0 0 24 24" aria-hidden="true" class="postMoreIcon">
@@ -820,12 +941,12 @@
                                 </button>
                             </header>
                             <p class="postText" id="postText203">
-                                이번 주에 본 차트 중에서는 원자재 가격과 운송지수 흐름을 같이 붙여서 보는 방식이 제일 직관적이었습니다. 수급보다 심리 반응이 먼저 오는 구간도 있어서 타이밍 체크가 중요해 보입니다.
+                                이번 주 로운이 귀여움 최종결산~~
                             </p>
                             <div class="postMediaGrid postMediaGrid--3" id="postMedia203">
-                                <img src="../../static/image/main/ad.png" alt="게시물 이미지 1" class="postMediaImage" id="postMediaImage203_1" />
-                                <img src="../../static/image/main/ad.png" alt="게시물 이미지 2" class="postMediaImage" id="postMediaImage203_2" />
-                                <img src="../../static/image/main/ad.png" alt="게시물 이미지 3" class="postMediaImage" id="postMediaImage203_3" />
+                                <img src="../../static/image/main/KakaoTalk_20260310_145435590.jpg" alt="게시물 이미지 1" class="postMediaImage" id="postMediaImage203_1" />
+                                <img src="../../static/image/main/KakaoTalk_20260310_145435590_01.jpg" alt="게시물 이미지 2" class="postMediaImage" id="postMediaImage203_2" />
+                                <img src="../../static/image/main/KakaoTalk_20260310_145435590_02.jpg" alt="게시물 이미지 3" class="postMediaImage" id="postMediaImage203_3" />
                             </div>
                             <footer class="postMetrics">
                                 <div class="tweet-action-bar">
@@ -1917,6 +2038,10 @@
                 />
             </div>
         </div>
+        <script
+            src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"
+            crossorigin="anonymous"
+        ></script>
         <script src="/static/js/main/event.js"></script>
     </body>
 </html>
