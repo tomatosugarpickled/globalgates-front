@@ -186,11 +186,6 @@ const composerEmojiCategoryData = {
     flags: ["🏳️", "🏴", "🏁", "🚩", "🎌", "🏳️‍🌈", "🇰🇷", "🇺🇸", "🇯🇵", "🇫🇷", "🇬🇧"],
 };
 
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> feature/main/main.v1.2
 const composerFormatButtonLabels = {
     bold: {
         inactive: "굵게, (CTRL+B) 님",
@@ -213,8 +208,6 @@ function parseTwemoji(scope) {
     });
 }
 
-<<<<<<< HEAD
-=======
 function escapeHtml(value) {
     return String(value)
         .replaceAll("&", "&amp;")
@@ -224,8 +217,6 @@ function escapeHtml(value) {
         .replaceAll("'", "&#39;");
 }
 
->>>>>>> Stashed changes
->>>>>>> feature/main/main.v1.2
 function setupComposerState() {
     const composerSection = document.getElementById("composerSection");
     const composerTextarea = document.getElementById("postContent");
@@ -317,11 +308,6 @@ function setupComposerState() {
     }
 }
 
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> feature/main/main.v1.2
 function setupComposerModal() {
     const createPostButton = document.getElementById("createPostButton");
     const composerModalOverlay = document.getElementById(
@@ -329,10 +315,7 @@ function setupComposerModal() {
     );
     const composerModalClose = document.getElementById("composerModalClose");
     const composerSection = document.getElementById("composerSection");
-<<<<<<< HEAD
-=======
     const composeView = document.getElementById("composerComposeView");
->>>>>>> feature/main/main.v1.2
     const composerTextarea = document.getElementById("postContent");
     const emojiPicker = composerSection?.querySelector(
         ".tweet-modal__emoji-picker",
@@ -345,14 +328,6 @@ function setupComposerModal() {
     const locationModalOverlay = document.getElementById(
         "locationModalOverlay",
     );
-<<<<<<< HEAD
-
-    if (!createPostButton || !composerModalOverlay || !composerSection) {
-        return;
-    }
-
-    function openComposerModal() {
-=======
     const tagView = document.getElementById("composerTagView");
 
     if (
@@ -365,16 +340,10 @@ function setupComposerModal() {
     }
 
     function openComposerModal({ focusEditor = true } = {}) {
->>>>>>> feature/main/main.v1.2
         composerSection.hidden = false;
         composerModalOverlay.hidden = false;
         composerSection.classList.add("isExpanded");
         composerSection.classList.add("isModalOpen");
-<<<<<<< HEAD
-        window.setTimeout(() => {
-            composerTextarea?.focus();
-        }, 0);
-=======
         composerSection.classList.remove("isTagViewOpen");
         if (composeView) {
             composeView.hidden = false;
@@ -387,13 +356,10 @@ function setupComposerModal() {
                 composerTextarea?.focus();
             }, 0);
         }
->>>>>>> feature/main/main.v1.2
     }
 
     function closeComposerModal() {
         composerModalOverlay.hidden = true;
-<<<<<<< HEAD
-=======
         if (typeof composerSection.__closeTagPanel === "function") {
             composerSection.__closeTagPanel({ restoreFocus: false });
         } else if (tagView) {
@@ -403,7 +369,6 @@ function setupComposerModal() {
             composeView.hidden = false;
         }
         composerSection.classList.remove("isTagViewOpen");
->>>>>>> feature/main/main.v1.2
         composerSection.classList.remove("isModalOpen");
         if (emojiPicker) {
             emojiPicker.hidden = true;
@@ -445,8 +410,6 @@ function setupComposerModal() {
             return;
         }
 
-<<<<<<< HEAD
-=======
         if (tagView && !tagView.hidden) {
             if (typeof composerSection.__closeTagPanel === "function") {
                 composerSection.__closeTagPanel();
@@ -456,7 +419,6 @@ function setupComposerModal() {
             return;
         }
 
->>>>>>> feature/main/main.v1.2
         if (locationModalOverlay && !locationModalOverlay.hidden) {
             locationModalOverlay.hidden = true;
             return;
@@ -577,10 +539,6 @@ function setupBoardSelector() {
     });
 }
 
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> feature/main/main.v1.2
 function setupComposerToolbar() {
     const composerSection = document.getElementById("composerSection");
     const composeView = document.getElementById("composerComposeView");
@@ -640,22 +598,13 @@ function setupComposerToolbar() {
     const attachmentUrls = [];
     let pendingLocation = locationButton?.textContent.trim() || "";
     let activeEmojiCategory = "recent";
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> feature/main/main.v1.2
     let savedComposerSelection = null;
     let pendingComposerFormats = new Set();
     let attachedComposerFiles = [];
     let pendingAttachmentEditIndex = null;
-<<<<<<< HEAD
-=======
     let selectedTaggedUsers = [];
     let pendingTaggedUsers = [];
     let currentTagResults = [];
->>>>>>> Stashed changes
->>>>>>> feature/main/main.v1.2
 
     if (!composerSection || !composerTextarea) {
         return;
@@ -1086,10 +1035,6 @@ function setupComposerToolbar() {
         });
     }
 
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-=======
     function isComposerImageSet() {
         return (
             attachedComposerFiles.length > 0 &&
@@ -1360,16 +1305,10 @@ function setupComposerToolbar() {
     }
 
     composerSection.__closeTagPanel = closeTagPanel;
-
->>>>>>> feature/main/main.v1.2
     emojiButton?.addEventListener("mousedown", (event) => {
         event.preventDefault();
     });
 
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> feature/main/main.v1.2
     emojiButton?.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -1602,15 +1541,9 @@ function setupComposerToolbar() {
     attachmentList?.addEventListener("click", (event) => {
         const removeButton = event.target.closest("[data-remove-attachment]");
         if (!removeButton) {
-<<<<<<< HEAD
-            const editButton = event.target.closest("[data-attachment-edit-index]");
-=======
-<<<<<<< Updated upstream
-=======
             const editButton = event.target.closest(
                 "[data-attachment-edit-index]",
             );
->>>>>>> feature/main/main.v1.2
             if (!editButton || !fileInput) {
                 return;
             }
@@ -1620,10 +1553,6 @@ function setupComposerToolbar() {
             );
             fileInput.value = "";
             fileInput.click();
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> feature/main/main.v1.2
             return;
         }
 
@@ -1725,11 +1654,6 @@ function setupComposerToolbar() {
         }
 
         attachmentPreview.hidden = false;
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> feature/main/main.v1.2
         const objectUrls = limitedFiles.map((file) => {
             const objectUrl = URL.createObjectURL(file);
             attachmentUrls.push(objectUrl);
@@ -1738,16 +1662,6 @@ function setupComposerToolbar() {
 
         if (limitedFiles.every((file) => file.type.startsWith("image/"))) {
             attachmentList.innerHTML = renderAttachmentImageGrid(objectUrls);
-<<<<<<< HEAD
-            return;
-        }
-
-        if (limitedFiles.length === 1 && limitedFiles[0].type.startsWith("video/")) {
-            attachmentList.innerHTML = renderAttachmentVideo(limitedFiles[0], objectUrls[0]);
-            return;
-        }
-
-=======
             syncUserTagTrigger();
             return;
         }
@@ -1764,8 +1678,6 @@ function setupComposerToolbar() {
             return;
         }
 
->>>>>>> Stashed changes
->>>>>>> feature/main/main.v1.2
         attachmentList.innerHTML = limitedFiles
             .map((file, index) =>
                 renderAttachmentFileCard(file, index, objectUrls[index]),

@@ -436,8 +436,6 @@ textarea {
     background-color: rgba(29, 155, 240, 0.08);
 }
 
-<<<<<<< Updated upstream
-=======
 .composerModalOverlay {
     position: fixed;
     inset: 0;
@@ -540,7 +538,6 @@ textarea {
     background-color: rgba(29, 155, 240, 0.08);
 }
 
->>>>>>> Stashed changes
 .composerForm {
     display: flex;
     gap: 12px;
