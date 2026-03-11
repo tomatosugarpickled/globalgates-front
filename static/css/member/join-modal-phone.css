@@ -1,0 +1,75 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: TwitterChirp, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.phone-verification {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+}
+
+.phone-verification-modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f1419;
+  line-height: 1.3;
+}
+
+.modal-desc {
+  font-size: 15px;
+  color: #536471;
+  line-height: 1.5;
+  margin-top: -12px;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 9999px;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s;
+}
+
+.btn:hover {
+  opacity: 0.85;
+}
+
+.btn-confirm {
+  background: #0f1419;
+  color: #fff;
+}
+
+.btn-edit {
+  background: #fff;
+  color: #0f1419;
+  border: 1.5px solid #cfd9de !important;
+}
