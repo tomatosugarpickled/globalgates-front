@@ -15,8 +15,6 @@ const modalPostEdit = document.querySelector("#modalPostEdit");
 const modalReportDetail = document.querySelector("#modalReportDetail");
 const modalExpertDetail = document.querySelector("#modalExpertDetail");
 
-const expertRejectedBtn = document.querySelector("#expertRejectedBtn");
-const expertApproveBtn = document.querySelector("#expertApproveBtn");
 const filterExpertApply = document.querySelector("#filterExpertApply");
 
 const newsWriteBtn = document.querySelector("#newsWriteBtn");
@@ -24,11 +22,31 @@ const newsCancelBtn = document.querySelector("#newsCancelBtn");
 const newsSubmitBtn = document.querySelector("#newsSubmitBtn");
 const aiBtn = document.querySelector("#aiBtn");
 
+const filterMemberType   = document.querySelector("#filterMemberType");
+const filterMemberStatus = document.querySelector("#filterMemberStatus");
+
+const filterPostType     = document.querySelector("#filterPostType");
+const filterPostCategory = document.querySelector("#filterPostCategory");
+
+const filterNewsCategory = document.querySelector("#filterNewsCategory");
+const newsHideBtn   = document.querySelector("#newsHideBtn");
+const newsShowBtn   = document.querySelector("#newsShowBtn");
+const newsDeleteBtn = document.querySelector("#newsDeleteBtn");
+
 const filterReportMember = document.querySelector("#filterReportMember");
 const filterReportPost = document.querySelector("#filterReportPost");
 
-const reportRejectedBtn = document.querySelector("#reportRejectedBtn");
-const reportDoneBtn = document.querySelector("#reportDoneBtn");
+const reportMemberDoneBtn   = document.querySelector("#reportMemberDoneBtn");
+const reportMemberRejectBtn = document.querySelector("#reportMemberRejectBtn");
+const reportMemberDeleteBtn = document.querySelector("#reportMemberDeleteBtn");
+
+const reportPostDoneBtn   = document.querySelector("#reportPostDoneBtn");
+const reportPostRejectBtn = document.querySelector("#reportPostRejectBtn");
+const reportPostDeleteBtn = document.querySelector("#reportPostDeleteBtn");
+
+const expertListApproveBtn = document.querySelector("#expertListApproveBtn");
+const expertListRejectBtn  = document.querySelector("#expertListRejectBtn");
+const expertListDeleteBtn  = document.querySelector("#expertListDeleteBtn");
 
 const memberTypeSelect = document.querySelector("#memberTypeSelect");
 
@@ -40,6 +58,9 @@ const previewCategory = document.querySelector("#previewCategory");
 const previewContent  = document.querySelector("#previewContent");
 const previewSource   = document.querySelector("#previewSource");
 const previewDate     = document.querySelector("#previewDate");
+
+const modalImageViewer = document.querySelector("#modalImageViewer");
+
 
 const badgeToStatus = (badge) => {
     switch (badge) {
@@ -111,45 +132,76 @@ newsCancelBtn.addEventListener("click", (e) => {
 });
 
 
-// 4. 뉴스 목록 관련들
+// 4. 뉴스 전체선택 체크박스
+document.querySelector("#newsCheckAll").addEventListener("change", (e) => {
+    newsTbody.querySelectorAll("input[type='checkbox']").forEach((cb) => {
+        cb.checked = e.target.checked;
+    });
+});
+
+// 4-1. 뉴스 비활성화 버튼
+newsHideBtn.addEventListener("click", () => {
+    const checked = [...newsTbody.querySelectorAll(".div-tr")].filter(tr =>
+        tr.querySelector("input[type='checkbox']").checked
+    );
+    if (!checked.length) { alert("선택된 뉴스가 없습니다."); return; }
+    if (!confirm(`선택한 ${checked.length}개 뉴스를 숨기시겠습니까?`)) return;
+    checked.forEach(tr => tr.classList.add("row-hidden"));
+});
+
+// 4-2. 뉴스 보이기 버튼
+newsShowBtn.addEventListener("click", () => {
+    const checked = [...newsTbody.querySelectorAll(".div-tr")].filter(tr =>
+        tr.querySelector("input[type='checkbox']").checked
+    );
+    if (!checked.length) { alert("선택된 뉴스가 없습니다."); return; }
+    if (!confirm(`선택한 ${checked.length}개 뉴스를 다시 표시하시겠습니까?`)) return;
+    checked.forEach(tr => tr.classList.remove("row-hidden"));
+});
+
+// 4-3. 뉴스 삭제 버튼
+newsDeleteBtn.addEventListener("click", () => {
+    const checked = [...newsTbody.querySelectorAll(".div-tr")].filter(tr =>
+        tr.querySelector("input[type='checkbox']").checked
+    );
+    if (!checked.length) { alert("선택된 뉴스가 없습니다."); return; }
+    if (!confirm(`선택한 ${checked.length}개 뉴스를 삭제하시겠습니까?`)) return;
+    checked.forEach(tr => tr.remove());
+});
+
+// 4-4. 뉴스 카테고리 필터
+const applyNewsFilter = () => {
+    const categoryVal = filterNewsCategory.value;
+    newsTbody.querySelectorAll(".div-tr").forEach((tr) => {
+        const tds     = tr.querySelectorAll(".div-td");
+        const category = tds[4].textContent.trim();
+        if (categoryVal === "all" || category === categoryVal) {
+            tr.classList.remove("off");
+        } else {
+            tr.classList.add("off");
+        }
+    });
+};
+filterNewsCategory.addEventListener("change", applyNewsFilter);
+
+// 4-5. 뉴스 행 클릭 → 수정 모달 열기
+// 컬럼: 선택(0)-번호(1)-출처(2)-제목(3)-카테고리(4)-조회수(5)-작성일(6)
 newsTbody.addEventListener("click", (e) => {
-    const toggleBtn = e.target.closest(".btn-toggle-news");
-    const delBtn    = e.target.closest(".btn-del-news");
+    if (e.target.type === "checkbox") return;
 
-    // 4-1. 활성/비활성 버튼
-    if (toggleBtn) {
-        e.stopPropagation();
-        const isActive = toggleBtn.textContent.trim() === "비활성화";
-        const msg = isActive ? "해당 뉴스를 비활성화하시겠습니까?" : "해당 뉴스를 활성화하시겠습니까?";
-        let result = confirm(msg);
-        if (!result) return;
-        toggleBtn.textContent = isActive ? "활성화" : "비활성화";
-        return;
-    }
-
-    // 4-2. 삭제 버튼
-    if (delBtn) {
-        e.stopPropagation();
-        let result = confirm("뉴스를 삭제하시겠습니까?");
-        if (!result) return;
-        delBtn.closest("tr").remove();
-        return;
-    }
-
-    // 4-3. 행 클릭 → 수정 모달 열기
-    const tr = e.target.closest("tr");
+    const tr = e.target.closest(".div-tr");
     if (!tr) return;
-    const tds = tr.querySelectorAll("td");
+    const tds = tr.querySelectorAll(".div-td");
 
-    document.querySelector("#newsDetailTitle").value    = tds[1].textContent;
+    document.querySelector("#newsDetailTitle").value    = tds[3].textContent;
     document.querySelector("#newsDetailSource").value   = tds[2].textContent;
-    document.querySelector("#newsDetailCategory").value = tds[3].textContent;
+    document.querySelector("#newsDetailCategory").value = tds[4].textContent;
     document.querySelector("#newsDetailContent").value  = aiNews.summary;
 
     newsOriginal = {
-        title:    tds[1].textContent,
+        title:    tds[3].textContent,
         source:   tds[2].textContent,
-        category: tds[3].textContent,
+        category: tds[4].textContent,
         content:  aiNews.summary
     };
 
@@ -198,7 +250,7 @@ document.querySelector("#newsDetailContent").addEventListener("input", checkNews
 
 
 // 5. 회원 목록 행 눌렀을때 상세 모달 열기
-memberTbody.querySelectorAll("tr").forEach((tr) => {
+memberTbody.querySelectorAll(".div-tr").forEach((tr) => {
     tr.addEventListener("click", (e) => {
         document.querySelector("#name").textContent     = "김민중";
         document.querySelector("#age").textContent      = "29";
@@ -239,40 +291,108 @@ document.querySelector("#modalMemberSave").addEventListener("click", (e) => {
 });
 
 
-// 5. 게시물 행 클릭/비활성화/삭제
+// 회원 필터 공통 함수
+// 컬럼: 번호(0)-이름(1)-이메일(2)-회사(3)-회원종류(4)-상태(5)-가입일(6)
+const applyMemberFilter = () => {
+    const typeVal   = filterMemberType.value;
+    const statusVal = filterMemberStatus.value;
+
+    memberTbody.querySelectorAll(".div-tr").forEach((tr) => {
+        const tds        = tr.querySelectorAll(".div-td");
+        const memberType = tds[4].querySelector(".badge") ? tds[4].querySelector(".badge").textContent.trim() : "";
+        const status     = tds[5].querySelector(".badge") ? tds[5].querySelector(".badge").textContent.trim() : "";
+
+        const typeMatch   = typeVal   === "all" || memberType === typeVal;
+        const statusMatch = statusVal === "all" || status     === statusVal;
+
+        if (typeMatch && statusMatch) {
+            tr.classList.remove("off");
+        } else {
+            tr.classList.add("off");
+        }
+    });
+};
+
+filterMemberType.addEventListener("change", applyMemberFilter);
+filterMemberStatus.addEventListener("change", applyMemberFilter);
+
+// 감추기 버튼
+document.querySelector("#postHideBtn").addEventListener("click", () => {
+    const checked = [...postTbody.querySelectorAll(".div-tr")].filter(tr =>
+        tr.querySelector("input[type='checkbox']").checked
+    );
+    if (!checked.length) { alert("선택된 게시물이 없습니다."); return; }
+    if (!confirm(`선택한 ${checked.length}개 게시물을 숨기시겠습니까?`)) return;
+    checked.forEach(tr => tr.classList.add("row-hidden"));
+});
+
+// 보이기 버튼
+document.querySelector("#postShowBtn").addEventListener("click", () => {
+    const checked = [...postTbody.querySelectorAll(".div-tr")].filter(tr =>
+        tr.querySelector("input[type='checkbox']").checked
+    );
+    if (!checked.length) { alert("선택된 게시물이 없습니다."); return; }
+    if (!confirm(`선택한 ${checked.length}개 게시물을 다시 표시하시겠습니까?`)) return;
+    checked.forEach(tr => tr.classList.remove("row-hidden"));
+});
+
+// 삭제 버튼
+document.querySelector("#postDeleteBtn").addEventListener("click", () => {
+    const checked = [...postTbody.querySelectorAll(".div-tr")].filter(tr =>
+        tr.querySelector("input[type='checkbox']").checked
+    );
+    if (!checked.length) { alert("선택된 게시물이 없습니다."); return; }
+    if (!confirm(`선택한 ${checked.length}개 게시물을 삭제하시겠습니까?`)) return;
+    checked.forEach(tr => tr.remove());
+});
+
+// 5-0. 게시물 필터 공통 함수
+const applyPostFilter = () => {
+    const typeVal     = filterPostType.value;
+    const categoryVal = filterPostCategory.value;
+
+    postTbody.querySelectorAll(".div-tr").forEach((tr) => {
+        const tds       = tr.querySelectorAll(".div-td");
+        const type      = tds[4].querySelector(".badge") ? tds[4].querySelector(".badge").textContent.trim() : "";
+        const category  = tds[5].textContent.trim();
+
+        const typeMatch     = typeVal === "all"     || type === typeVal;
+        const categoryMatch = categoryVal === "all" || category === categoryVal;
+
+        if (typeMatch && categoryMatch) {
+            tr.classList.remove("off");
+        } else {
+            tr.classList.add("off");
+        }
+    });
+};
+
+filterPostType.addEventListener("change", applyPostFilter);
+filterPostCategory.addEventListener("change", applyPostFilter);
+
+// 5. 게시물 전체선택 체크박스
+document.querySelector("#checkAll").addEventListener("change", (e) => {
+    postTbody.querySelectorAll("input[type='checkbox']").forEach((cb) => {
+        cb.checked = e.target.checked;
+    });
+});
+
+// 5. 게시물 행 클릭 → 수정 모달 열기
 postTbody.addEventListener("click", (e) => {
-    const toggleBtn = e.target.closest(".btn-toggle-post");
-    const delBtn    = e.target.closest(".btn-del-post");
-
-    // 5-1. 활성/비활성 버튼
-    if (toggleBtn) {
-        e.stopPropagation();
-        const isActive = toggleBtn.textContent.trim() === "비활성화";
-        const msg = isActive ? "해당 게시물을 비활성화하시겠습니까?" : "해당 게시물을 활성화하시겠습니까?";
-        let result = confirm(msg);
-        if (!result) return;
-        toggleBtn.textContent = isActive ? "활성화" : "비활성화";
-        return;
-    }
-
-    // 5-2. 삭제 버튼
-    if (delBtn) {
-        e.stopPropagation();
-        let result = confirm("게시물을 삭제하시겠습니까?");
-        if (!result) return;
-        delBtn.closest("tr").remove();
-        return;
-    }
+    if (e.target.type === "checkbox") return;
 
     // 5-3. 행 클릭 → 수정 모달 열기
-    const tr = e.target.closest("tr");
+    const tr = e.target.closest(".div-tr");
     if (!tr) return;
-    const tds = tr.querySelectorAll("td");
+    const tds = tr.querySelectorAll(".div-td");
 
-    document.querySelector("#peTitle").textContent   = tds[2].textContent;
-    document.querySelector("#peType").value          = tds[3].querySelector(".badge").textContent.trim();
-    document.querySelector("#peCategory").value      = tds[4].textContent;
-    document.querySelector("#peContent").textContent = "안녕하세요. 철강 원자재 수입 관련하여 파트너 업체를 찾고 있습니다.";
+    // 컬럼: 선택(0)-번호(1)-작성자(2)-제목(3)-글종류(4)-물품종류(5)-작성일(6)
+    document.querySelector("#peAuthor").textContent  = tds[2].textContent;
+    document.querySelector("#peTitle").textContent   = tds[3].textContent;
+    document.querySelector("#peContent").textContent = "안녕하세요. 철강 원자재 수입 관련하여 파트너 업체를 찾고 있습니다.안녕하세요. 철강 원자재 수입 관련하여 파트너 업체를 찾고 있습니다.";
+    document.querySelector("#peType").value          = tds[4].querySelector(".badge").textContent.trim();
+    document.querySelector("#peCategory").value      = tds[5].textContent;
+    document.querySelector("#peDate").textContent    = tds[6].textContent;
 
     postOriginal = {
         type:     document.querySelector("#peType").value,
@@ -376,15 +496,50 @@ newsSubmitBtn.addEventListener("click", (e) => {
 });
 
 
-// 8. 회원 신고 상태 필터
+// 8. 회원 신고 전체선택
+document.querySelector("#reportMemberCheckAll").addEventListener("change", (e) => {
+    reportMemberTbody.querySelectorAll("input[type='checkbox']").forEach((cb) => {
+        cb.checked = e.target.checked;
+    });
+});
+
+// 8-1. 회원 신고 처리완료 버튼
+reportMemberDoneBtn.addEventListener("click", () => {
+    const checked = [...reportMemberTbody.querySelectorAll(".div-tr")].filter(tr =>
+        tr.querySelector("input[type='checkbox']").checked
+    );
+    if (!checked.length) { alert("선택된 항목이 없습니다."); return; }
+    if (!confirm(`선택한 ${checked.length}개 신고를 승인하시겠습니까?`)) return;
+    alert("승인 처리되었습니다.");
+});
+
+// 8-2. 회원 신고 반려 버튼
+reportMemberRejectBtn.addEventListener("click", () => {
+    const checked = [...reportMemberTbody.querySelectorAll(".div-tr")].filter(tr =>
+        tr.querySelector("input[type='checkbox']").checked
+    );
+    if (!checked.length) { alert("선택된 항목이 없습니다."); return; }
+    if (!confirm(`선택한 ${checked.length}개 신고를 반려하시겠습니까?`)) return;
+    alert("반려 처리되었습니다.");
+});
+
+// 8-3. 회원 신고 삭제 버튼
+reportMemberDeleteBtn.addEventListener("click", () => {
+    const checked = [...reportMemberTbody.querySelectorAll(".div-tr")].filter(tr =>
+        tr.querySelector("input[type='checkbox']").checked
+    );
+    if (!checked.length) { alert("선택된 항목이 없습니다."); return; }
+    if (!confirm(`선택한 ${checked.length}개 신고를 삭제하시겠습니까?`)) return;
+    checked.forEach(tr => tr.remove());
+});
+
+// 8-4. 회원 신고 상태 필터
 filterReportMember.addEventListener("change", (e) => {
     const val = e.target.value;
-
-    reportMemberTbody.querySelectorAll("tr").forEach((tr) => {
-        const badge    = tr.querySelector("td:nth-child(5) .badge");
+    reportMemberTbody.querySelectorAll(".div-tr").forEach((tr) => {
+        const badge    = tr.querySelector(".div-td:nth-child(6) .badge");
         const badgeCls = badge ? badge.className.split(" ")[1] : "";
         const status   = badgeToStatus(badgeCls) || "";
-
         if (val === "all" || status === val) {
             tr.classList.remove("off");
         } else {
@@ -393,15 +548,50 @@ filterReportMember.addEventListener("change", (e) => {
     });
 });
 
-// 8-2. 글 신고 상태 필터
+// 8-5. 글 신고 전체선택
+document.querySelector("#reportPostCheckAll").addEventListener("change", (e) => {
+    reportPostTbody.querySelectorAll("input[type='checkbox']").forEach((cb) => {
+        cb.checked = e.target.checked;
+    });
+});
+
+// 8-6. 글 신고 처리완료 버튼
+reportPostDoneBtn.addEventListener("click", () => {
+    const checked = [...reportPostTbody.querySelectorAll(".div-tr")].filter(tr =>
+        tr.querySelector("input[type='checkbox']").checked
+    );
+    if (!checked.length) { alert("선택된 항목이 없습니다."); return; }
+    if (!confirm(`선택한 ${checked.length}개 신고를 승인하시겠습니까?`)) return;
+    alert("승인 처리되었습니다.");
+});
+
+// 8-7. 글 신고 반려 버튼
+reportPostRejectBtn.addEventListener("click", () => {
+    const checked = [...reportPostTbody.querySelectorAll(".div-tr")].filter(tr =>
+        tr.querySelector("input[type='checkbox']").checked
+    );
+    if (!checked.length) { alert("선택된 항목이 없습니다."); return; }
+    if (!confirm(`선택한 ${checked.length}개 신고를 반려하시겠습니까?`)) return;
+    alert("반려 처리되었습니다.");
+});
+
+// 8-8. 글 신고 삭제 버튼
+reportPostDeleteBtn.addEventListener("click", () => {
+    const checked = [...reportPostTbody.querySelectorAll(".div-tr")].filter(tr =>
+        tr.querySelector("input[type='checkbox']").checked
+    );
+    if (!checked.length) { alert("선택된 항목이 없습니다."); return; }
+    if (!confirm(`선택한 ${checked.length}개 신고를 삭제하시겠습니까?`)) return;
+    checked.forEach(tr => tr.remove());
+});
+
+// 8-9. 글 신고 상태 필터
 filterReportPost.addEventListener("change", (e) => {
     const val = e.target.value;
-
-    reportPostTbody.querySelectorAll("tr").forEach((tr) => {
-        const badge    = tr.querySelector("td:nth-child(5) .badge");
+    reportPostTbody.querySelectorAll(".div-tr").forEach((tr) => {
+        const badge    = tr.querySelector(".div-td:nth-child(6) .badge");
         const badgeCls = badge ? badge.className.split(" ")[1] : "";
         const status   = badgeToStatus(badgeCls) || "";
-
         if (val === "all" || status === val) {
             tr.classList.remove("off");
         } else {
@@ -411,58 +601,40 @@ filterReportPost.addEventListener("change", (e) => {
 });
 
 
-// 9. 회원 신고 행 클릭 → 심사 모달
-// 컬럼: 번호(0)-신고자(1)-신고대상(2)-신고사유(3)-상태(4)-신고일(5)
+// 9. 회원 신고 행 클릭 → 상세 모달
+// 컬럼: 선택(0)-번호(1)-신고자(2)-신고대상(3)-신고사유(4)-상태(5)-신고일(6)
 reportMemberTbody.addEventListener("click", (e) => {
-    const tr = e.target.closest("tr");
+    if (e.target.type === "checkbox") return;
+    const tr = e.target.closest(".div-tr");
     if (!tr) return;
-    const tds = tr.querySelectorAll("td");
-    const badgeCls = tds[4].querySelector(".badge").className.split(" ")[1];
-    const isPending = badgeCls === "badge-pending";
+    const tds = tr.querySelectorAll(".div-td");
 
-    document.querySelector("#modalReportTitle").textContent  = "회원 신고 심사";
-    document.querySelector("#reportReporter").textContent    = tds[1].textContent;
-    document.querySelector("#reportDate").textContent        = tds[5].textContent;
+    document.querySelector("#modalReportTitle").textContent  = "회원 신고 상세";
+    document.querySelector("#reportReporter").textContent    = tds[2].textContent;
+    document.querySelector("#reportDate").textContent        = tds[6].textContent;
     document.querySelector("#reportTargetLabel").textContent = "피신고자";
-    document.querySelector("#reportTarget").textContent      = tds[2].textContent;
-    document.querySelector("#reportReason").textContent      = tds[3].textContent;
-    document.querySelector("#reportStatusBadge").innerHTML   = tds[4].innerHTML;
-
-    if (isPending) {
-        reportRejectedBtn.classList.remove("off");
-        reportDoneBtn.classList.remove("off");
-    } else {
-        reportRejectedBtn.classList.add("off");
-        reportDoneBtn.classList.add("off");
-    }
+    document.querySelector("#reportTarget").textContent      = tds[3].textContent;
+    document.querySelector("#reportReason").textContent      = tds[4].textContent;
+    document.querySelector("#reportStatusBadge").innerHTML   = tds[5].innerHTML;
 
     modalReportDetail.classList.remove("off");
 });
 
-// 9-2. 글 신고 행 클릭 → 심사 모달
-// 컬럼: 번호(0)-신고자(1)-신고대상(2)-신고사유(3)-상태(4)-신고일(5)
+// 9-2. 글 신고 행 클릭 → 상세 모달
+// 컬럼: 선택(0)-번호(1)-신고자(2)-신고글(3)-신고사유(4)-상태(5)-신고일(6)
 reportPostTbody.addEventListener("click", (e) => {
-    const tr = e.target.closest("tr");
+    if (e.target.type === "checkbox") return;
+    const tr = e.target.closest(".div-tr");
     if (!tr) return;
-    const tds = tr.querySelectorAll("td");
-    const badgeCls = tds[4].querySelector(".badge").className.split(" ")[1];
-    const isPending = badgeCls === "badge-pending";
+    const tds = tr.querySelectorAll(".div-td");
 
-    document.querySelector("#modalReportTitle").textContent  = "글 신고 심사";
-    document.querySelector("#reportReporter").textContent    = tds[1].textContent;
-    document.querySelector("#reportDate").textContent        = tds[5].textContent;
+    document.querySelector("#modalReportTitle").textContent  = "글 신고 상세";
+    document.querySelector("#reportReporter").textContent    = tds[2].textContent;
+    document.querySelector("#reportDate").textContent        = tds[6].textContent;
     document.querySelector("#reportTargetLabel").textContent = "신고 게시물";
-    document.querySelector("#reportTarget").textContent      = tds[2].textContent;
-    document.querySelector("#reportReason").textContent      = tds[3].textContent;
-    document.querySelector("#reportStatusBadge").innerHTML   = tds[4].innerHTML;
-
-    if (isPending) {
-        reportRejectedBtn.classList.remove("off");
-        reportDoneBtn.classList.remove("off");
-    } else {
-        reportRejectedBtn.classList.add("off");
-        reportDoneBtn.classList.add("off");
-    }
+    document.querySelector("#reportTarget").textContent      = tds[3].textContent;
+    document.querySelector("#reportReason").textContent      = tds[4].textContent;
+    document.querySelector("#reportStatusBadge").innerHTML   = tds[5].innerHTML;
 
     modalReportDetail.classList.remove("off");
 });
@@ -482,50 +654,78 @@ modalReportDetail.addEventListener("click", (e) => {
     }
 });
 
-// 9-4. 반려 버튼
-reportRejectedBtn.addEventListener("click", (e) => {
-    let result = confirm("해당 신고를 반려하시겠습니까?");
+// 9-3-1. 첨부 이미지 썸네일 클릭 → 이미지 뷰어
+document.querySelector("#reportImages").addEventListener("click", (e) => {
+    const thumb = e.target.closest(".report-attach-thumb");
+    if (!thumb) return;
+    document.querySelector("#imgViewerImg").src = thumb.src;
+    modalImageViewer.classList.remove("off");
+});
 
-    if (result) {
-        alert("반려 처리되었습니다.");
-        modalReportDetail.classList.add("off");
+// 이미지 뷰어 닫기
+document.querySelector("#imgViewerClose").addEventListener("click", (e) => {
+    modalImageViewer.classList.add("off");
+});
+
+modalImageViewer.addEventListener("click", (e) => {
+    if (e.target === modalImageViewer) {
+        modalImageViewer.classList.add("off");
     }
 });
 
-// 9-5. 처리완료 버튼
-reportDoneBtn.addEventListener("click", (e) => {
-    let result = confirm("해당 신고를 처리 완료하시겠습니까?");
 
-    if (result) {
-        alert("처리 완료되었습니다.");
-        modalReportDetail.classList.add("off");
-    }
+
+// 10. 전문가 신청 전체선택
+document.querySelector("#expertCheckAll").addEventListener("change", (e) => {
+    expertApplyTbody.querySelectorAll("input[type='checkbox']").forEach((cb) => {
+        cb.checked = e.target.checked;
+    });
 });
 
+// 10-1. 전문가 신청 승인 버튼 (일괄)
+expertListApproveBtn.addEventListener("click", () => {
+    const checked = [...expertApplyTbody.querySelectorAll(".div-tr")].filter(tr =>
+        tr.querySelector("input[type='checkbox']").checked
+    );
+    if (!checked.length) { alert("선택된 항목이 없습니다."); return; }
+    if (!confirm(`선택한 ${checked.length}개 신청을 승인하시겠습니까?`)) return;
+    alert("승인 처리되었습니다.");
+});
 
-// 10. 전문가 신청 행 클릭 → 심사 모달
-// 컬럼: 번호(0)-이름(1)-이메일(2)-소속(3)-상태(4)
+// 10-2. 전문가 신청 반려 버튼 (일괄)
+expertListRejectBtn.addEventListener("click", () => {
+    const checked = [...expertApplyTbody.querySelectorAll(".div-tr")].filter(tr =>
+        tr.querySelector("input[type='checkbox']").checked
+    );
+    if (!checked.length) { alert("선택된 항목이 없습니다."); return; }
+    if (!confirm(`선택한 ${checked.length}개 신청을 반려하시겠습니까?`)) return;
+    alert("반려 처리되었습니다.");
+});
+
+// 10-3. 전문가 신청 삭제 버튼 (일괄)
+expertListDeleteBtn.addEventListener("click", () => {
+    const checked = [...expertApplyTbody.querySelectorAll(".div-tr")].filter(tr =>
+        tr.querySelector("input[type='checkbox']").checked
+    );
+    if (!checked.length) { alert("선택된 항목이 없습니다."); return; }
+    if (!confirm(`선택한 ${checked.length}개 신청을 삭제하시겠습니까?`)) return;
+    checked.forEach(tr => tr.remove());
+});
+
+// 10-4. 전문가 신청 행 클릭 → 상세 모달
+// 컬럼: 선택(0)-번호(1)-이름(2)-이메일(3)-소속(4)-상태(5)-신청일(6)
 expertApplyTbody.addEventListener("click", (e) => {
-    const tr = e.target.closest("tr");
+    if (e.target.type === "checkbox") return;
+    const tr = e.target.closest(".div-tr");
     if (!tr) return;
-    const tds = tr.querySelectorAll("td");
-    const badgeCls = tds[4].querySelector(".badge").className.split(" ")[1];
-    const isPending = badgeCls === "badge-pending";
+    const tds = tr.querySelectorAll(".div-td");
 
-    document.querySelector("#expertApplicant").textContent = tds[1].textContent;
-    document.querySelector("#expertEmail").textContent     = tds[2].textContent;
-    document.querySelector("#expertCompany").textContent   = tds[3].textContent;
-    document.querySelector("#expertDate").textContent      = tds[5].textContent;
+    document.querySelector("#expertApplicant").textContent = tds[2].textContent;
+    document.querySelector("#expertEmail").textContent     = tds[3].textContent;
+    document.querySelector("#expertCompany").textContent   = tds[4].textContent;
+    document.querySelector("#expertDate").textContent      = tds[6].textContent;
     document.querySelector("#expertReason").textContent    = "무역 분야 10년 경력 보유, 관련 자격증 취득 완료. 전문가로서 양질의 정보를 제공하고자 신청합니다.";
-    document.querySelector("#expertStatusBadge").innerHTML = tds[4].innerHTML;
-
-    if (isPending) {
-        expertRejectedBtn.classList.remove("off");
-        expertApproveBtn.classList.remove("off");
-    } else {
-        expertRejectedBtn.classList.add("off");
-        expertApproveBtn.classList.add("off");
-    }
+    document.querySelector("#expertStatusBadge").innerHTML = tds[5].innerHTML;
 
     modalExpertDetail.classList.remove("off");
 });
@@ -545,30 +745,12 @@ modalExpertDetail.addEventListener("click", (e) => {
     }
 });
 
-// 10-3. 전문가 반려 버튼
-expertRejectedBtn.addEventListener("click", (e) => {
-    let result = confirm("전문가 신청을 반려하시겠습니까?");
-    if (result) {
-        alert("반려 처리되었습니다.");
-        modalExpertDetail.classList.add("off");
-    }
-});
-
-// 10-4. 전문가 승인 버튼
-expertApproveBtn.addEventListener("click", (e) => {
-    let result = confirm("전문가 신청을 승인하시겠습니까?");
-    if (result) {
-        alert("승인 처리되었습니다.");
-        modalExpertDetail.classList.add("off");
-    }
-});
-
 // 10-5. 전문가 신청 상태 필터
 filterExpertApply.addEventListener("change", (e) => {
     const val = e.target.value;
 
-    expertApplyTbody.querySelectorAll("tr").forEach((tr) => {
-        const badge    = tr.querySelector("td:nth-child(5) .badge");
+    expertApplyTbody.querySelectorAll(".div-tr").forEach((tr) => {
+        const badge    = tr.querySelector(".div-td:nth-child(6) .badge");
         const badgeCls = badge ? badge.className.split(" ")[1] : "";
         const status   = badgeToStatus(badgeCls) || "";
 
@@ -583,8 +765,6 @@ filterExpertApply.addEventListener("change", (e) => {
 
 // 11. 뉴스 등록 미리보기 초기화 및 실시간 업데이트
 
-previewDate.textContent = new Date().toISOString().slice(0, 10);
-
 document.querySelector("#newsTitle").addEventListener("input", (e) => {
     previewTitle.textContent = e.target.value || "제목이 여기에 표시됩니다";
 });
@@ -598,5 +778,5 @@ document.querySelector("#newsContent").addEventListener("input", (e) => {
 });
 
 document.querySelector("#newsSource").addEventListener("input", (e) => {
-    previewSource.textContent = e.target.value || "—";
+    previewSource.textContent = e.target.value || "출처";
 });
