@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Inquiry List / Global Gates</title>
+        <link rel="stylesheet" href="/static/css/Inquiry/Inquiry_list.css" />
+    </head>
+    <body>
+        <div class="app-layout">
+            <main class="main-content">
+                <div class="main-header">
+                    <button class="header-back" id="headerBack" type="button">
+                        <svg viewBox="0 0 24 24" class="header-back-icon">
+                            <path
+                                d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"
+                            />
+                        </svg>
+                    </button>
+                    <h1 class="header-title">거래처 등록 요청 목록</h1>
+                    <div class="header-spacer"></div>
+                    <button class="header-settings" type="button">
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="20"
+                            height="20"
+                            stroke="currentColor"
+                            fill="none"
+                            stroke-width="2"
+                            class="header-settings-icon"
+                        >
+                            <circle cx="12" cy="12" r="3" />
+                            <path
+                                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.32 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+                            />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="category-banner">
+                    <p class="category-banner-title">거래처 유형</p>
+                    <div class="category-scroll-wrap">
+                        <button
+                            class="category-scroll-arrow category-scroll-left"
+                            id="scrollLeft"
+                            style="display: none"
+                            type="button"
+                        >
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path
+                                    d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"
+                                    fill="currentColor"
+                                />
+                            </svg>
+                        </button>
+                        <div class="category-scroll" id="categoryScroll">
+                            <button class="cat-chip active" data-cat="전체">
+                                전체
+                            </button>
+                            <button
+                                class="cat-chip has-subs"
+                                data-cat="물류"
+                                data-subs="해상포워딩,항공포워딩,내륙운송,창고"
+                            >
+                                물류 ›
+                            </button>
+                            <button
+                                class="cat-chip has-subs"
+                                data-cat="제조/공급"
+                                data-subs="OEM,ODM,원자재,패키징"
+                            >
+                                제조/공급 ›
+                            </button>
+                            <button
+                                class="cat-chip has-subs"
+                                data-cat="유통/바이어"
+                                data-subs="국내유통,해외유통,해외바이어,도매"
+                            >
+                                유통/바이어 ›
+                            </button>
+                            <button
+                                class="cat-chip has-subs"
+                                data-cat="통관/인증"
+                                data-subs="관세,FTA,검역,인증"
+                            >
+                                통관/인증 ›
+                            </button>
+                            <button class="cat-chip" data-cat="식품">
+                                식품
+                            </button>
+                            <button class="cat-chip" data-cat="화장품">
+                                화장품
+                            </button>
+                            <button class="cat-chip" data-cat="전자">
+                                전자
+                            </button>
+                            <button class="cat-chip" data-cat="소비재">
+                                소비재
+                            </button>
+                        </div>
+                        <button
+                            class="category-scroll-arrow category-scroll-right"
+                            id="scrollRight"
+                            style="display: none"
+                            type="button"
+                        >
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path
+                                    d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"
+                                    fill="currentColor"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="friendsList">
+                    <div class="user-card" data-handle="@대한통운">
+                        <div class="user-avatar">대</div>
+                        <div class="user-info">
+                            <div class="user-top">
+                                <div class="user-name-group">
+                                    <div class="user-name">대한통운</div>
+                                    <div class="user-handle">@대한통운</div>
+                                    <div class="user-followed-by">
+                                        연계 전문가: @한국무역 · 상태: 등록 검토 중
+                                    </div>
+                                </div>
+                                <button class="connect-btn disconnect" type="button">
+                                    disapproved
+                                </button>
+                            </div>
+                            <div class="user-bio">
+                                해상·항공 포워딩 중심 물류 거래처. 전문가 댓글
+                                멘션을 통해 소개된 계정으로 팔로우 후 등록 요청을
+                                보낸 상태입니다.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-card" data-handle="@발진물산">
+                        <div class="user-avatar">발</div>
+                        <div class="user-info">
+                            <div class="user-top">
+                                <div class="user-name-group">
+                                    <div class="user-name">발진물산</div>
+                                    <div class="user-handle">@발진물산</div>
+                                    <div class="user-followed-by">
+                                        연계 전문가: @한국무역 · 관심 품목: 원자재/수입
+                                    </div>
+                                </div>
+                                <button class="connect-btn disconnect" type="button">
+                                    disapproved
+                                </button>
+                            </div>
+                            <div class="user-bio">
+                                동남아 원자재 수입 유통사. 댓글 소개 이후 전문가와
+                                지속 협업을 원해 팔로우한 거래처 계정입니다.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-card" data-handle="@세림패키징">
+                        <div class="user-avatar">세</div>
+                        <div class="user-info">
+                            <div class="user-top">
+                                <div class="user-name-group">
+                                    <div class="user-name">세림패키징</div>
+                                    <div class="user-handle">@세림패키징</div>
+                                    <div class="user-followed-by">
+                                        연계 전문가: @무역브릿지 · 분야: OEM/포장
+                                    </div>
+                                </div>
+                                <button class="connect-btn disconnect" type="button">
+                                    disapproved
+                                </button>
+                            </div>
+                            <div class="user-bio">
+                                식품·화장품 패키징 OEM 가능 거래처. 사용자 게시글에
+                                전문가가 멘션으로 연결해 준 뒤 등록 요청에 들어온
+                                상태입니다.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-card" data-handle="@한성관세법인">
+                        <div class="user-avatar">한</div>
+                        <div class="user-info">
+                            <div class="user-top">
+                                <div class="user-name-group">
+                                    <div class="user-name">한성관세법인</div>
+                                    <div class="user-handle">@한성관세법인</div>
+                                    <div class="user-followed-by">
+                                        연계 전문가: @trade_insight · 분야: 통관/인증
+                                    </div>
+                                </div>
+                                <button class="connect-btn disconnect" type="button">
+                                    disapproved
+                                </button>
+                            </div>
+                            <div class="user-bio">
+                                HS코드, FTA, 검역 대응 전문 거래처. 전문가를 통해
+                                수입 상담에 참여하고 싶어 등록 요청을 보낸 계정입니다.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-card" data-handle="@퍼시픽바이어스">
+                        <div class="user-avatar">퍼</div>
+                        <div class="user-info">
+                            <div class="user-top">
+                                <div class="user-name-group">
+                                    <div class="user-name">퍼시픽바이어스</div>
+                                    <div class="user-handle">@퍼시픽바이어스</div>
+                                    <div class="user-followed-by">
+                                        연계 전문가: @한국무역 · 분야: 해외 바이어
+                                    </div>
+                                </div>
+                                <button class="connect-btn disconnect" type="button">
+                                    disapproved
+                                </button>
+                            </div>
+                            <div class="user-bio">
+                                북미 유통망을 가진 해외 바이어 계정. 전문가 댓글을
+                                보고 직접 팔로우 후 거래처 등록 검토를 요청했습니다.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-card" data-handle="@동방상사">
+                        <div class="user-avatar">동</div>
+                        <div class="user-info">
+                            <div class="user-top">
+                                <div class="user-name-group">
+                                    <div class="user-name">동방상사</div>
+                                    <div class="user-handle">@동방상사</div>
+                                    <div class="user-followed-by">
+                                        연계 전문가: @bridge_export · 분야: 소비재 유통
+                                    </div>
+                                </div>
+                                <button class="connect-btn disconnect" type="button">
+                                    disapproved
+                                </button>
+                            </div>
+                            <div class="user-bio">
+                                생활용품·잡화 유통 거래처. 전문가와 직접 연계되길
+                                희망해 팔로우 후 등록 대기 목록에 올라온 계정입니다.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-spacer"></div>
+            </main>
+        </div>
+
+        <div class="bottombar-fixed">
+            <div class="bottombar-slide">
+                <div class="bottombar" data-testid="BottomBar">
+                    <nav class="bottombar-nav" aria-label="기본" role="navigation">
+                        <a href="" class="tab-link" data-tab="home" aria-label="홈">
+                            <div class="tab-icon-wrap">
+                                <svg viewBox="0 0 24 24" aria-hidden="true" class="tab-icon">
+                                    <g><path
+                                        d="M21.591 7.146L12.52 1.157c-.316-.21-.724-.21-1.04 0l-9.071 5.99c-.26.173-.409.456-.409.757v13.183c0 .502.418.913.929.913h6.638c.511 0 .929-.41.929-.913v-7.075h3.008v7.075c0 .502.418.913.929.913h6.639c.51 0 .928-.41.928-.913V7.904c0-.301-.158-.584-.408-.758zM20 20l-4.5.01.011-7.097c0-.502-.418-.913-.928-.913H9.44c-.511 0-.929.41-.929.913L8.5 20H4V8.773l8.011-5.342L20 8.764z"
+                                        data-inactive="M21.591 7.146L12.52 1.157c-.316-.21-.724-.21-1.04 0l-9.071 5.99c-.26.173-.409.456-.409.757v13.183c0 .502.418.913.929.913h6.638c.511 0 .929-.41.929-.913v-7.075h3.008v7.075c0 .502.418.913.929.913h6.639c.51 0 .928-.41.928-.913V7.904c0-.301-.158-.584-.408-.758zM20 20l-4.5.01.011-7.097c0-.502-.418-.913-.928-.913H9.44c-.511 0-.929.41-.929.913L8.5 20H4V8.773l8.011-5.342L20 8.764z"
+                                        data-active="M21.591 7.146L12.52 1.157c-.316-.21-.724-.21-1.04 0l-9.071 5.99c-.26.173-.409.456-.409.757v13.183c0 .502.418.913.929.913H9.14c.51 0 .929-.41.929-.913v-7.075h3.909v7.075c0 .502.417.913.928.913h6.165c.511 0 .929-.41.929-.913V7.904c0-.301-.158-.584-.408-.758z"
+                                    ></path></g>
+                                </svg>
+                                <div class="unread-badge" aria-hidden="true"></div>
+                            </div>
+                        </a>
+
+                        <a href="" class="tab-link" data-tab="explore" aria-label="탐색하기">
+                            <div class="tab-icon-wrap">
+                                <svg viewBox="0 0 24 24" aria-hidden="true" class="tab-icon">
+                                    <g><path
+                                        d="M10.25 3.75c-3.59 0-6.5 2.91-6.5 6.5s2.91 6.5 6.5 6.5c1.795 0 3.419-.726 4.596-1.904 1.178-1.177 1.904-2.801 1.904-4.596 0-3.59-2.91-6.5-6.5-6.5zm-8.5 6.5c0-4.694 3.806-8.5 8.5-8.5s8.5 3.806 8.5 8.5c0 1.986-.682 3.815-1.824 5.262l4.781 4.781-1.414 1.414-4.781-4.781c-1.447 1.142-3.276 1.824-5.262 1.824-4.694 0-8.5-3.806-8.5-8.5z"
+                                        data-inactive="M10.25 3.75c-3.59 0-6.5 2.91-6.5 6.5s2.91 6.5 6.5 6.5c1.795 0 3.419-.726 4.596-1.904 1.178-1.177 1.904-2.801 1.904-4.596 0-3.59-2.91-6.5-6.5-6.5zm-8.5 6.5c0-4.694 3.806-8.5 8.5-8.5s8.5 3.806 8.5 8.5c0 1.986-.682 3.815-1.824 5.262l4.781 4.781-1.414 1.414-4.781-4.781c-1.447 1.142-3.276 1.824-5.262 1.824-4.694 0-8.5-3.806-8.5-8.5z"
+                                        data-active="M10.25 4.25c-3.314 0-6 2.686-6 6s2.686 6 6 6c1.657 0 3.155-.67 4.243-1.757 1.087-1.088 1.757-2.586 1.757-4.243 0-3.314-2.686-6-6-6zm-9 6c0-4.971 4.029-9 9-9s9 4.029 9 9c0 1.943-.617 3.744-1.664 5.215l4.475 4.474-2.122 2.122-4.474-4.475c-1.471 1.047-3.272 1.664-5.215 1.664-4.971 0-9-4.029-9-9z"
+                                    ></path></g>
+                                </svg>
+                            </div>
+                        </a>
+
+                        <a href="" class="tab-link" data-tab="grok" aria-label="Grok">
+                            <div class="tab-icon-wrap">
+                                <svg viewBox="0 0 42 42" aria-hidden="true" class="tab-icon">
+                                    <g><path
+                                        d="M12.745 20.54l10.97-8.19c.539-.4 1.307-.244 1.564.38 1.349 3.288.746 7.241-1.938 9.955-2.683 2.714-6.417 3.31-9.83 1.954l-3.728 1.745c5.347 3.697 11.84 2.782 15.898-1.324 3.219-3.255 4.216-7.692 3.284-11.693l.008.009c-1.351-5.878.332-8.227 3.782-13.031L33 0l-4.54 4.59v-.014L12.743 20.544m-2.263 1.987c-3.837-3.707-3.175-9.446.1-12.755 2.42-2.449 6.388-3.448 9.852-1.979l3.72-1.737c-.67-.49-1.53-1.017-2.515-1.387-4.455-1.854-9.789-.931-13.41 2.728-3.483 3.523-4.579 8.94-2.697 13.561 1.405 3.454-.899 5.898-3.22 8.364C1.49 30.2.666 31.074 0 32l10.478-9.466"
+                                        data-inactive="M12.745 20.54l10.97-8.19c.539-.4 1.307-.244 1.564.38 1.349 3.288.746 7.241-1.938 9.955-2.683 2.714-6.417 3.31-9.83 1.954l-3.728 1.745c5.347 3.697 11.84 2.782 15.898-1.324 3.219-3.255 4.216-7.692 3.284-11.693l.008.009c-1.351-5.878.332-8.227 3.782-13.031L33 0l-4.54 4.59v-.014L12.743 20.544m-2.263 1.987c-3.837-3.707-3.175-9.446.1-12.755 2.42-2.449 6.388-3.448 9.852-1.979l3.72-1.737c-.67-.49-1.53-1.017-2.515-1.387-4.455-1.854-9.789-.931-13.41 2.728-3.483 3.523-4.579 8.94-2.697 13.561 1.405 3.454-.899 5.898-3.22 8.364C1.49 30.2.666 31.074 0 32l10.478-9.466"
+                                        data-active="M8 0C3.582 0 0 3.582 0 8v26c0 4.418 3.582 8 8 8h26c4.418 0 8-3.582 8-8V8c0-4.418-3.582-8-8-8H8zm19.997 17.35l-11.1 8.19 15.9-15.963v.015L37.391 5c-.082.117-.165.23-.248.345-3.49 4.804-5.194 7.153-3.826 13.03l-.009-.008c.943 4.001-.065 8.438-3.322 11.693-4.106 4.107-10.677 5.02-16.087 1.324l3.772-1.745c3.454 1.355 7.232.76 9.947-1.954 2.716-2.714 3.325-6.666 1.96-9.956-.259-.623-1.037-.78-1.58-.378zm-13.292-2.574c-3.314 3.31-3.983 9.047-.1 12.755l-.003.003L4 37c.663-.913 1.485-1.776 2.306-2.639l.04-.042c2.346-2.464 4.67-4.906 3.25-8.357-1.903-4.622-.795-10.038 2.73-13.56 3.664-3.66 9.06-4.583 13.568-2.729.998.37 1.867.897 2.545 1.387l-3.764 1.737c-3.505-1.47-7.52-.47-9.97 1.98z"
+                                    ></path></g>
+                                </svg>
+                            </div>
+                        </a>
+
+                        <a href="" class="tab-link tab-link--active" data-tab="notifications" aria-label="알림">
+                            <div class="tab-icon-wrap">
+                                <svg viewBox="0 0 24 24" aria-hidden="true" class="tab-icon">
+                                    <g><path
+                                        d="M11.996 2c-4.062 0-7.49 3.021-7.999 7.051L2.866 18H7.1c.463 2.282 2.481 4 4.9 4s4.437-1.718 4.9-4h4.236l-1.143-8.958C19.48 5.017 16.054 2 11.996 2zM9.171 18h5.658c-.412 1.165-1.523 2-2.829 2s-2.417-.835-2.829-2z"
+                                        data-inactive="M19.993 9.042C19.48 5.017 16.054 2 11.996 2s-7.49 3.021-7.999 7.051L2.866 18H7.1c.463 2.282 2.481 4 4.9 4s4.437-1.718 4.9-4h4.236l-1.143-8.958zM12 20c-1.306 0-2.417-.835-2.829-2h5.658c-.412 1.165-1.523 2-2.829 2zm-6.866-4l.847-6.698C6.364 6.272 8.941 4 11.996 4s5.627 2.268 6.013 5.295L18.864 16H5.134z"
+                                        data-active="M11.996 2c-4.062 0-7.49 3.021-7.999 7.051L2.866 18H7.1c.463 2.282 2.481 4 4.9 4s4.437-1.718 4.9-4h4.236l-1.143-8.958C19.48 5.017 16.054 2 11.996 2zM9.171 18h5.658c-.412 1.165-1.523 2-2.829 2s-2.417-.835-2.829-2z"
+                                    ></path></g>
+                                </svg>
+                            </div>
+                        </a>
+
+                        <a href="" class="tab-link" data-tab="dm" aria-label="쪽지">
+                            <div class="tab-icon-wrap">
+                                <svg viewBox="0 0 24 24" aria-hidden="true" class="tab-icon">
+                                    <g><path
+                                        d="M1.998 5.5c0-1.381 1.119-2.5 2.5-2.5h15c1.381 0 2.5 1.119 2.5 2.5v13c0 1.381-1.119 2.5-2.5 2.5h-15c-1.381 0-2.5-1.119-2.5-2.5v-13zm2.5-.5c-.276 0-.5.224-.5.5v2.764l8 3.638 8-3.636V5.5c0-.276-.224-.5-.5-.5h-15zm15.5 5.463l-8 3.636-8-3.638V18.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5v-8.037z"
+                                        data-inactive="M1.998 5.5c0-1.381 1.119-2.5 2.5-2.5h15c1.381 0 2.5 1.119 2.5 2.5v13c0 1.381-1.119 2.5-2.5 2.5h-15c-1.381 0-2.5-1.119-2.5-2.5v-13zm2.5-.5c-.276 0-.5.224-.5.5v2.764l8 3.638 8-3.636V5.5c0-.276-.224-.5-.5-.5h-15zm15.5 5.463l-8 3.636-8-3.638V18.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5v-8.037z"
+                                        data-active="M1.998 4.499c0-.828.671-1.499 1.5-1.499h17c.828 0 1.5.671 1.5 1.499v2.858l-10 4.545-10-4.547V4.499zm0 5.053V19.5c0 .828.671 1.5 1.5 1.5h17c.828 0 1.5-.672 1.5-1.5V9.554l-10 4.545-10-4.547z"
+                                    ></path></g>
+                                </svg>
+                            </div>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="disconnectModal">
+            <div class="modal-dialog" role="alertdialog" aria-labelledby="modalTitle">
+                <h1 class="modal-title" id="modalTitle">
+                    이 거래처를 disapproved 처리하시겠습니까?
+                </h1>
+                <p class="modal-desc">
+                    disapproved 처리하면 이 거래처는 현재 관리 중인 거래처 등록
+                    요청 목록에서 제외됩니다. 필요하면 다시 approve로 전환해
+                    재검토할 수 있습니다.
+                </p>
+                <div class="modal-actions">
+                    <button class="modal-btn-confirm" id="modalConfirm" type="button">
+                        disapproved
+                    </button>
+                    <button class="modal-btn-cancel" id="modalCancel" type="button">
+                        취소
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="/static/js/Inquiry_list/event.js"></script>
+    </body>
+</html>
