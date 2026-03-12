@@ -275,7 +275,7 @@ body {
     background-color: #0f1419;
     color: white;
 }
-.Profile-Edit-Btn.Edit, .Profile-Edit-Btn.Connect, .Profile-Edit-Btn.Connecting {
+.Profile-Edit-Btn.Edit, .Profile-Edit-Btn.Connect, .Profile-Edit-Btn.Connected {
     padding: 0px 16px;
 }
 .Profile-Edit-Btn svg {
@@ -285,7 +285,7 @@ body {
 .Edit:hover, .Request:hover, .More:hover {
   background-color: rgba(15, 20, 26, 0.05);
 }
-.Profile-Edit-Btn.Connecting:hover {
+.Profile-Edit-Btn.Connected:hover {
     border: 1px solid red;
     background-color: rgba(255, 0, 0, 0.2);
     color: red;
@@ -534,7 +534,6 @@ body {
 
 .Sidebar-Column {
   display: flex;
-  flex-direction: column;
   flex: 0 0 auto;
   align-items: stretch;
   width: 340px;
@@ -542,6 +541,7 @@ body {
   position: relative;
 }
 .Sidebar-Inner {
+    position: fixed;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -709,19 +709,65 @@ body {
 }
 
 .Sidebar-Request-List {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
 
+.Request-Container {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 16px;
+    user-select: none;
+    cursor: pointer;
+}
+
+.Request-Container:hover {
+    background-color: #e9eef2;
+}
+
+.Request-Title {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 20px;
+}
+
+.Request-With {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+}
+
+.With-People {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1d9bf0;
+}
+
+.With-People:hover {
+    text-decoration: underline;
 }
 
 /* 게시글 관련 css */
 .Post-Card {
     display: flex;
     gap: 12px;
-    padding: 16px;
+    padding: 0px 16px;
     border-bottom: 1px solid #eff3f4;
+    cursor: pointer;
 }
 
 .Post-Card:hover {
     background: #f7f9f9;
+}
+
+.Post-Avatar-Wrapper {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    padding-top: 16px;
 }
 
 .Post-Avatar {
@@ -747,6 +793,22 @@ body {
     height: 100%;
     object-fit: cover;
     display: block;
+}
+
+.Post-Link-Line {
+    width: 2px;
+    height: 100%;
+    margin: 0 auto;
+    border: 1px solid #536471;
+}
+
+.Upper-Link-Line {
+    position: absolute;
+    width: 2px;
+    border: 1px solid #536471;
+    height: 17px;
+    top: -1px;
+    left: 19px;
 }
 
 .Post-Body {
@@ -1206,22 +1268,556 @@ img.Post-Media-Image {
     object-fit: cover;
 }
 
-.Post-Product-Detail {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-}
-
 .Product-Detail-Wrapper {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
+.Post-Product-Detail {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.Detail-Category-Tags {
+    display: flex;
+    gap: 5px;
+}
+
+.Category-Tag {
+    display: inline-flex;
+    align-items: center;
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 9999px;
+    background: rgba(29, 155, 240, 0.12);
+    color: #1d9bf0;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 .Detail-Value {
     font-size: 15px;
     font-weight: 400;
     line-height: 20px;
+}
+
+/* 게시글, 답글 더보기 메뉴 */
+.Post-More-Menu {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    top: 0px;
+    border: 1px solid #e9eef2;
+    border-radius: 24px;
+    padding: 12px;
+}
+
+.More-Menu-Buttons {
+    display: flex;
+    flex-direction: column;
+    width: 210px;
+}
+
+.Menu-Button {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 8px;
+    border: none;
+    background-color: white;
+}
+
+.Button-Icon {
+    width: 20px;
+    height: 20px;
+}
+
+.Button-Text {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 15px;
+    color: #0f1419;
+}
+
+/* 상품 작성 모달 css */
+.Product-Write-Modal {
+    position: fixed;
+    display: flex;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: auto;
+
+    margin: 0 auto;
+    width: 608px;
+    max-width: 1000px;
+    border-radius: 16px;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 51;
+}
+
+.Product-Write-Form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    background-color: #fff;
+    width: 100%;
+    padding: 64px 0px;
+    
+    box-shadow: 0 0 3px #0f141926, 0 0 16px #0f14191a;
+}
+
+.Product-From-Wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    max-height: 80vh;
+    min-height: 122px;
+}
+
+.Product-From-Container {
+    overflow: auto;
+    padding: 0px 80px;
+}
+
+.From-Input-Wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    background-color: rgba(0, 0, 0, 0);
+    align-items: stretch;
+    text-decoration: none;
+    min-width: 0px;
+    min-height: 40px;
+}
+
+.From-Input-Container {
+    text-align: left;
+}
+
+.Modal-Close-Button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 16px;
+    margin-right: 16px;
+    cursor: pointer;
+}
+
+.Close-Button-svg {
+    width: 20px;
+    height: 20px;
+}
+
+.From-Input-Header {
+    padding-bottom: 24px;
+    position: sticky;
+    background-color: #fff;
+    justify-content: flex-start;
+    top: 0px;
+    left: 0px;
+}
+
+.Header-Title {
+    min-width: 0px;
+    font-size: 26px;
+    font-weight: 800;
+    color: rgb(15, 20, 25);
+    text-align: left;
+}
+
+.Header-Desc {
+    min-width: 0px;
+    margin-top: 16px;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 20px;
+    color: rgb(15, 20, 25);
+}
+
+.Form-Input-Content {
+    margin-bottom: 16px;
+
+}
+
+.Input-Content-Label {
+    min-width: 0px;
+    margin-top: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 16px;
+    color: rgb(15, 20, 25);
+}
+
+.Input-Content-Input {
+    flex: 1 1 0%;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.Content-Input-Wrapper {
+    display: flex;
+    border: 1px solid rgb(207, 217, 222);
+    margin: 8px 0px;
+    background-color: #fff;
+    border-radius: 8px;
+    height: 45px;
+    align-items: center;
+}
+
+.Content-Input {
+    appearance: none;
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    line-height: 16px;
+    text-align: left;
+    box-sizing: border-box;
+    padding: 0px;
+    padding-left: 8px;
+    padding-right: 16px;
+    background-color: transparent;
+}
+
+.Content-Textarea {
+    border: 1px solid rgb(207, 217, 222);
+    outline: none;
+    border-radius: 8px;
+    margin: 8px 0px;
+    width: 100%;
+    height: 100px;
+    font-size: 15px;
+    line-height: 16px;
+    padding: 16px 8px;
+    text-align: left;
+    box-sizing: border-box;
+    resize: none;
+    background-color: transparent;
+}
+
+.From-Input-Footer {
+    flex-direction: row;
+    padding-top: 48px;
+    padding-bottom: 8px;
+    background-color: rgb(255, 255, 255);
+    position: sticky;
+    bottom: 0px;
+    left: 0px;
+}
+
+.Input-Footer-Button {
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 20px;
+    border-radius: 9999px;
+    background-color: rgb(207, 217, 222);
+    color: #0f1419;
+    border: none;
+    outline: none;
+}
+
+.Input-Footer-Button:hover {
+    filter: brightness(.9);
+}
+
+.submit {
+    background-color: #1d9bf0;
+    color: white;
+}
+
+/* 상품 등록 카테고리 태그 */
+/* ─── Composer-Meta ─── */
+.Composer-Meta {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 6px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eff3f4;
+}
+
+.Composer-Meta-Row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 16px;
+}
+
+/* ─── Reply-Audience ─── */
+.Reply-Audience {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+/* ─── Composer-Tag-Label ─── */
+.Composer-Tag-Label {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #1d9bf0;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.Composer-Tag-Label:hover {
+    text-decoration: underline;
+}
+
+/* ─── Composer-Tag-Editor ─── */
+.Composer-Tag-Editor {
+    width: clamp(180px, 44%, 248px);
+    max-width: 100%;
+    min-height: 27px;
+    padding: 0 10px;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    background: #f7f9f9;
+    box-shadow: inset 0 0 0 1px rgba(15, 20, 25, 0.04);
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.Composer-Tag-Editor:focus-within {
+    border-color: rgba(29, 155, 240, 0.45);
+    background: #ffffff;
+    box-shadow:
+        0 0 0 4px rgba(29, 155, 240, 0.12),
+        inset 0 0 0 1px rgba(29, 155, 240, 0.16);
+}
+
+/* ─── Composer-Tag-Field ─── */
+.Composer-Tag-Field {
+    min-width: 50px;
+    flex: 1 1 auto;
+    min-height: 25px;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #0f1419;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+}
+
+.Composer-Tag-Field::placeholder {
+    color: #536471;
+}
+
+/* ─── Location-Display ─── */
+.Location-Display {
+    display: inline-flex;
+    align-items: center;
+    border: none;
+    min-height: 22px;
+    min-width: 22px;
+    padding: 0;
+    border-radius: 9999px;
+    background: transparent;
+    color: #1d9bf0;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 18px;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+    box-shadow: none;
+    outline: none;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.Location-Display:hover,
+.Location-Display:focus,
+.Location-Display:focus-visible,
+.Location-Display:active {
+    background: rgba(29, 155, 240, 0.1);
+    box-shadow: none;
+    outline: none;
+}
+
+.Location-Display[hidden] {
+    display: none;
+}
+
+.Location-Display-Inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 22px;
+    padding: 0 11px;
+    color: inherit;
+}
+
+.Location-Display-Icon {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+}
+
+.Location-Display-Text-Wrap,
+.Location-Display-Text-Outer {
+    display: inline-flex;
+    align-items: center;
+}
+
+.Location-Display-Text-Outer,
+.Location-Display-Text-Inner {
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+}
+
+/* ─── Category-Banner ─── */
+.Category-Banner {
+    width: 100%;
+    padding-bottom: 0;
+}
+
+/* ─── Category-Scroll-Wrap ─── */
+.Category-Scroll-Wrap {
+    position: relative;
+    overflow: hidden;
+}
+
+/* ─── Category-Scroll ─── */
+.Category-Scroll {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 9px 0px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.Category-Scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* ─── Category-Scroll-Arrow ─── */
+.Category-Scroll-Arrow {
+    position: absolute;
+    top: 0;
+    bottom: 12px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    border: none;
+    color: #0f1419;
+}
+
+.Category-Scroll-Left {
+    left: 0;
+    background: linear-gradient(to right, #fff 60%, transparent);
+}
+
+.Category-Scroll-Right {
+    right: 0;
+    background: linear-gradient(to left, #fff 60%, transparent);
+}
+
+/* ─── Cat-Chip ─── */
+.Cat-Chip {
+    flex-shrink: 0;
+    padding: 6px 16px;
+    border: 1px solid #cfd9de;
+    border-radius: 9999px;
+    background: #fff;
+    color: #0f1419;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s;
+}
+
+.Cat-Chip--Has-Subs {
+    padding-right: 16px;
+}
+
+.Cat-Chip:hover {
+    background: #f7f9f9;
+    border-color: #b0bec5;
+}
+
+.Cat-Chip--Active {
+    border-color: #1d9bf0;
+    background: #1d9bf0;
+    color: #fff;
+    font-weight: 700;
+}
+
+.Cat-Chip--Parent-Highlight {
+    border-color: #1d9bf0;
+    background: #1d9bf0;
+    color: #fff;
+    font-weight: 700;
+}
+
+.Cat-Chip--Sub-Active {
+    border-color: #1d9bf0;
+    background: #1d9bf0;
+    color: #fff;
+    font-weight: 700;
+}
+
+/* 태그 목록 */
+.Tag-List {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+/* Category-Tag는 기존 css 재활용, 삭제 버튼만 추가 */
+.Tag-Remove-Btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 6px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #1d9bf0;
+    font-size: 12px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.Category-Tag:hover {
+    filter: brightness(.8);
 }
 
 /* 모달 css */

@@ -8,7 +8,7 @@ window.onload = () => {
     // 마이페이지 게시글 div들
     const contentDivs = document.querySelectorAll(".Profile-Content");
 
-    // 네비게이션 바 클린 이벤트
+    // 네비게이션 바 클릭 이벤트
     navBarDivs.forEach((nav, i) => {
         nav.addEventListener("click", (e) => {
             navBarTexts.forEach((t) => t.classList.remove("selected"));
@@ -21,5 +21,5 @@ window.onload = () => {
         });
     });
 
-    document.querySelector(".Profile-Tab-Item.Posts").click();
+    document.querySelector(".Profile-Tab-Item.Replies").click();
 };
