@@ -1,3 +1,9 @@
+@keyframes pop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.35); }
+    70%  { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
 
 *, *::before, *::after {
     box-sizing: border-box;
@@ -511,6 +517,7 @@ body {
     font-weight: 700;
     background-color: #0f1419;
     color: white;
+    cursor: pointer;
 }
 
 .Profile-Content-List {
@@ -676,6 +683,7 @@ body {
     width: auto;
     padding: 8px 15px;
     background-color: white;
+    border: 1px solid #0f1419;
     border-radius: 9999px;
     color: #0f1419;
 }
@@ -755,6 +763,7 @@ body {
     display: flex;
     gap: 12px;
     padding: 0px 16px;
+    padding-top: 10px;
     border-bottom: 1px solid #eff3f4;
     cursor: pointer;
 }
@@ -1084,6 +1093,13 @@ img.Post-Media-Image {
     overflow: hidden;
 }
 
+.Post-Action-Btn.pop {
+    animation: pop 0.5s ease;
+}
+.Post-Action-Btn svg.off {
+    display: none;
+}
+
 /* 배경 블러 처리용 (썸네일 배경) */
 .Post-Media-Bg {
     position: absolute;
@@ -1310,6 +1326,7 @@ img.Post-Media-Image {
     display: flex;
     align-items: center;
     top: 0px;
+    background-color: white;
     border: 1px solid #e9eef2;
     border-radius: 24px;
     padding: 12px;
@@ -1328,7 +1345,12 @@ img.Post-Media-Image {
     gap: 10px;
     padding: 8px;
     border: none;
+    border-radius: 12px;
     background-color: white;
+}
+
+.Menu-Button:hover {
+    background-color: #eff3f4;
 }
 
 .Button-Icon {
@@ -1337,10 +1359,440 @@ img.Post-Media-Image {
 }
 
 .Button-Text {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     line-height: 15px;
     color: #0f1419;
+}
+
+/* 상품 수정 모달 css */
+.Profile-Edit-Modal-Overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.Profile-Edit-Modal-Backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: -1;
+}
+.Profile-Edit-Modal-Box {
+  background-color: #ffffff;
+  border-radius: 16px;
+  width: 600px;
+  height: 650px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+
+.Profile-Edit-Modal-Layout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.Profile-Edit-Header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 53px;
+  min-height: 53px;
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.Profile-Edit-Close-Button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  border: none;
+  background-color: transparent;
+  color: rgb(15, 20, 26);
+  cursor: pointer;
+  margin-left: -8px;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
+}
+
+.Profile-Edit-Close-Button:hover {
+  background-color: rgba(15, 20, 26, 0.1);
+}
+
+.Profile-Edit-Title {
+  font-size: 20px;
+  font-weight: 700;
+  color: rgb(15, 20, 25);
+  line-height: 1.2;
+  flex: 1;
+  text-align: left;
+  padding-left: 8px;
+}
+
+.Profile-Edit-Save-Button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-color: rgb(15, 20, 25);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
+}
+
+.Profile-Edit-Save-Button:hover {
+  background-color: rgb(39, 44, 48);
+}
+
+.Profile-Edit-Save-Button-Text {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.Profile-Edit-ScrollContent {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.Profile-Edit-ScrollContent::-webkit-scrollbar {
+  width: 4px;
+}
+.Profile-Edit-ScrollContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+.Profile-Edit-ScrollContent::-webkit-scrollbar-thumb {
+  background-color: rgb(207, 217, 222);
+  border-radius: 9999px;
+}
+
+.Profile-Edit-PhotoSection {
+  position: relative;
+  width: 100%;
+}
+
+.Profile-Edit-Banner-Area {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  background-color: rgb(207, 217, 222);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.Profile-Edit-Banner-Button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 9999px;
+  border: none;
+  background-color: rgba(15, 20, 25, 0.6);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.Profile-Edit-Banner-Button:hover {
+  background-color: rgba(15, 20, 25, 0.8);
+}
+
+.Profile-Edit-Banner-FileInput {
+  display: none;
+}
+
+.Profile-Edit-Avatar-Container {
+  position: absolute;
+  bottom: 20px;
+  left: 16px;
+  width: 80px;
+  height: 80px;
+}
+
+.Profile-Edit-Avatar-Image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: rgb(158, 27, 90);
+  border: 3px solid #ffffff;
+  overflow: hidden;
+}
+
+.Profile-Edit-Avatar-Button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  border: none;
+  background-color: rgba(15, 20, 25, 0.6);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.Profile-Edit-Avatar-Button:hover {
+  background-color: rgba(15, 20, 25, 0.8);
+}
+
+.Profile-Edit-Avatar-FileInput {
+  display: none;
+}
+
+/* 아바타 하단 여백 보정 */
+.Profile-Edit-PhotoSection {
+  padding-bottom: 60px;
+}
+
+.Profile-Edit-ImagineSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid rgb(239, 243, 244);
+}
+
+.Profile-Edit-Imagine-TextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.Profile-Edit-Imagine-Title {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgb(15, 20, 26);
+}
+
+.Profile-Edit-Imagine-Subtitle {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgb(83, 100, 113);
+}
+
+.Profile-Edit-Imagine-Button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 9999px;
+  border: 1px solid rgb(207, 217, 222);
+  background-color: rgb(207, 217, 222);
+  color: rgb(15, 20, 26);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
+}
+
+.Profile-Edit-Imagine-Button:hover {
+  background-color: rgb(190, 201, 207);
+}
+
+.Profile-Edit-Field {
+  padding: 0 16px;
+  margin-bottom: 0;
+  border-top: 1px solid rgb(239, 243, 244);
+}
+
+.Profile-Edit-Field-Label {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid rgb(207, 217, 222);
+  border-radius: 4px;
+  padding: 0;
+  margin: 12px 0;
+  cursor: text;
+  transition: border-color 0.2s;
+  background-color: #ffffff;
+}
+
+.Profile-Edit-Field-Label:focus-within {
+  border-color: rgb(29, 155, 240);
+}
+
+.Profile-Edit-Field-Inner {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 4px 8px 4px 8px;
+}
+
+.Profile-Edit-Field-Header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.Profile-Edit-Field-LabelText {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgb(83, 100, 113);
+  line-height: 1.4;
+}
+
+.Profile-Edit-Field-Counter {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgb(83, 100, 113);
+}
+
+.Profile-Edit-Name-Input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 17px;
+  font-weight: 400;
+  color: rgb(15, 20, 25);
+  background-color: transparent;
+  padding: 4px 0;
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+.Profile-Edit-Bio-Textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 17px;
+  font-weight: 400;
+  color: rgb(15, 20, 25);
+  background-color: transparent;
+  padding: 4px 0;
+  resize: none;
+  font-family: inherit;
+  line-height: 1.4;
+  min-height: 80px;
+}
+
+.Profile-Edit-Location-Input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 17px;
+  font-weight: 400;
+  color: rgb(15, 20, 25);
+  background-color: transparent;
+  padding: 4px 0;
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+.Profile-Edit-Website-Input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 17px;
+  font-weight: 400;
+  color: rgb(15, 20, 25);
+  background-color: transparent;
+  padding: 4px 0;
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+.Profile-Edit-Birthdate-Button {
+  display: flex;
+  width: 100%;
+  border: none;
+  border-top: 1px solid rgb(239, 243, 244);
+  background-color: transparent;
+  color: rgb(15, 20, 26);
+  cursor: pointer;
+  padding: 12px 16px;
+  text-align: left;
+  transition: background-color 0.2s;
+}
+
+.Profile-Edit-Birthdate-Button:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.Profile-Edit-Birthdate-Inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.Profile-Edit-Birthdate-TextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.Profile-Edit-Birthdate-Label {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgb(83, 100, 113);
+}
+
+.Profile-Edit-Birthdate-Value {
+  font-size: 15px;
+  font-weight: 400;
+  color: rgb(15, 20, 26);
+}
+
+.Profile-Edit-Professional-Link {
+  display: flex;
+  width: 100%;
+  border-top: 1px solid rgb(239, 243, 244);
+  text-decoration: none;
+  color: rgb(15, 20, 26);
+  padding: 12px 16px;
+  transition: background-color 0.2s;
+}
+
+.Profile-Edit-Professional-Link:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.Profile-Edit-Professional-Inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.Profile-Edit-Professional-Text {
+  font-size: 15px;
+  font-weight: 400;
+  color: rgb(15, 20, 26);
 }
 
 /* 상품 작성 모달 css */
@@ -1386,7 +1838,9 @@ img.Post-Media-Image {
 
 .Product-From-Container {
     overflow: auto;
-    padding: 0px 80px;
+    padding: 0px 20px;
+    margin: 0px 60px;
+    scrollbar-width: thin;
 }
 
 .From-Input-Wrapper {
@@ -1412,6 +1866,8 @@ img.Post-Media-Image {
     position: absolute;
     top: 0;
     right: 0;
+    background-color: transparent;
+    border: none;
     margin-top: 16px;
     margin-right: 16px;
     cursor: pointer;
@@ -1429,6 +1885,7 @@ img.Post-Media-Image {
     justify-content: flex-start;
     top: 0px;
     left: 0px;
+    z-index: 1;
 }
 
 .Header-Title {
@@ -1537,10 +1994,162 @@ img.Post-Media-Image {
     filter: brightness(.9);
 }
 
+.Product-Image-Upload-Area {
+    border: 1.5px dashed #cfd9de;
+    border-radius: 12px;
+    min-height: 120px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color .2s;
+    margin-top: 8px;
+}
+.Product-Image-Upload-Area:hover {
+    border-color: #1d9bf0;
+}
+.Product-Image-Upload-Placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 32px 16px;
+    color: #536471;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.Product-Image-Upload-Placeholder.off { display: none; }
+.Product-Image-Preview-Grid { padding: 8px; }
+.Product-Image-Preview-Grid.off { display: none; }
+ 
+.Product-Image-Reset-Btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 6px 12px;
+    border: 1px solid #cfd9de;
+    border-radius: 20px;
+    background: none;
+    color: #536471;
+    font-size: 13px;
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+}
+.Product-Image-Reset-Btn:hover:not(:disabled) {
+    color: #e0245e;
+    border-color: #e0245e;
+}
+.Product-Image-Reset-Btn:disabled,
+.Product-Image-Reset-Btn.off {
+    display: none;
+}
+ 
+.Product-Image-Remove-Btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.55);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    transition: background .15s;
+}
+.Product-Image-Remove-Btn:hover { background: rgba(0,0,0,.8); }
+ 
+.Label-Sub {
+    font-size: 12px;
+    color: #536471;
+    font-style: normal;
+    margin-left: 4px;
+}
+
 .submit {
     background-color: #1d9bf0;
     color: white;
 }
+
+/* ── 상품 이미지 그리드 ── */
+.Product-Img-Grid {
+    display: grid;
+    gap: 4px;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+}
+/* 1장 */
+.Product-Img-Grid[data-count="1"] {
+    grid-template-columns: 1fr;
+}
+.Product-Img-Grid[data-count="1"] .Product-Img-Item {
+    aspect-ratio: 16/9;
+}
+/* 2장 */
+.Product-Img-Grid[data-count="2"] {
+    grid-template-columns: 1fr 1fr;
+}
+.Product-Img-Grid[data-count="2"] .Product-Img-Item {
+    aspect-ratio: 1/1;
+}
+/* 3장: 왼쪽 1장(세로) + 오른쪽 2장(위아래) */
+.Product-Img-Grid[data-count="3"] {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+.Product-Img-Grid[data-count="3"] .Product-Img-Item:first-child {
+    grid-row: 1 / 3;
+    aspect-ratio: auto;
+}
+.Product-Img-Grid[data-count="3"] .Product-Img-Item:not(:first-child) {
+    aspect-ratio: 1/1;
+}
+/* 4장: 2x2 */
+.Product-Img-Grid[data-count="4"] {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+.Product-Img-Grid[data-count="4"] .Product-Img-Item {
+    aspect-ratio: 1/1;
+}
+
+.Product-Img-Item {
+    position: relative;
+    overflow: hidden;
+    background: #f0f0f0;
+    min-height: 100px;
+}
+.Product-Img-Item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.Product-Image-Remove-Btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.55);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    transition: background .15s;
+}
+.Product-Image-Remove-Btn:hover { background: rgba(0,0,0,.8); }
 
 /* 상품 등록 카테고리 태그 */
 /* ─── Composer-Meta ─── */
@@ -1828,7 +2437,893 @@ img.Post-Media-Image {
     background-color: rgba(0, 0, 0, 0.8);
 }
 
+/* 공유 모달 css */
+.Share-Sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Share-Sheet-Backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.Share-Sheet-Card {
+    position: relative;
+    z-index: 1;
+    width: min(600px, calc(100vw - 32px));
+    max-height: min(650px, calc(100vh - 32px));
+    min-height: 400px;
+    overflow: hidden;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow:
+        rgba(101, 119, 134, 0.2) 0px 0px 15px 0px,
+        rgba(101, 119, 134, 0.15) 0px 0px 3px 1px;
+    display: flex;
+    flex-direction: column;
+}
+
+.Share-Sheet-Card--Bookmark {
+    min-height: 320px;
+}
+
+.Share-Sheet-Header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #eff3f4;
+}
+
+.Share-Sheet-Icon-Btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: #0f1419;
+    cursor: pointer;
+}
+
+.Share-Sheet-Icon-Btn:hover {
+    background: rgba(15, 20, 25, 0.08);
+}
+
+.Share-Sheet-Icon-Btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.Share-Sheet-Title {
+    margin: 0;
+    flex: 1;
+    color: #0f1419;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.Share-Sheet-Header-Spacer {
+    width: 36px;
+    height: 36px;
+}
+
+.Share-Sheet-Search {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eff3f4;
+}
+
+.Share-Sheet-Search-Input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #cfd9de;
+    border-radius: 999px;
+    outline: none;
+    font: inherit;
+}
+
+.Share-Sheet-List {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.Share-Sheet-User {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #eff3f4;
+    background: #ffffff;
+    color: #0f1419;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+}
+
+.Share-Sheet-User:hover {
+    background: rgba(15, 20, 25, 0.04);
+}
+
+.Share-Sheet-User-Avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.Share-Sheet-User-Avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.Share-Sheet-User-Body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.Share-Sheet-User-Name {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.Share-Sheet-User-Handle {
+    color: #536471;
+    font-size: 14px;
+}
+
+.Share-Sheet-Create-Folder {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-bottom: 1px solid #eff3f4;
+    background: #ffffff;
+    color: #1d9bf0;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+}
+
+.Share-Sheet-Create-Folder:hover {
+    background: rgba(15, 20, 25, 0.04);
+}
+
+.Share-Sheet-Folder {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #eff3f4;
+    background: #ffffff;
+    color: #0f1419;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+}
+
+.Share-Sheet-Folder:hover {
+    background: rgba(15, 20, 25, 0.04);
+}
+
+.Share-Sheet-Folder-Icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #1d9bf0;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.Share-Sheet-Folder-Icon svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+}
+
+.Share-Sheet-Folder-Name {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.Share-Sheet-Folder-Check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    color: transparent;
+}
+
+.Share-Sheet-Folder-Check--Active {
+    color: #1d9bf0;
+}
+
+.Share-Sheet-Folder-Check svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.Share-Sheet-Empty {
+    padding: 24px 16px;
+    color: #536471;
+    font-size: 15px;
+    text-align: center;
+}
+
+/* 신고하기 모달 */
+/* ── 알림 토스트 ───────────────────────────────────────────── */
+.Notification-Toast {
+    position: fixed;
+    left: 50%;
+    bottom: 88px;
+    transform: translateX(-50%);
+    z-index: 1200;
+    padding: 12px 20px;
+    border-radius: 999px;
+    background: #1d9bf0;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(15, 20, 25, 0.2);
+    animation: Notification-Toast-In 0.15s ease-out;
+}
+ 
+@keyframes Notification-Toast-In {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+ 
+/* ── 다이얼로그 공통 ────────────────────────────────────────── */
+.Notification-Dialog {
+    position: fixed;
+    inset: 0;
+    z-index: 1300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+ 
+.Notification-Dialog.off {
+    display: none;
+}
+ 
+.Notification-Dialog__Backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 20, 25, 0.45);
+}
+ 
+.Notification-Dialog__Card {
+    position: relative;
+    z-index: 1;
+    width: min(600px, calc(100vw - 32px));
+    max-height: calc(100vh - 48px);
+    overflow: auto;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow:
+        rgba(101, 119, 134, 0.2) 0px 0px 15px 0px,
+        rgba(101, 119, 134, 0.15) 0px 0px 3px 1px;
+}
+ 
+.Notification-Dialog__Card--Small {
+    width: min(320px, calc(100vw - 32px));
+    padding: 32px;
+}
+ 
+.Notification-Dialog__Card--Report {
+    width: min(600px, calc(100vw - 32px));
+}
+ 
+/* ── 헤더 ───────────────────────────────────────────────────── */
+.Notification-Dialog__Header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 8px 16px;
+    border-bottom: 1px solid #eff3f4;
+}
+ 
+/* ── 아이콘 버튼 (← 닫기) ──────────────────────────────────── */
+.Notification-Dialog__Icon-Btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: #0f1419;
+    cursor: pointer;
+}
+ 
+.Notification-Dialog__Icon-Btn:hover {
+    background: rgba(15, 20, 25, 0.08);
+}
+ 
+.Notification-Dialog__Icon-Btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+ 
+/* ── 타이틀 ─────────────────────────────────────────────────── */
+.Notification-Dialog__Title {
+    margin: 0;
+    color: #0f1419;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+ 
+/* ── 액션 버튼 공통 ─────────────────────────────────────────── */
+.Notification-Dialog__Danger,
+.Notification-Dialog__Secondary {
+    border: none;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+ 
+/* ── 바디 ───────────────────────────────────────────────────── */
+.Notification-Dialog__Body {
+    padding: 20px 0 0;
+}
+ 
+.Notification-Dialog__Description,
+.Notification-Dialog__Help {
+    margin: 0;
+    color: #536471;
+    font-size: 15px;
+    line-height: 1.5;
+}
+ 
+/* ── 액션 영역 ──────────────────────────────────────────────── */
+.Notification-Dialog__Actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+}
+ 
+.Notification-Dialog__Danger {
+    width: 100%;
+    padding: 12px 16px;
+    background: #f4212e;
+    color: #ffffff;
+}
+ 
+.Notification-Dialog__Secondary {
+    width: 100%;
+    padding: 12px 16px;
+    background: #ffffff;
+    color: #0f1419;
+    border: 1px solid #cfd9de;
+}
+ 
+/* ── 신고 질문 ──────────────────────────────────────────────── */
+.Notification-Dialog__Question {
+    margin: 0;
+    padding: 0 16px 16px;
+    color: #0f1419;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+ 
+/* ── 신고 항목 리스트 ───────────────────────────────────────── */
+.Notification-Report__List {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid #eff3f4;
+}
+ 
+.Notification-Report__Item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-bottom: 1px solid #eff3f4;
+    background: #ffffff;
+    color: #0f1419;
+    font-size: 15px;
+    text-align: left;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+ 
+.Notification-Report__Item:hover {
+    background: rgba(15, 20, 25, 0.04);
+}
+ 
+.Notification-Report__Item svg {
+    width: 18px;
+    height: 18px;
+    fill: #536471;
+    flex-shrink: 0;
+}
+
+/* 작은 모달 css*/
+.Small-Modal {
+    display: grid;
+    position: fixed;
+    max-width: 19.5rem;
+    width: 100%;
+    min-height: 238px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 24px;
+    gap: 12px;
+    border-radius: 0.75rem;
+    border-width: 1px;
+    border-color: #e4eaec;
+    background-color: white;
+    z-index: 54; /* 올라간 백드롭(53) 위 */
+}
+
+.Small-Header {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.Small-Header h2 {
+    margin: 0;
+    font-size: 23px;
+    line-height: 28px;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    color: #0f141a;
+}
+
+.Small-Message {
+    margin: 0;
+    color: #52636f;
+}
+
+.Small-Buttons {
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.Small-Button {
+    display: inline-flex;
+    min-width: 36px;
+    height: 36px;
+    padding: 0px 16px;
+    font-size: 15px;
+    line-height: 20px;
+    border-radius: 9999px;
+    margin-left: 0px !important;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border: 1px none transparent;
+    outline: none;
+    cursor: pointer;
+}
+
+.Ban {
+    background-color: #f41f2d;
+    color: white;
+}
+
+.Cancel {
+    background-color: #e4eaec;
+    color: #0f141a;
+}
+
+.Small-Button:hover {
+    filter: brightness(.9);
+}
+
+.Close-Button {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    border-radius: 0.25rem;
+    opacity: 0.7;
+    cursor: pointer;
+    text-transform: none;
+    background-color: transparent;
+    border: 1px none transparent;
+
+    transition-property: opacity;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.Close-Button svg {
+    width: 16px;
+    height: 16px;
+}
+
+.Close-Button:hover {
+    opacity: 1;
+}
+
 /* 토글용 css */
 .off {
     display: none;
+}
+
+/* Toast css */
+.Clipboard-Toast {
+    position: fixed;
+    left: 50%;
+    bottom: -100px;
+    transform: translate(-50%);
+    z-index: 200;
+    width: auto !important;
+    color: white !important;
+    font-size: 15px !important;
+    line-height: 20px !important;
+    background-color: #1e9cf1 !important;
+    border-style: none !important;
+    padding: 18px 15px;
+    border-radius: 0.5rem;
+    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px;
+    transition: bottom 0.4s ease;
+}
+
+/* 반응형 ---------------- */
+@media (max-width: 1023px) {
+    .Page-Layout {
+        justify-content: flex-start;
+        gap: 0;
+    }
+
+    .Sidebar-Column {
+        display: none;
+    }
+
+    .Primary-Column {
+        width: 100%;
+        max-width: 100%;
+        border-left: none;
+        border-right: none;
+    }
+}
+
+@media (max-width: 599px) {
+
+    /* ── 헤더 ── */
+    .Header-Row {
+        height: 48px;
+        padding: 0 12px;
+    }
+
+    .Header-Name-Text {
+        font-size: 17px;
+    }
+
+    .Header-Post-Count-Text {
+        font-size: 12px;
+    }
+
+    /* ── 프로필 배너 ── */
+    .Profile-Banner {
+        height: 120px;
+    }
+
+    /* ── 프로필 아바타 ── */
+    .Profile-Avatar-Container {
+        width: 80px;
+        height: 80px;
+        margin-top: -48px;
+    }
+
+    .Profile-Avatar-Circle {
+        width: 80px;
+        height: 80px;
+        border-width: 3px;
+    }
+
+    /* ── 프로필 편집 버튼 영역 ── */
+    .Profile-Edit-Wrap {
+        padding-top: 8px;
+        gap: 4px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .Profile-Edit-Btn.Edit,
+    .Profile-Edit-Btn.Connect,
+    .Profile-Edit-Btn.Connected {
+        font-size: 14px;
+        height: 32px;
+        padding: 0 12px;
+    }
+
+    /* ── 이름 / 핸들 ── */
+    .Profile-Name-Block {
+        padding: 0 12px 4px;
+    }
+
+    .Profile-Display-Name {
+        font-size: 17px;
+    }
+
+    /* ── 소개글 ── */
+    .Profile-Description {
+        padding: 4px 12px 8px;
+    }
+
+    /* ── 메타 / 팔로우 ── */
+    .Profile-Meta {
+        padding: 4px 12px;
+    }
+
+    .Profile-Follow-Row {
+        padding: 8px 12px 12px;
+        gap: 16px;
+    }
+
+    /* ── 탭 네비 ── */
+    .Profile-Tab-Item-Inner {
+        padding: 0 8px;
+    }
+
+    .Profile-Tab-Text {
+        font-size: 13px;
+    }
+
+    /* ── 게시글 카드 ── */
+    .Post-Card {
+        padding: 10px 12px 0;
+        gap: 8px;
+    }
+
+    .Post-Name {
+        font-size: 14px;
+    }
+
+    .Post-Handle,
+    .Post-Time {
+        font-size: 13px;
+    }
+
+    .Post-Text {
+        font-size: 14px;
+        margin: 6px 0 10px;
+    }
+
+    .Post-Action-Btn {
+        height: 30px;
+        padding: 0 4px;
+        font-size: 12px;
+    }
+
+    .Post-Action-Icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* ── 상품 카드 ── */
+    .Post-Product-Image {
+        width: 72px;
+        height: 72px;
+    }
+
+    .Post-Title {
+        font-size: 15px;
+    }
+
+    /* ── 콘텐츠 헤더 ── */
+    .Profile-Content-Header {
+        padding: 10px 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .Content-Header-Button {
+        width: 100%;
+        text-align: center;
+        padding: 8px 0;
+    }
+
+    /* ── 더보기 메뉴 ── */
+    .Post-More-Menu {
+        left: 0 !important;
+        right: 0;
+        width: calc(100vw - 24px);
+        margin: 0 12px;
+    }
+
+    .More-Menu-Buttons {
+        width: 100%;
+    }
+
+    /* ── 미디어 오버레이 ── */
+    .Post-Media-Preview-Overlay {
+        padding: 12px;
+    }
+
+    .Post-Media-Preview-Image {
+        border-radius: 12px;
+    }
+
+    /* ── 상품 등록 모달 ── */
+    .Product-Write-Modal {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        align-items: flex-start;
+    }
+
+    .Product-Write-Form {
+        border-radius: 0;
+        min-height: 100%;
+        padding: 48px 0 24px;
+    }
+
+    .Product-From-Container {
+        margin: 0 12px;
+        padding: 0 8px;
+    }
+
+    /* ── 프로필 수정 모달 ── */
+    .Profile-Edit-Modal-Overlay {
+        align-items: flex-start;
+    }
+
+    .Profile-Edit-Modal-Box {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        max-height: 100%;
+    }
+
+    /* ── Share Sheet ── */
+    .Share-Sheet-Card {
+        width: 100%;
+        max-height: 85vh;
+        border-radius: 16px 16px 0 0;
+        align-self: flex-end;
+    }
+
+    .Share-Sheet {
+        align-items: flex-end;
+    }
+
+    /* ── 신고하기 / 다이얼로그 ── */
+    .Notification-Dialog__Card {
+        width: calc(100vw - 24px);
+    }
+
+    .Notification-Dialog__Card--Report {
+        width: calc(100vw - 24px);
+        max-height: 90vh;
+        overflow: auto;
+    }
+
+    /* ── 작은 모달 ── */
+    .Small-Modal {
+        max-width: calc(100vw - 32px);
+        width: 100%;
+    }
+
+    /* ── Toast ── */
+    .Notification-Toast {
+        width: calc(100vw - 32px);
+        text-align: center;
+        bottom: 72px;
+    }
+
+    /* ── Clipboard Toast ── */
+    .Clipboard-Toast {
+        width: calc(100vw - 32px);
+        text-align: center;
+    }
+}
+
+@media (max-width: 359px) {
+    .Profile-Tab-Text {
+        font-size: 11px;
+    }
+
+    .Profile-Tab-Item-Inner {
+        padding: 0 4px;
+    }
+
+    .Post-Card {
+        padding: 8px 8px 0;
+        gap: 6px;
+    }
+}
+
+@media (min-width: 600px) and (max-width: 767px) {
+    .Primary-Column {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .Profile-Banner {
+        height: 160px;
+    }
+
+    .Profile-Avatar-Container {
+        width: 110px;
+        height: 110px;
+        margin-top: -66px;
+    }
+
+    .Profile-Avatar-Circle {
+        width: 110px;
+        height: 110px;
+    }
+
+    .Profile-Edit-Modal-Box {
+        width: min(520px, calc(100vw - 32px));
+        height: min(90vh, 650px);
+    }
+
+    .Product-Write-Modal {
+        width: min(520px, calc(100vw - 32px));
+    }
+}
+
+@media (min-width: 1024px) {
+    .Primary-Column {
+        width: 600px;
+        max-width: 600px;
+        flex: 0 0 600px;
+    }
+
+    .Sidebar-Column {
+        width: 340px;
+        flex: 0 0 340px;
+    }
+
+    .Sidebar-Inner {
+        width: 340px;
+    }
+}
+
+@media (min-width: 1280px) {
+    .Page-Layout {
+        gap: 28px;
+    }
 }

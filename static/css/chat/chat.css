@@ -2515,7 +2515,7 @@ body {
     box-shadow: var(0 0 #0000, 0 0 #0000), var(0 0 #0000, 0 0 #0000), var(0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1));
 }
 
-/* 유저 차단 모달 */
+/* 공용 작은 모달 */
 .Small-Modal {
     display: grid;
     position: fixed;
