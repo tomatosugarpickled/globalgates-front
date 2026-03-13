@@ -143,3 +143,79 @@ if (trendReportMenu) {
         }
     }, { passive: true });
 }
+
+// 7. 검색창 포커스 드롭다운
+const searchForm        = document.getElementById("searchForm");
+const searchInput       = document.getElementById("searchInput");
+const searchPanel       = document.getElementById("searchPanel");
+const searchPanelEmpty  = document.getElementById("searchPanelEmpty");
+const searchRecentSec   = document.getElementById("searchRecentSection");
+const searchResultsEl   = document.getElementById("searchResults");
+const searchResultTopic = document.getElementById("searchResultTopic");
+const searchResultLabel = document.getElementById("searchResultLabel");
+
+if (searchForm && searchInput && searchPanel) {
+
+    function showEmpty() {
+        searchPanelEmpty.hidden = false;
+        searchRecentSec.hidden  = true;
+        searchResultsEl.hidden  = true;
+    }
+
+    function showRecent() {
+        searchPanelEmpty.hidden = true;
+        searchRecentSec.hidden  = false;
+        searchResultsEl.hidden  = true;
+    }
+
+    function showResults(val) {
+        searchResultLabel.textContent = "\u201C" + val + "\u201D \uAC80\uC0C9";
+        searchPanelEmpty.hidden = true;
+        searchRecentSec.hidden  = true;
+        searchResultsEl.hidden  = false;
+    }
+
+    function updatePanel() {
+        var val = searchInput.value.trim();
+        if (val.length > 0) {
+            showResults(val);
+        } else {
+            showRecent();
+        }
+    }
+
+    // 패널 내부 mousedown 시 preventDefault → input blur 방지 (F12, devtools 클릭과 구분)
+    searchPanel.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+    });
+
+    searchInput.addEventListener("focus", (e) => {
+        searchForm.classList.add("isFocused");
+        searchPanel.hidden = false;
+        updatePanel();
+    });
+
+    searchInput.addEventListener("input", (e) => {
+        updatePanel();
+    });
+
+    searchInput.addEventListener("blur", (e) => {
+        // document.hasFocus()가 false면 devtools/OS로 이동한 것 → 닫지 않음
+        if (!document.hasFocus()) { return; }
+        searchForm.classList.remove("isFocused");
+        searchPanel.hidden = true;
+    });
+
+    searchInput.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            searchForm.classList.remove("isFocused");
+            searchPanel.hidden = true;
+            searchInput.blur();
+        }
+    });
+
+    searchResultTopic.addEventListener("click", (e) => {
+        searchForm.classList.remove("isFocused");
+        searchPanel.hidden = true;
+    });
+}

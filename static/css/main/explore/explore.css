@@ -3,7 +3,46 @@
 }
 
 #timelinePanel > .searchForm {
-    padding: 12px 16px 0px;
+    padding: 12px 0 0;
+}
+
+/* 래퍼: containing block 역할 + 좌우 여백 */
+#timelinePanel .searchDropdownWrap {
+    position: relative;
+    margin: 0 16px;
+}
+
+/* 포커스 시 검색 아이콘 색상 변경 안 함 */
+#timelinePanel .searchForm.isFocused .searchIcon {
+    color: #536471;
+}
+
+/* 드롭다운 패널: 래퍼 기준으로 left:0/right:0 → form 너비와 동일 */
+#timelinePanel .searchPanel {
+    left: 0;
+    right: 0;
+    min-height: auto;
+}
+
+#timelinePanel .searchPanelEmpty {
+    padding: 16px 20px;
+}
+
+/* 검색 드롭다운 - 최근 검색 헤더 */
+.searchRecentHeader {
+    padding: 10px 16px 4px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #536471;
+    letter-spacing: 0.01em;
+}
+
+/* 최근 검색 아이템 아바타 */
+.searchResultAvatar--recent {
+    background: #eff3f4;
+    color: #536471;
+    font-size: 22px;
+    font-weight: 400;
 }
 
 /* Trending 탭 */

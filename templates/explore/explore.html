@@ -190,6 +190,7 @@
         <!-- 중앙 타임라인 패널: 탭 전환, 게시글 작성 모달, 실제 피드 카드가 이 영역을 기준으로 렌더링된다. -->
         <main class="timelinePanel" id="timelinePanel">
             <form class="searchForm" id="searchForm">
+                <div class="searchDropdownWrap">
                     <label class="searchField" for="searchInput">
                         <span class="hiddenText">검색</span>
                         <span class="searchIcon" aria-hidden="true">
@@ -206,55 +207,54 @@
                         />
                     </label>
                     <div class="searchPanel" id="searchPanel" hidden>
-                        <div class="searchPanelEmpty" id="searchPanelEmpty">
+                        <!-- 상태1: 입력 없음 + 최근검색 없음 -->
+                        <div class="searchPanelEmpty" id="searchPanelEmpty" hidden>
                             <p class="searchPanelText" id="searchPanelText">
                                 인물이나 리스트 또는 키워드를 검색해 보세요
                             </p>
                         </div>
 
-                        <div
-                            class="searchResults"
-                            id="searchResults"
-                            hidden
-                        >
-                            <button
-                                class="searchResultTopic"
-                                id="searchResultTopic"
-                                type="button"
-                            >
-                                <span
-                                    class="searchResultIcon"
-                                    aria-hidden="true"
-                                    >⌕</span
-                                >
-                                <span
-                                    class="searchResultLabel"
-                                    id="searchResultLabel"
-                                    >#검색 결과</span
-                                >
-                            </button>
+                        <!-- 상태2: 입력 없음 + 최근검색 있음 -->
+                        <div id="searchRecentSection">
+                            <div class="searchRecentHeader">최근 검색</div>
+                            <div class="searchResultItem searchResultItem--recent">
+                                <div class="searchResultAvatar searchResultAvatar--recent">&#x2315;</div>
+                                <div class="searchResultProfile">
+                                    <span class="searchResultName">반도체 ETF</span>
+                                </div>
+                            </div>
+                            <div class="searchResultItem searchResultItem--recent">
+                                <div class="searchResultAvatar searchResultAvatar--recent">&#x2315;</div>
+                                <div class="searchResultProfile">
+                                    <span class="searchResultName">삼성전자</span>
+                                </div>
+                            </div>
+                            <div class="searchResultItem searchResultItem--recent">
+                                <div class="searchResultAvatar searchResultAvatar--recent">&#x2315;</div>
+                                <div class="searchResultProfile">
+                                    <span class="searchResultName">코스피 200</span>
+                                </div>
+                            </div>
+                        </div>
 
-                            <div
-                                class="searchResultList"
-                                id="searchResultList"
-                            >
-                                <div
-                                    class="searchResultItem"
-                                    id="searchResultItemSample"
-                                >
+                        <!-- 상태3: 입력 있음 -->
+                        <div class="searchResults" id="searchResults" hidden>
+                            <button class="searchResultTopic" id="searchResultTopic" type="button">
+                                <span class="searchResultIcon" aria-hidden="true">&#x2315;</span>
+                                <span class="searchResultLabel" id="searchResultLabel">#검색 결과</span>
+                            </button>
+                            <div class="searchResultList" id="searchResultList">
+                                <div class="searchResultItem" id="searchResultItemSample">
                                     <div class="searchResultAvatar">T</div>
                                     <div class="searchResultProfile">
-                                        <span class="searchResultName"
-                                            >TradeHub Official</span
-                                        >
-                                        <span class="searchResultHandle"
-                                            >@TradeHub_KR</span
-                                        >
+                                        <span class="searchResultName">TradeHub Official</span>
+                                        <span class="searchResultHandle">@TradeHub_KR</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div><!-- /.searchDropdownWrap -->
                 </form>
             <nav
                 class="timelineTabs"
