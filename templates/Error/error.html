@@ -7,56 +7,24 @@
         <link rel="stylesheet" href="/static/css/Error/Error.css" />
     </head>
     <body>
-        <main role="main" class="css-175oi2r r-16y2uox r-1wbh5a2 r-1habvwh">
-            <div class="css-175oi2r r-150rngu r-16y2uox r-1wbh5a2 r-113js5t">
-                <div class="css-175oi2r r-f8sm7e r-13qz1uu r-1ye8kvj">
-                    <div class="css-175oi2r" data-testid="error-detail">
-                        <div class="css-175oi2r r-x53rwf r-1m1l54l">
-                            <div
-                                dir="ltr"
-                                class="css-146c3p1 r-bcqeeo r-qvutc0 r-37j5jr r-q4m81j r-1b43r93 r-14yzgew r-16dba41 r-jv1ppg"
-                                style="color: rgb(15, 20, 25)"
-                            >
-                                <div
-                                    class="css-175oi2r r-xoduu5 r-1awozwy r-16y2uox r-1777fci r-1la3zjv r-1m1l54l r-f8sm7e r-13qz1uu r-1ye8kvj"
-                                >
-                                    <span
-                                        class="css-1jxf684 r-bcqeeo r-qvutc0 r-poiln3 r-q4m81j r-eektet"
-                                        style="color: rgb(83, 100, 113)"
-                                        ><span
-                                            class="css-1jxf684 r-bcqeeo r-1ttztb7 r-qvutc0 r-poiln3"
-                                            >이 페이지는 존재하지 않습니다. 다른
-                                            페이지를 검색해 보세요.</span
-                                        ></span
-                                    ><a
-                                        href="/search"
-                                        role="link"
-                                        class="css-175oi2r r-xoduu5 r-sdzlij r-1phboty r-rs99b7 r-lrvibr r-15ysp7h r-4wgw6l r-gu64tb r-o7ynqc r-6416eg r-1ny4l3l r-1loqt21"
-                                        style="
-                                            border-color: rgba(0, 0, 0, 0);
-                                            background-color: rgb(29, 155, 240);
-                                        "
-                                        ><span
-                                            class="css-1jxf684 r-qvutc0 r-poiln3 r-q4m81j r-b88u0q r-1awozwy r-6koalj r-18u37iz r-16y2uox r-bcqeeo r-1777fci"
-                                            style="color: rgb(255, 255, 255)"
-                                            ><div class="css-175oi2r r-xoduu5">
-                                                <span
-                                                    class="css-1jxf684 r-dnmrzs r-1udh08x r-1udbk01 r-3s2u2q r-bcqeeo r-1ttztb7 r-qvutc0 r-poiln3 r-1b43r93 r-14yzgew"
-                                                    ><span
-                                                        class="css-1jxf684 r-bcqeeo r-1ttztb7 r-qvutc0 r-poiln3"
-                                                        >홈으로 돌아가기</span
-                                                    ></span
-                                                >
-                                            </div></span
-                                        ></a
-                                    >
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <main role="main" class="error-container">
+            <div class="error-content" data-testid="error-detail">
+                <p class="error-message">
+                    이 페이지는 존재하지 않습니다. 다른 페이지를 검색해 보세요.
+                </p>
+                <a
+                    href="/search"
+                    role="link"
+                    class="error-link"
+                    style="
+                        border-color: rgba(0, 0, 0, 0);
+                        background-color: rgb(29, 155, 240);
+                    "
+                >
+                    홈
+                </a>
             </div>
         </main>
+        <script src="/static/js/Error/event.js"></script>
     </body>
-    <script src="/static/js/Error/event.js"></script>
 </html>
