@@ -178,22 +178,6 @@
                                 ···
                             </button>
                         </div>
-                        <div
-                            class="account-menu-popup"
-                            id="accountMenuPopup"
-                            role="menu"
-                            aria-label="계정 메뉴"
-                            hidden
-                        >
-                            <button
-                                type="button"
-                                class="account-menu-logout"
-                                id="accountLogoutButton"
-                                role="menuitem"
-                            >
-                                @CodeKim1218 계정에서 로그아웃
-                            </button>
-                        </div>
                     </div>
                 </div>
             </aside>
@@ -284,7 +268,7 @@
                                 K
                             </div>
                             <div class="composerBody tweet-modal__input-wrap">
-                            <!-- 게시판/커뮤니티 선택 영역: 게시글이 어느 보드에 발행될지 정하고 hidden input과 동기화한다. -->
+                            <!-- 게시판/커뮤니티 선택 영역: 게시글이 어느 보드에 표시될지 JS 상태로만 관리한다. -->
                             <div class="composerAudience">
                                     <div class="composerAudienceRow">
                                         <button
@@ -307,188 +291,9 @@
                                             ></div>
                                         </div>
                                     </div>
-                                    <input
-                                        type="hidden"
-                                        id="boardType"
-                                        name="boardType"
-                                        value="general"
-                                    />
-                                    <input
-                                        type="hidden"
-                                        id="communityId"
-                                        name="communityId"
-                                        value=""
-                                    />
-                                    <div
-                                        class="boardMenu"
-                                        id="boardMenu"
-                                        hidden
-                                    >
-                                        <div class="boardMenuHeader">
-                                            <h3
-                                                class="boardMenuTitle"
-                                                id="boardMenuTitle"
-                                            >
-                                                게시판 선택
-                                            </h3>
-                                        </div>
-                                        <div
-                                            class="boardMenuOptions"
-                                            id="boardMenuOptions"
-                                            role="listbox"
-                                            aria-labelledby="boardMenuTitle"
-                                        >
-                                            <button
-                                                class="boardMenuOption isSelected"
-                                                id="boardOptionGeneral"
-                                                type="button"
-                                                data-board-value="general"
-                                                data-board-label="일반"
-                                                role="option"
-                                                aria-selected="true"
-                                            >
-                                                <span
-                                                    class="boardMenuOptionInfo"
-                                                >
-                                                    <span
-                                                        class="boardMenuOptionIcon boardMenuOptionIcon--general"
-                                                        aria-hidden="true"
-                                                    >
-                                                        <svg
-                                                            viewBox="0 0 24 24"
-                                                            class="boardMenuOptionSvg"
-                                                        >
-                                                            <g>
-                                                                <path
-                                                                    d="M12 2.25c-5.376 0-9.75 4.374-9.75 9.75s4.374 9.75 9.75 9.75 9.75-4.374 9.75-9.75-4.374-9.75-9.75-9.75zm6.88 8.75h-3.126a15.848 15.848 0 00-1.038-4.018A7.786 7.786 0 0118.88 11zm-6.13-6.59c.747.855 1.676 2.718 2.184 5.59H12.75V4.41zm-1.5 0V10H9.066c.508-2.872 1.437-4.735 2.184-5.59zM5.12 13h3.126c.134 1.468.487 2.85 1.038 4.018A7.786 7.786 0 015.12 13zm3.126-2H5.12a7.786 7.786 0 014.144-4.018A15.85 15.85 0 008.246 11zm1.52 2h2.484v5.59c-.747-.855-1.676-2.718-2.184-5.59zm2.484-2H9.766c.508-2.872 1.437-4.735 2.184-5.59V11zm1.5 7.59V13h2.184c-.508 2.872-1.437 4.735-2.184 5.59zm2.484-7.59H13.75V4.41c.747.855 1.676 2.718 2.184 5.59zM14.716 17.018c.551-1.168.904-2.55 1.038-4.018h3.126a7.786 7.786 0 01-4.164 4.018z"
-                                                                ></path>
-                                                            </g>
-                                                        </svg>
-                                                    </span>
-                                                    <span
-                                                        class="boardMenuOptionLabel"
-                                                        >일반</span
-                                                    >
-                                                </span>
-                                                <span
-                                                    class="boardMenuOptionCheck"
-                                                    aria-hidden="true"
-                                                    >✓</span
-                                                >
-                                            </button>
-                                            <button
-                                                class="boardMenuOption"
-                                                id="boardOptionProduct"
-                                                type="button"
-                                                data-board-value="product"
-                                                data-board-label="상품"
-                                                role="option"
-                                                aria-selected="false"
-                                            >
-                                                <span
-                                                    class="boardMenuOptionInfo"
-                                                >
-                                                    <span
-                                                        class="boardMenuOptionIcon boardMenuOptionIcon--product"
-                                                        aria-hidden="true"
-                                                    >
-                                                        <svg
-                                                            viewBox="0 0 24 24"
-                                                            class="boardMenuOptionSvg"
-                                                        >
-                                                            <g>
-                                                                <path
-                                                                    d="M3.5 7.75l8.5-5 8.5 5v8.5l-8.5 5-8.5-5v-8.5zm8.5-3.25L6.03 8 12 11.51 17.97 8 12 4.5zm-6.5 4.79v6.12l5.5 3.24v-6.12L5.5 9.29zm7 9.36l5.5-3.24V9.29l-5.5 3.23v6.13z"
-                                                                ></path>
-                                                            </g>
-                                                        </svg>
-                                                    </span>
-                                                    <span
-                                                        class="boardMenuOptionLabel"
-                                                        >상품</span
-                                                    >
-                                                </span>
-                                                <span
-                                                    class="boardMenuOptionCheck"
-                                                    aria-hidden="true"
-                                                    >✓</span
-                                                >
-                                            </button>
-                                        </div>
-                                        <div class="boardMenuSection">
-                                            <h4 class="boardMenuSectionTitle">
-                                                내 커뮤니티
-                                            </h4>
-                                            <div
-                                                class="communityMenuList"
-                                                id="communityMenuList"
-                                            >
-                                                <button
-                                                    class="communityMenuItem"
-                                                    id="communityOptionMarket"
-                                                    type="button"
-                                                    data-community-id="market-talk"
-                                                    data-community-label="무역 토크"
-                                                >
-                                                    <img
-                                                        src="../../static/images/main/ad.png"
-                                                        alt="무역 토크"
-                                                        class="communityMenuAvatar"
-                                                    />
-                                                    <span
-                                                        class="communityMenuText"
-                                                    >
-                                                        <span
-                                                            class="communityMenuName"
-                                                            >무역 토크</span
-                                                        >
-                                                        <span
-                                                            class="communityMenuMeta"
-                                                            >1.2만 멤버</span
-                                                        >
-                                                    </span>
-                                                    <span
-                                                        class="communityMenuCheck"
-                                                        aria-hidden="true"
-                                                        >✓</span
-                                                    >
-                                                </button>
-                                                <button
-                                                    class="communityMenuItem"
-                                                    id="communityOptionProduct"
-                                                    type="button"
-                                                    data-community-id="product-lab"
-                                                    data-community-label="상품 연구소"
-                                                >
-                                                    <img
-                                                        src="../../static/images/main/ad.png"
-                                                        alt="상품 연구소"
-                                                        class="communityMenuAvatar"
-                                                    />
-                                                    <span
-                                                        class="communityMenuText"
-                                                    >
-                                                        <span
-                                                            class="communityMenuName"
-                                                            >상품 연구소</span
-                                                        >
-                                                        <span
-                                                            class="communityMenuMeta"
-                                                            >8.7천 멤버</span
-                                                        >
-                                                    </span>
-                                                    <span
-                                                        class="communityMenuCheck"
-                                                        aria-hidden="true"
-                                                        >✓</span
-                                                    >
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
 
-                            <!-- 본문 입력 영역: contenteditable 기반이라 서식, 이모지, 커서 복원 로직이 JS에서 함께 붙는다. -->
+                            <!-- 본문 입력 영역: contenteditable 기반이라 서식, 커서 복원, 첨부 상태 동기화 로직이 JS에서 함께 붙는다. -->
                             <div class="composerField" id="composerField">
                                     <span class="hiddenText">게시물 본문</span>
                                     <div
@@ -500,12 +305,6 @@
                                         aria-multiline="true"
                                         data-placeholder="무슨 일이 일어나고 있나요?"
                                     ></div>
-                                    <input
-                                        type="hidden"
-                                        id="postContentValue"
-                                        name="content"
-                                        value=""
-                                    />
                                 </div>
 
                             <!-- 첨부 미리보기 영역: 이미지/동영상/일반 파일을 올리면 동일 위치에서 즉시 결과를 확인한다. -->
@@ -643,13 +442,6 @@
                                             </div>
                                         </button>
                                     </div>
-                                    <input
-                                        type="hidden"
-                                        id="postTagsValue"
-                                        name="tags"
-                                        value=""
-                                    />
-
                                     <div
                                         class="category-banner composerCategoryBanner"
                                     >
@@ -796,7 +588,7 @@
                                     </div>
                             </div>
 
-                            <!-- 하단 작성 도구/제출 영역: 이모지, 미디어, 위치, 서식 버튼과 글자 수, 제출 버튼을 묶는다. -->
+                            <!-- 하단 작성 도구/제출 영역: 미디어, 위치, 서식 버튼과 글자 수, 제출 버튼을 묶는다. -->
                             <div class="composerFooter">
                                     <div
                                         class="toolGroup"
@@ -852,27 +644,6 @@
                                                     <g>
                                                         <path
                                                             d="M3 5.5C3 4.119 4.119 3 5.5 3h13C19.881 3 21 4.119 21 5.5v13c0 1.381-1.119 2.5-2.5 2.5h-13C4.119 21 3 19.881 3 18.5v-13zm2.5-.5c-.276 0-.5.224-.5.5v13c0 .276.224.5.5.5h13c.276 0 .5-.224.5-.5v-13c0-.276-.224-.5-.5-.5h-13zm2.5 8h1v-2h2V9.5h-2v-1H8v5h1v-2zm5.5 2v-5h-1.5v5H13zm3-3v1h-2.5v2h3.5v1H13v-5h3.5v1H14z"
-                                                        ></path>
-                                                    </g>
-                                                </svg>
-                                            </button>
-                                            <button
-                                                type="button"
-                                                class="tweet-modal__tool-btn"
-                                                aria-label="이모티콘 추가하기"
-                                                data-testid="emojiButton"
-                                                aria-expanded="false"
-                                                aria-haspopup="menu"
-                                            >
-                                                <svg
-                                                    viewBox="0 0 24 24"
-                                                    width="20"
-                                                    height="20"
-                                                    aria-hidden="true"
-                                                >
-                                                    <g>
-                                                        <path
-                                                            d="M12 22.75C6.072 22.75 1.25 17.928 1.25 12S6.072 1.25 12 1.25 22.75 6.072 22.75 12 17.928 22.75 12 22.75zm0-20c-5.109 0-9.25 4.141-9.25 9.25s4.141 9.25 9.25 9.25 9.25-4.141 9.25-9.25S17.109 2.75 12 2.75zM9 11.75c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm6 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm-8.071 3.971c.307-.298.771-.397 1.188-.253C9.07 16.154 10.52 16.75 12 16.75s2.93-.596 3.883-.982c.417-.144.88-.044 1.188.253a.846.846 0 01-.149 1.34c-1.254.715-3.059 1.139-4.922 1.139s-3.668-.424-4.922-1.139a.847.847 0 01-.149-1.39z"
                                                         ></path>
                                                     </g>
                                                 </svg>
@@ -1410,121 +1181,6 @@
                         </div>
                     </div>
                 </section>
-
-                <div
-                    class="tweet-modal__emoji-picker"
-                    id="composerEmojiPicker"
-                    role="dialog"
-                    aria-label="이모티콘 선택기"
-                    hidden
-                >
-                    <div class="tweet-modal__emoji-search">
-                        <svg
-                            viewBox="0 0 24 24"
-                            width="22"
-                            height="22"
-                            aria-hidden="true"
-                            class="tweet-modal__emoji-search-icon"
-                        >
-                            <g>
-                                <path
-                                    d="M10.5 3.75c-3.728 0-6.75 3.022-6.75 6.75s3.022 6.75 6.75 6.75c1.55 0 2.977-.522 4.114-1.4l4.893 4.893 1.06-1.06-4.892-4.893a6.714 6.714 0 001.4-4.114c0-3.728-3.022-6.75-6.75-6.75zm-5.25 6.75c0-2.9 2.35-5.25 5.25-5.25s5.25 2.35 5.25 5.25-2.35 5.25-5.25 5.25-5.25-2.35-5.25-5.25z"
-                                ></path>
-                            </g>
-                        </svg>
-                        <input
-                            type="search"
-                            class="tweet-modal__emoji-search-input"
-                            data-testid="emojiSearchInput"
-                            placeholder="이모티콘 검색하기"
-                            aria-label="이모티콘 검색하기"
-                        />
-                    </div>
-
-                    <div
-                        class="tweet-modal__emoji-tabs"
-                        role="tablist"
-                        aria-label="이모지 카테고리"
-                    >
-                        <button
-                            type="button"
-                            class="tweet-modal__emoji-tab tweet-modal__emoji-tab--active"
-                            data-emoji-category="recent"
-                            role="tab"
-                            aria-selected="true"
-                            aria-label="최근"
-                        ></button>
-                        <button
-                            type="button"
-                            class="tweet-modal__emoji-tab"
-                            data-emoji-category="smileys"
-                            role="tab"
-                            aria-selected="false"
-                            aria-label="스마일리 및 사람"
-                        ></button>
-                        <button
-                            type="button"
-                            class="tweet-modal__emoji-tab"
-                            data-emoji-category="animals"
-                            role="tab"
-                            aria-selected="false"
-                            aria-label="동물 및 자연"
-                        ></button>
-                        <button
-                            type="button"
-                            class="tweet-modal__emoji-tab"
-                            data-emoji-category="food"
-                            role="tab"
-                            aria-selected="false"
-                            aria-label="음식 및 음료"
-                        ></button>
-                        <button
-                            type="button"
-                            class="tweet-modal__emoji-tab"
-                            data-emoji-category="activities"
-                            role="tab"
-                            aria-selected="false"
-                            aria-label="활동"
-                        ></button>
-                        <button
-                            type="button"
-                            class="tweet-modal__emoji-tab"
-                            data-emoji-category="travel"
-                            role="tab"
-                            aria-selected="false"
-                            aria-label="여행 및 장소"
-                        ></button>
-                        <button
-                            type="button"
-                            class="tweet-modal__emoji-tab"
-                            data-emoji-category="objects"
-                            role="tab"
-                            aria-selected="false"
-                            aria-label="사물"
-                        ></button>
-                        <button
-                            type="button"
-                            class="tweet-modal__emoji-tab"
-                            data-emoji-category="symbols"
-                            role="tab"
-                            aria-selected="false"
-                            aria-label="기호"
-                        ></button>
-                        <button
-                            type="button"
-                            class="tweet-modal__emoji-tab"
-                            data-emoji-category="flags"
-                            role="tab"
-                            aria-selected="false"
-                            aria-label="깃발"
-                        ></button>
-                    </div>
-
-                    <div
-                        class="tweet-modal__emoji-content"
-                        data-testid="emojiPickerContent"
-                    ></div>
-                </div>
 
                 <!-- 메인 피드 영역: 게시글 카드와 카드별 액션 메뉴, 공유/더보기 드롭다운이 모두 이 리스트를 기준으로 작동한다. -->
                 <section
@@ -3368,7 +3024,6 @@
                             <input
                                 class="searchInput"
                                 id="searchInput"
-                                name="keyword"
                                 type="search"
                                 placeholder="검색"
                                 autocomplete="off"
@@ -3633,6 +3288,7 @@
             <a href="/profile" class="mobileItem">프로필</a>
         </nav>
 
+        <!-- 추천 사용자 카드의 연결 끊기 확인 모달: JS는 이 고정 오버레이의 active/aria 상태만 토글한다. -->
         <div class="modalOverlay" id="disconnectModal" aria-hidden="true">
             <div
                 class="modalPanel"
@@ -3660,6 +3316,7 @@
             </div>
         </div>
 
+        <!-- 답글 작성 모달: JS는 Notification처럼 이 고정 오버레이를 재사용하고 hidden만 토글한다. -->
         <div class="tweet-modal-overlay" data-reply-modal hidden>
             <div class="tweet-modal" role="dialog" aria-modal="true" aria-labelledby="reply-modal-title">
                 <div class="tweet-modal__header">
@@ -3764,18 +3421,6 @@
                                         <g><path d="M3 5.5C3 4.119 4.119 3 5.5 3h13C19.881 3 21 4.119 21 5.5v13c0 1.381-1.119 2.5-2.5 2.5h-13C4.119 21 3 19.881 3 18.5v-13zm2.5-.5c-.276 0-.5.224-.5.5v13c0 .276.224.5.5.5h13c.276 0 .5-.224.5-.5v-13c0-.276-.224-.5-.5-.5h-13zm2.5 8h1v-2h2V9.5h-2v-1H8v5h1v-2zm5.5 2v-5h-1.5v5H13zm3-3v1h-2.5v2h3.5v1H13v-5h3.5v1H14z"></path></g>
                                     </svg>
                                 </button>
-                                <button
-                                    type="button"
-                                    class="tweet-modal__tool-btn"
-                                    aria-label="이모티콘 추가하기"
-                                    data-testid="emojiButton"
-                                    aria-expanded="false"
-                                    aria-haspopup="menu"
-                                >
-                                    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                                        <g><path d="M12 22.75C6.072 22.75 1.25 17.928 1.25 12S6.072 1.25 12 1.25 22.75 6.072 22.75 12 17.928 22.75 12 22.75zm0-20c-5.109 0-9.25 4.141-9.25 9.25s4.141 9.25 9.25 9.25 9.25-4.141 9.25-9.25S17.109 2.75 12 2.75zM9 11.75c-.69 0-1.25-.56-1.25-1.25S8.31 9.25 9 9.25s1.25.56 1.25 1.25S9.69 11.75 9 11.75zm6 0c-.69 0-1.25-.56-1.25-1.25S14.31 9.25 15 9.25s1.25.56 1.25 1.25S15.69 11.75 15 11.75zm-8.071 3.971c.307-.298.771-.397 1.188-.253C9.07 16.154 10.52 16.75 12 16.75s2.93-.596 3.883-.982c.417-.144.88-.044 1.188.253a.846.846 0 01-.149 1.34c-1.254.715-3.059 1.139-4.922 1.139s-3.668-.424-4.922-1.139a.847.847 0 01-.149-1.39z"></path></g>
-                                    </svg>
-                                </button>
                                 <button type="button" class="tweet-modal__tool-btn tweet-modal__tool-btn--geo" aria-label="위치 태그하기" data-testid="geoButton">
                                     <div dir="ltr" class="tweet-modal__tool-btn-inner">
                                         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" class="tweet-modal__tool-btn-icon tweet-modal__tool-btn-icon--geo">
@@ -3802,26 +3447,6 @@
                                         <g><path d="M9 6h3.731L9.184 18H5v2h10v-2h-3.731l3.547-12H19V4H9v2z"></path></g>
                                     </svg>
                                 </button>
-                            </div>
-                            <div class="tweet-modal__emoji-picker" role="dialog" aria-label="이모티콘 선택기" hidden>
-                                <div class="tweet-modal__emoji-search">
-                                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" class="tweet-modal__emoji-search-icon">
-                                        <g><path d="M10.5 3.75c-3.728 0-6.75 3.022-6.75 6.75s3.022 6.75 6.75 6.75c1.55 0 2.977-.522 4.114-1.4l4.893 4.893 1.06-1.06-4.892-4.893a6.714 6.714 0 001.4-4.114c0-3.728-3.022-6.75-6.75-6.75zm-5.25 6.75c0-2.9 2.35-5.25 5.25-5.25s5.25 2.35 5.25 5.25-2.35 5.25-5.25 5.25-5.25-2.35-5.25-5.25z"></path></g>
-                                    </svg>
-                                    <input type="search" class="tweet-modal__emoji-search-input" data-testid="emojiSearchInput" placeholder="이모티콘 검색하기" aria-label="이모티콘 검색하기" />
-                                </div>
-                                <div class="tweet-modal__emoji-tabs" role="tablist" aria-label="이모지 카테고리">
-                                    <button type="button" class="tweet-modal__emoji-tab tweet-modal__emoji-tab--active" data-emoji-category="recent" role="tab" aria-selected="true" aria-label="최근"></button>
-                                    <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="smileys" role="tab" aria-selected="false" aria-label="스마일리 및 사람"></button>
-                                    <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="animals" role="tab" aria-selected="false" aria-label="동물 및 자연"></button>
-                                    <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="food" role="tab" aria-selected="false" aria-label="음식 및 음료"></button>
-                                    <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="activities" role="tab" aria-selected="false" aria-label="활동"></button>
-                                    <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="travel" role="tab" aria-selected="false" aria-label="여행 및 장소"></button>
-                                    <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="objects" role="tab" aria-selected="false" aria-label="사물"></button>
-                                    <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="symbols" role="tab" aria-selected="false" aria-label="기호"></button>
-                                    <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="flags" role="tab" aria-selected="false" aria-label="깃발"></button>
-                                </div>
-                                <div class="tweet-modal__emoji-content" data-testid="emojiPickerContent"></div>
                             </div>
                             <div class="composerActions">
                                 <div
@@ -3993,6 +3618,7 @@
             </div>
         </div>
 
+        <!-- 이미지 미리보기 오버레이: JS는 이 고정 노드의 `hidden`과 이미지 src만 토글한다. -->
         <div class="mediaPreviewOverlay" id="mediaPreviewOverlay" hidden>
             <div
                 class="mediaPreviewDialog"
@@ -4026,115 +3652,429 @@
                 />
             </div>
         </div>
-        <div id="layers"></div>
-        <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@3.0.3/dist/index.min.js"></script>
-        <script src="../../static/js/main/event.js"></script>
-        <!-- <script>
-          const handleCopyClipBoard = async (text) => {
-            try {
-              await navigator.clipboard.writeText(text);
-              alert("클립보드에 복사되었습니다!");
-            } catch (err) {
-              console.error("클립보드 복사 실패:", err);
-              alert("복사에 실패했습니다. 다시 시도해주세요.");
-            }
-          };
 
-          import {useLocation} from "react-router-dom";
-          const location = useLocation();
-          console.log("Current location:", location);
+        <!-- 전역 토스트/모달 레이어: JS는 새 DOM을 만들지 않고 아래 고정 레이어를 재사용한다. -->
+        <div
+            class="notification-toast"
+            id="mainNotificationToast"
+            role="status"
+            aria-live="polite"
+            hidden
+        ></div>
+        <div
+            class="share-toast"
+            id="mainShareToast"
+            role="status"
+            aria-live="polite"
+            hidden
+        ></div>
+        <!-- 게시글 더보기의 차단 확인 모달: body 하단 고정 노드로 두고 내용만 바꿔 재사용한다. -->
+        <div
+            class="notification-dialog notification-dialog--block"
+            id="mainPostBlockDialog"
+            hidden
+        >
+            <div
+                class="notification-dialog__backdrop"
+                data-post-block-close="true"
+            ></div>
+            <div
+                class="notification-dialog__card notification-dialog__card--small"
+                role="alertdialog"
+                aria-modal="true"
+                aria-labelledby="mainPostBlockTitle"
+                aria-describedby="mainPostBlockDesc"
+            >
+                <h2
+                    id="mainPostBlockTitle"
+                    class="notification-dialog__title"
+                >
+                    <span data-post-block-handle>@user</span> 님을 차단할까요?
+                </h2>
+                <p
+                    id="mainPostBlockDesc"
+                    class="notification-dialog__description"
+                >
+                    내 공개 게시물을 볼 수 있지만 더 이상 게시물에 참여할 수 없습니다.
+                    또한
+                    <span data-post-block-handle>@user</span>
+                    님은 나를 팔로우하거나 쪽지를 보낼 수 없으며, 이 계정과 관련된
+                    알림도 내게 표시되지 않습니다.
+                </p>
+                <div class="notification-dialog__actions">
+                    <button
+                        type="button"
+                        class="notification-dialog__danger"
+                        data-post-block-confirm="true"
+                    >
+                        차단
+                    </button>
+                    <button
+                        type="button"
+                        class="notification-dialog__secondary"
+                        data-post-block-close="true"
+                    >
+                        취소
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 게시글 신고 모달: 신고 사유 목록은 정적 HTML로 두고 open/close만 JS에서 처리한다. -->
+        <div
+            class="notification-dialog notification-dialog--report"
+            id="mainPostReportDialog"
+            hidden
+        >
+            <div
+                class="notification-dialog__backdrop"
+                data-post-report-close="true"
+            ></div>
+            <div
+                class="notification-dialog__card notification-dialog__card--report"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="mainPostReportTitle"
+            >
+                <div class="notification-dialog__header">
+                    <button
+                        type="button"
+                        class="notification-dialog__icon-btn"
+                        data-post-report-close="true"
+                        aria-label="돌아가기"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <g>
+                                <path
+                                    d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"
+                                ></path>
+                            </g>
+                        </svg>
+                    </button>
+                    <h2
+                        id="mainPostReportTitle"
+                        class="notification-dialog__title"
+                    >
+                        신고하기
+                    </h2>
+                </div>
+                <div class="notification-dialog__body">
+                    <p class="notification-dialog__question">
+                        이 게시물에 어떤 문제가 있나요?
+                    </p>
+                    <ul class="notification-report__list">
+                        <li><button type="button" class="notification-report__item"><span>다른 회사 제품 도용 신고</span><svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9.293 6.293 10.707 4.88 17.828 12l-7.121 7.12-1.414-1.413L14.999 12z"></path></g></svg></button></li>
+                        <li><button type="button" class="notification-report__item"><span>실제 존재하지 않는 제품 등록 신고</span><svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9.293 6.293 10.707 4.88 17.828 12l-7.121 7.12-1.414-1.413L14.999 12z"></path></g></svg></button></li>
+                        <li><button type="button" class="notification-report__item"><span>스펙·원산지 허위 표기 신고</span><svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9.293 6.293 10.707 4.88 17.828 12l-7.121 7.12-1.414-1.413L14.999 12z"></path></g></svg></button></li>
+                        <li><button type="button" class="notification-report__item"><span>특허 제품 무단 판매 신고</span><svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9.293 6.293 10.707 4.88 17.828 12l-7.121 7.12-1.414-1.413L14.999 12z"></path></g></svg></button></li>
+                        <li><button type="button" class="notification-report__item"><span>수출입 제한 품목 신고</span><svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9.293 6.293 10.707 4.88 17.828 12l-7.121 7.12-1.414-1.413L14.999 12z"></path></g></svg></button></li>
+                        <li><button type="button" class="notification-report__item"><span>반복적인 동일 게시물 신고</span><svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9.293 6.293 10.707 4.88 17.828 12l-7.121 7.12-1.414-1.413L14.999 12z"></path></g></svg></button></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- 공유용 채팅 시트: 사용자 목록만 JS가 `#mainShareChatUserList` 안에서 다시 그린다. -->
+        <div class="share-sheet" id="mainShareChatSheet" hidden>
+            <div
+                class="share-sheet__backdrop"
+                data-share-chat-close="true"
+            ></div>
+            <div
+                class="share-sheet__card"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="mainShareChatTitle"
+            >
+                <div class="share-sheet__header">
+                    <button
+                        type="button"
+                        class="share-sheet__icon-btn"
+                        data-share-chat-close="true"
+                        aria-label="돌아가기"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <g>
+                                <path
+                                    d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"
+                                ></path>
+                            </g>
+                        </svg>
+                    </button>
+                    <h2 id="mainShareChatTitle" class="share-sheet__title">
+                        공유하기
+                    </h2>
+                    <span class="share-sheet__header-spacer"></span>
+                </div>
+                <div class="share-sheet__search">
+                    <input
+                        type="text"
+                        class="share-sheet__search-input"
+                        id="mainShareChatSearch"
+                        placeholder="검색"
+                        aria-label="검색"
+                    />
+                </div>
+                <div
+                    class="share-sheet__list"
+                    id="mainShareChatUserList"
+                    data-share-user-list
+                ></div>
+            </div>
+        </div>
+        <!-- 공유용 북마크 시트: 체크 상태만 바뀌고 시트 자체는 고정 HTML을 재사용한다. -->
+        <div class="share-sheet" id="mainShareBookmarkSheet" hidden>
+            <div
+                class="share-sheet__backdrop"
+                data-share-bookmark-close="true"
+            ></div>
+            <div
+                class="share-sheet__card share-sheet__card--bookmark"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="mainShareBookmarkTitle"
+            >
+                <div class="share-sheet__header">
+                    <button
+                        type="button"
+                        class="share-sheet__icon-btn"
+                        data-share-bookmark-close="true"
+                        aria-label="닫기"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <g>
+                                <path
+                                    d="M10.59 12 4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"
+                                ></path>
+                            </g>
+                        </svg>
+                    </button>
+                    <h2
+                        id="mainShareBookmarkTitle"
+                        class="share-sheet__title"
+                    >
+                        폴더에 추가
+                    </h2>
+                    <span class="share-sheet__header-spacer"></span>
+                </div>
+                <button
+                    type="button"
+                    class="share-sheet__create-folder"
+                    id="mainShareBookmarkCreateFolder"
+                >
+                    새 북마크 폴더 만들기
+                </button>
+                <button
+                    type="button"
+                    class="share-sheet__folder"
+                    id="mainShareBookmarkFolder"
+                    data-share-folder="all-bookmarks"
+                >
+                    <span class="share-sheet__folder-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <g>
+                                <path
+                                    d="M2.998 8.5c0-1.38 1.119-2.5 2.5-2.5h9c1.381 0 2.5 1.12 2.5 2.5v14.12l-7-3.5-7 3.5V8.5zM18.5 2H8.998v2H18.5c.275 0 .5.224.5.5V15l2 1.4V4.5c0-1.38-1.119-2.5-2.5-2.5z"
+                                ></path>
+                            </g>
+                        </svg>
+                    </span>
+                    <span class="share-sheet__folder-name">모든 북마크</span>
+                    <span
+                        class="share-sheet__folder-check"
+                        id="mainShareBookmarkCheck"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <g>
+                                <path
+                                    d="M9.64 18.952l-5.55-4.861 1.317-1.504 3.951 3.459 8.459-10.948L19.4 6.32 9.64 18.952z"
+                                ></path>
+                            </g>
+                        </svg>
+                    </span>
+                </button>
+            </div>
+        </div>
 
-        </script> -->
-        <script>
-            const exchangeRateFeedContent = document.getElementById(
-                "exchangeRateFeedContent",
-            );
-            const exchangeRateFeedSubtitle = document.getElementById(
-                "exchangeRateFeedSubtitle",
-            );
+        <!-- 전역 레이어 마운트: 더보기/공유 드롭다운과 계정 팝업이 이 루트에 올라온다. -->
+        <div id="layers">
+            <!-- 계정 메뉴 팝업: 좌측 하단 계정 카드가 열 때 JS가 이 고정 노드를 재사용하고 hidden만 토글한다. -->
+            <div
+                class="account-menu-popup"
+                id="accountMenuPopup"
+                role="menu"
+                aria-label="계정 메뉴"
+                hidden
+            >
+                <button
+                    type="button"
+                    class="account-menu-logout"
+                    id="accountLogoutButton"
+                    role="menuitem"
+                >
+                    @CodeKim1218 계정에서 로그아웃
+                </button>
+            </div>
 
-            const currencies = ["KRW", "EUR", "JPY", "CNY", "GBP"];
-            const currencyLabels = {
-                KRW: "대한민국 원",
-                EUR: "유로",
-                JPY: "일본 엔",
-                CNY: "중국 위안",
-                GBP: "영국 파운드",
-            };
-
-            function formatExchangeDate(value) {
-                if (!value) {
-                    return "";
-                }
-
-                const date = new Date(value);
-                if (Number.isNaN(date.getTime())) {
-                    return value;
-                }
-
-                return new Intl.DateTimeFormat("ko-KR", {
-                    month: "long",
-                    day: "numeric",
-                }).format(date);
-            }
-
-            function formatExchangeValue(code, value) {
-                const fractionDigits = code === "JPY" ? 2 : 4;
-
-                return new Intl.NumberFormat("ko-KR", {
-                    minimumFractionDigits: fractionDigits,
-                    maximumFractionDigits: fractionDigits,
-                }).format(value);
-            }
-
-            async function loadExchangeRates() {
-                try {
-                    const res = await fetch(
-                        "https://api.frankfurter.app/latest?base=USD&symbols=" +
-                            currencies.join(","),
-                    );
-
-                    const data = await res.json();
-
-                    const rates = data.rates;
-                    const updatedText = formatExchangeDate(data.date);
-
-                    if (exchangeRateFeedSubtitle) {
-                        exchangeRateFeedSubtitle.textContent = updatedText
-                            ? `USD 기준 주요 통화 · ECB 발표일 ${updatedText}`
-                            : "USD 기준 주요 통화";
-                    }
-
-                    exchangeRateFeedContent.innerHTML = currencies
-                        .map((code) => {
-                            const value = rates[code];
-                            const label = currencyLabels[code] || code;
-
-                            return `
-                <div class="exchangeRateRow">
-                    <div class="exchangeRateMain">
-                        <div class="exchangeRateCurrencyLine">
-                            <span class="exchangeRateCurrency">${code}</span>
-                            <span class="exchangeRateCurrencyName">${label}</span>
-                        </div>
-                        <span class="exchangeRateMeta">1 USD</span>
-                    </div>
-                    <div class="exchangeRateValueWrap">
-                        <span class="exchangeRateValue">${formatExchangeValue(code, value)}</span>
+            <!-- 게시판 선택 레이어: 작성 모달의 audience 버튼이 열 때 이 고정 레이어를 버튼 아래에 배치한다. -->
+            <div class="boardMenu" id="boardMenu" hidden>
+                <div class="boardMenuHeader">
+                    <h3 class="boardMenuTitle" id="boardMenuTitle">
+                        게시판 선택
+                    </h3>
+                </div>
+                <div
+                    class="boardMenuOptions"
+                    id="boardMenuOptions"
+                    role="listbox"
+                    aria-labelledby="boardMenuTitle"
+                >
+                    <button
+                        class="boardMenuOption isSelected"
+                        id="boardOptionGeneral"
+                        type="button"
+                        data-board-value="general"
+                        data-board-label="일반"
+                        role="option"
+                        aria-selected="true"
+                    >
+                        <span class="boardMenuOptionInfo">
+                            <span
+                                class="boardMenuOptionIcon boardMenuOptionIcon--general"
+                                aria-hidden="true"
+                            >
+                                <svg viewBox="0 0 24 24" class="boardMenuOptionSvg">
+                                    <g>
+                                        <path
+                                            d="M12 2.25c-5.376 0-9.75 4.374-9.75 9.75s4.374 9.75 9.75 9.75 9.75-4.374 9.75-9.75-4.374-9.75-9.75-9.75zm6.88 8.75h-3.126a15.848 15.848 0 00-1.038-4.018A7.786 7.786 0 0118.88 11zm-6.13-6.59c.747.855 1.676 2.718 2.184 5.59H12.75V4.41zm-1.5 0V10H9.066c.508-2.872 1.437-4.735 2.184-5.59zM5.12 13h3.126c.134 1.468.487 2.85 1.038 4.018A7.786 7.786 0 015.12 13zm3.126-2H5.12a7.786 7.786 0 014.144-4.018A15.85 15.85 0 008.246 11zm1.52 2h2.484v5.59c-.747-.855-1.676-2.718-2.184-5.59zm2.484-2H9.766c.508-2.872 1.437-4.735 2.184-5.59V11zm1.5 7.59V13h2.184c-.508 2.872-1.437 4.735-2.184 5.59zm2.484-7.59H13.75V4.41c.747.855 1.676 2.718 2.184 5.59zM14.716 17.018c.551-1.168.904-2.55 1.038-4.018h3.126a7.786 7.786 0 01-4.164 4.018z"
+                                        ></path>
+                                    </g>
+                                </svg>
+                            </span>
+                            <span class="boardMenuOptionLabel">일반</span>
+                        </span>
+                        <span class="boardMenuOptionCheck" aria-hidden="true">✓</span>
+                    </button>
+                    <button
+                        class="boardMenuOption"
+                        id="boardOptionProduct"
+                        type="button"
+                        data-board-value="product"
+                        data-board-label="상품"
+                        role="option"
+                        aria-selected="false"
+                    >
+                        <span class="boardMenuOptionInfo">
+                            <span
+                                class="boardMenuOptionIcon boardMenuOptionIcon--product"
+                                aria-hidden="true"
+                            >
+                                <svg viewBox="0 0 24 24" class="boardMenuOptionSvg">
+                                    <g>
+                                        <path
+                                            d="M3.5 7.75l8.5-5 8.5 5v8.5l-8.5 5-8.5-5v-8.5zm8.5-3.25L6.03 8 12 11.51 17.97 8 12 4.5zm-6.5 4.79v6.12l5.5 3.24v-6.12L5.5 9.29zm7 9.36l5.5-3.24V9.29l-5.5 3.23v6.13z"
+                                        ></path>
+                                    </g>
+                                </svg>
+                            </span>
+                            <span class="boardMenuOptionLabel">상품</span>
+                        </span>
+                        <span class="boardMenuOptionCheck" aria-hidden="true">✓</span>
+                    </button>
+                </div>
+                <div class="boardMenuSection">
+                    <h4 class="boardMenuSectionTitle">내 커뮤니티</h4>
+                    <div class="communityMenuList" id="communityMenuList">
+                        <button
+                            class="communityMenuItem"
+                            id="communityOptionMarket"
+                            type="button"
+                            data-community-id="market-talk"
+                            data-community-label="무역 토크"
+                        >
+                            <img
+                                src="../../static/images/main/ad.png"
+                                alt="무역 토크"
+                                class="communityMenuAvatar"
+                            />
+                            <span class="communityMenuText">
+                                <span class="communityMenuName">무역 토크</span>
+                                <span class="communityMenuMeta">1.2만 멤버</span>
+                            </span>
+                            <span class="communityMenuCheck" aria-hidden="true">✓</span>
+                        </button>
+                        <button
+                            class="communityMenuItem"
+                            id="communityOptionProduct"
+                            type="button"
+                            data-community-id="product-lab"
+                            data-community-label="상품 연구소"
+                        >
+                            <img
+                                src="../../static/images/main/ad.png"
+                                alt="상품 연구소"
+                                class="communityMenuAvatar"
+                            />
+                            <span class="communityMenuText">
+                                <span class="communityMenuName">상품 연구소</span>
+                                <span class="communityMenuMeta">8.7천 멤버</span>
+                            </span>
+                            <span class="communityMenuCheck" aria-hidden="true">✓</span>
+                        </button>
                     </div>
                 </div>
-            `;
-                        })
-                        .join("");
-                } catch (err) {
-                    exchangeRateFeedContent.innerHTML =
-                        '<p class="exchangeRateFeedState">환율 정보를 불러오지 못했습니다.</p>';
+            </div>
 
-                    console.error(err);
-                }
-            }
-
-            loadExchangeRates();
-        </script>
+            <!-- 좌측 더보기 팝오버: JS는 버튼 좌표만 다시 계산하고, 레이어는 이 고정 노드의 hidden만 토글한다. -->
+            <div class="nav-more-layer" id="navMoreLayer" hidden>
+                <div
+                    class="nav-more-overlay"
+                    data-nav-more-close="true"
+                ></div>
+                <div
+                    class="nav-more-popover"
+                    id="navMorePopover"
+                    role="group"
+                    aria-label="더보기 메뉴 그룹"
+                >
+                    <div class="nav-more-dropdown" data-testid="Dropdown">
+                        <div
+                            role="menu"
+                            class="nav-more-menu"
+                            aria-label="더보기 메뉴"
+                        >
+                            <a class="nav-more-item" role="menuitem" href="" data-nav-more-item="lists"><div class="nav-more-itemInner"><svg viewBox="0 0 24 24" aria-hidden="true" class="nav-more-itemIcon"><g><path data-nav-more-icon="lists"></path></g></svg><span class="nav-more-itemLabel">리스트</span></div></a>
+                            <a class="nav-more-item" role="menuitem" href="" data-nav-more-item="communities"><div class="nav-more-itemInner"><svg viewBox="0 0 24 24" aria-hidden="true" class="nav-more-itemIcon"><g><path data-nav-more-icon="communities"></path></g></svg><span class="nav-more-itemLabel">커뮤니티</span></div></a>
+                            <a class="nav-more-item" role="menuitem" href="" data-nav-more-item="bookmarks"><div class="nav-more-itemInner"><svg viewBox="0 0 24 24" aria-hidden="true" class="nav-more-itemIcon"><g><path data-nav-more-icon="bookmarks"></path></g></svg><span class="nav-more-itemLabel">북마크</span></div></a>
+                            <a class="nav-more-item" role="menuitem" href="" data-nav-more-item="business"><div class="nav-more-itemInner"><svg viewBox="0 0 24 24" aria-hidden="true" class="nav-more-itemIcon"><g><path data-nav-more-icon="business"></path></g></svg><span class="nav-more-itemLabel">비즈니스</span></div></a>
+                            <a class="nav-more-item" role="menuitem" href="" data-nav-more-item="ads" target="_blank" rel="noreferrer"><div class="nav-more-itemInner"><svg viewBox="0 0 24 24" aria-hidden="true" class="nav-more-itemIcon"><g><path data-nav-more-icon="ads"></path></g></svg><span class="nav-more-itemLabel">광고</span></div></a>
+                            <a class="nav-more-item" role="menuitem" href="" data-nav-more-item="spaces"><div class="nav-more-itemInner"><svg viewBox="0 0 24 24" aria-hidden="true" class="nav-more-itemIcon"><g><path data-nav-more-icon="spaces"></path></g></svg><span class="nav-more-itemLabel">스페이스 만들기</span></div></a>
+                            <a class="nav-more-item" role="menuitem" href="" data-nav-more-item="settings"><div class="nav-more-itemInner"><svg viewBox="0 0 24 24" aria-hidden="true" class="nav-more-itemIcon"><g><path data-nav-more-icon="settings"></path></g></svg><span class="nav-more-itemLabel">설정 및 개인정보</span></div></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 게시글 공유 드롭다운: 클릭한 공유 버튼 근처로만 재배치되고, 마크업은 `#layers` 안의 고정 노드를 재사용한다. -->
+            <div class="layers-dropdown-container" id="mainShareDropdown" hidden>
+                <div
+                    class="layers-overlay"
+                    data-share-dropdown-close="true"
+                ></div>
+                <div class="layers-dropdown-inner">
+                    <div
+                        role="menu"
+                        class="dropdown-menu"
+                        id="mainShareDropdownMenu"
+                    >
+                        <div>
+                            <div class="dropdown-inner" data-testid="Dropdown">
+                                <button type="button" role="menuitem" class="menu-item share-menu-item share-menu-item--copy" data-share-action="copy"><span class="menu-item__icon share-menu-item__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M18.36 5.64c-1.95-1.96-5.11-1.96-7.07 0L9.88 7.05 8.46 5.64l1.42-1.42c2.73-2.73 7.16-2.73 9.9 0 2.73 2.74 2.73 7.17 0 9.9l-1.42 1.42-1.41-1.42 1.41-1.41c1.96-1.96 1.96-5.12 0-7.07zm-2.12 3.53l-7.07 7.07-1.41-1.41 7.07-7.07 1.41 1.41zm-12.02.71l1.42-1.42 1.41 1.42-1.41 1.41c-1.96 1.96-1.96 5.12 0 7.07 1.95 1.96 5.11 1.96 7.07 0l1.41-1.41 1.42 1.41-1.42 1.42c-2.73 2.73-7.16 2.73-9.9 0-2.73-2.74-2.73-7.17 0-9.9z"></path></g></svg></span><span class="menu-item__label">링크 복사하기</span></button>
+                                <button type="button" role="menuitem" class="menu-item share-menu-item share-menu-item--chat" data-share-action="chat"><span class="menu-item__icon share-menu-item__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M1.998 5.5c0-1.381 1.119-2.5 2.5-2.5h15c1.381 0 2.5 1.119 2.5 2.5v13c0 1.381-1.119 2.5-2.5 2.5h-15c-1.381 0-2.5-1.119-2.5-2.5v-13zm2.5-.5c-.276 0-.5.224-.5.5v2.764l8 3.638 8-3.636V5.5c0-.276-.224-.5-.5-.5h-15zm15.5 5.463l-8 3.636-8-3.638V18.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5v-8.037z"></path></g></svg></span><span class="menu-item__label">Chat으로 전송하기</span></button>
+                                <button type="button" role="menuitem" class="menu-item share-menu-item share-menu-item--bookmark" data-share-action="bookmark"><span class="menu-item__icon share-menu-item__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M18 3V0h2v3h3v2h-3v3h-2V5h-3V3zm-7.5 1a.5.5 0 00-.5.5V7h3.5A2.5 2.5 0 0116 9.5v3.48l3 2.1V11h2v7.92l-5-3.5v7.26l-6.5-3.54L3 22.68V9.5A2.5 2.5 0 015.5 7H8V4.5A2.5 2.5 0 0110.5 2H12v2zm-5 5a.5.5 0 00-.5.5v9.82l4.5-2.46 4.5 2.46V9.5a.5.5 0 00-.5-.5z"></path></g></svg></span><span class="menu-item__label">폴더에 북마크 추가하기</span></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="../../static/js/main/event.js"></script>
     </body>
 </html>
