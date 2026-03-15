@@ -522,6 +522,8 @@ body {
     fill: currentColor;
 }
 
+/* ── 드롭다운 마운트 레이어 (#layers) ─────────────────────
+   HTML의 #layers 에 event.js 가 공유/더보기 드롭다운을 append/remove 한다. */
 #layers {
     position: absolute;
     top: 0;
@@ -533,8 +535,8 @@ body {
 }
 
 /* ================================================
-   X (Twitter) 알림 더보기 드롭다운 메뉴 CSS
-   [role="menu"] — 13개 menuitem 포함
+   #layers 내부 드롭다운 메뉴
+   event.js 의 openShareDropdown()/openNotificationDropdown() 이 생성하는 구조
    ================================================ */
 .dropdown-menu {
     position: absolute;
@@ -667,6 +669,7 @@ a.menu-item:visited {
     color: rgb(15, 20, 25);
 }
 
+/* event.js 가 #layers 아래에 만드는 임시 래퍼 */
 .layers-overlay {
     position: fixed;
     top: 0;
@@ -693,6 +696,8 @@ a.menu-item:visited {
     pointer-events: auto;
 }
 
+/* ── body 동적 토스트/모달 ─────────────────────────────────
+   event.js 가 body 에 직접 추가하는 알림 토스트/차단/신고 모달 */
 .notification-toast {
     position: fixed;
     left: 50%;
@@ -1150,7 +1155,8 @@ a.menu-item:visited {
     background-color: rgba(29, 155, 240, 0.1);
 }
 
-/* ── 댓글 모달 오버레이 ──────────────────────────────────── */
+/* ── 답글 모달 오버레이 ([data-reply-modal]) ────────────────
+   HTML에 미리 있는 답글 모달을 event.js 가 hidden 토글로 재사용한다. */
 body.modal-open {
     overflow: hidden;
 }
@@ -1354,6 +1360,8 @@ body.modal-open {
     display: block;
 }
 
+/* compose view 안의 첨부 미리보기.
+   event.js 가 [data-attachment-preview] 표시를 토글하고 [data-attachment-media] 내용을 채운다. */
 .tweet-modal__attachment {
     width: min(100%, 320px);
     margin-top: 12px;
@@ -1633,6 +1641,7 @@ body.modal-open {
     white-space: nowrap;
 }
 
+/* compose view 하단 고정 영역: 위치 메타, 툴바, 이모지 버튼, 답글 버튼 */
 .tweet-modal__footer {
     display: flex;
     flex-direction: column;
@@ -1758,6 +1767,8 @@ body.modal-open {
     display: none;
 }
 
+/* HTML에 남겨둔 커스텀 이모지 fallback 패널.
+   외부 EmojiButton 라이브러리가 있을 때는 별도 DOM 이 reply modal overlay 안에 생성된다. */
 .tweet-modal__emoji-picker {
     position: fixed;
     left: 16px;
@@ -2729,6 +2740,8 @@ body.modal-open {
     }
 }
 
+/* ── body 동적 공유 UI ─────────────────────────────────────
+   event.js 가 body 에 직접 추가하는 공유 토스트/바텀시트 */
 .share-toast {
     position: fixed;
     left: 50%;
@@ -2960,7 +2973,8 @@ body.modal-open {
 }
 
 
-/* ── 초안 뷰 (같은 .tweet-modal 내부에서 작성 뷰와 토글) ── */
+/* ── 답글 모달 서브뷰 토글 ─────────────────────────────────
+   모두 같은 [data-reply-modal] 내부에 있고 event.js 가 hidden 속성으로 전환한다. */
 .tweet-modal__compose-view[hidden],
 .tweet-modal__draft-view[hidden],
 .tweet-modal__location-view[hidden],
@@ -2969,6 +2983,7 @@ body.modal-open {
     display: none;
 }
 
+/* 기본 답글 작성 화면 */
 .tweet-modal__compose-view {
     display: flex;
     flex-direction: column;
@@ -2976,6 +2991,7 @@ body.modal-open {
     overflow: hidden;
 }
 
+/* 임시저장 목록 화면 */
 .tweet-modal__draft-view {
     position: relative;
     display: flex;
@@ -2984,6 +3000,7 @@ body.modal-open {
     overflow: hidden;
 }
 
+/* 위치 선택 화면 */
 .tweet-modal__location-view {
     display: flex;
     flex-direction: column;
@@ -2991,6 +3008,7 @@ body.modal-open {
     overflow: hidden;
 }
 
+/* 사용자 태그 선택 화면 */
 .tweet-modal__tag-view {
     display: flex;
     flex-direction: column;
@@ -2998,6 +3016,7 @@ body.modal-open {
     overflow: hidden;
 }
 
+/* 미디어 ALT 편집 화면 */
 .tweet-modal__media-view {
     display: flex;
     flex-direction: column;
@@ -3114,6 +3133,7 @@ body.modal-open {
     min-height: 0;
 }
 
+/* HTML에 있는 초안 목록 컨테이너. event.js 가 체크박스/선택 상태만 갱신한다. */
 .draft-panel__list {
     display: flex;
     flex-direction: column;

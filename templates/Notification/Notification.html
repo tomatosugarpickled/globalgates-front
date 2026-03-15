@@ -7,6 +7,9 @@
         <link rel="stylesheet" href="/static/css/Notification/Notification.css" />
     </head>
     <body>
+        <!-- 외부 이모지 라이브러리: 답글 모달의 기존 emojiButton과 event.js가 연결해서 사용한다 -->
+        <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@3.0.3/dist/index.min.js"></script>
+        <!-- 알림 페이지 본문: 상단 헤더 + 알림 리스트가 들어가는 메인 컬럼 -->
         <main role="main" class="notif-page">
             <div class="notif-layout">
                 <div class="notif-col" data-testid="primaryColumn">
@@ -72,7 +75,7 @@
                             </div>
                         </nav>
                     </div>
-                    <!-- 알림 목록 -->
+                    <!-- 알림 목록 영역: .notif-item / .notif-tweet-item 카드가 세로로 쌓이는 본문 -->
                     <section class="notif-timeline" aria-labelledby="notif-timeline-label" role="region">
                         <h1 id="notif-timeline-label" class="notif-timeline__title">알림</h1>
                         <div class="notif-list" aria-label="타임라인: 알림">
@@ -334,9 +337,10 @@
                     </section>
                 </div><!-- /.notif-col -->
             </div><!-- /.notif-layout -->
+            <!-- 동적 드롭다운 마운트 지점: event.js의 공유/더보기 드롭다운이 여기에 append/remove 된다 -->
             <div id="layers" aria-hidden="true"></div>
         </main>
-        <!-- 모바일 하단 네비게이션 바 -->
+        <!-- 모바일 하단 네비게이션 바: event.js가 활성 탭 아이콘 상태만 제어한다 -->
         <div class="bottombar-fixed">
             <div class="bottombar-slide">
                 <div class="bottombar" data-testid="BottomBar">
@@ -413,14 +417,17 @@
             </div>
         </div>
 
+        <!-- 답글 모달 전체 레이어: event.js의 openReplyModal()/closeReplyModal()이 이 블록을 열고 닫는다 -->
         <div class="tweet-modal-overlay" data-reply-modal hidden>
             <div class="tweet-modal" role="dialog" aria-modal="true" aria-labelledby="reply-modal-title">
                 <!-- 작성 화면: 답글 입력창, 첨부 미리보기, 하단 툴바가 들어가는 기본 화면 -->
                 <div class="tweet-modal__compose-view">
+                <!-- 작성 진행률: event.js가 입력 길이에 따라 progressBar width를 갱신한다 -->
                 <div class="tweet-modal__progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
                     <div class="tweet-modal__progress-bar" data-testid="progressBar-bar" style="width: 0%;"></div>
                 </div>
 
+                <!-- 답글 모달 헤더: 닫기와 임시저장 진입 버튼 -->
                 <div class="tweet-modal__header">
                     <button type="button" class="tweet-modal__close" aria-label="닫기" data-testid="app-bar-close">
                         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
@@ -431,6 +438,7 @@
                     <button type="button" class="tweet-modal__draft" data-testid="unsentButton">임시저장</button>
                 </div>
 
+                <!-- 답글 작성 본문: 원본 게시물 + 에디터 + 첨부 미리보기 -->
                 <div class="tweet-modal__body">
                     <button type="button" class="tweet-modal__context-button">
                         test의 @sokkomann 님과 @tmtsugar 님에게 보내는 답글
@@ -470,6 +478,8 @@
                                 data-testid="tweetTextarea_0"
                                 data-placeholder="답글 게시하기"
                             ></div>
+                            <!-- 첨부 미리보기 영역: event.js가 [data-attachment-preview] hidden을 토글하고
+                                 [data-attachment-media] 안에 이미지/동영상/파일 카드를 동적으로 채운다 -->
                             <div class="tweet-modal__attachment attachments" data-attachment-preview data-testid="attachments" hidden>
                                 <div class="tweet-modal__attachment-media media-grid-wrapper" data-attachment-media></div>
                                 <div class="tweet-modal__attachment-meta media-actions-bar">
@@ -499,6 +509,7 @@
                     </div>
                 </div>
 
+                <!-- 답글 모달 하단 영역: 위치 표시, 툴바, 이모지 버튼, 제출 버튼 -->
                 <div class="tweet-modal__footer">
                     <div class="tweet-modal__footer-meta">
                         <div class="tweet-modal__footer-meta-slot tweet-modal__footer-meta-slot--end">
@@ -578,6 +589,7 @@
                                 </svg>
                             </button>
                         </div>
+                        <!-- 기존 커스텀 이모지 피커 마크업: 외부 라이브러리 실패 시 fallback 용도로 유지 -->
                         <div class="tweet-modal__emoji-picker" role="dialog" aria-label="이모티콘 선택기" hidden>
                             <div class="tweet-modal__emoji-search">
                                 <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" class="tweet-modal__emoji-search-icon">
@@ -611,7 +623,7 @@
                 </div>
                 </div><!-- /.tweet-modal__compose-view -->
 
-                <!-- 위치 선택 레이어: 검색창과 위치 목록을 보여주는 영역 -->
+                <!-- 위치 선택 서브뷰: compose view를 숨기고 이 블록을 대신 표시한다 -->
                 <div class="tweet-modal__location-view" hidden>
                     <div class="tweet-modal__location-modal" role="dialog" aria-modal="true" aria-labelledby="location-modal-title">
                         <!-- 위치 선택 헤더: 닫기, 삭제, 완료 버튼 -->
@@ -666,7 +678,7 @@
                     </div>
                 </div><!-- /.tweet-modal__location-view -->
 
-                <!-- 사용자 태그 모달: 첨부한 이미지에 사람을 태그하는 전체 레이어 -->
+                <!-- 사용자 태그 서브뷰: 첨부 미디어의 태그 대상을 선택하는 화면 -->
                 <div class="tweet-modal__tag-view" hidden>
                     <div class="tweet-modal__tag-modal" role="dialog" aria-modal="true" aria-labelledby="tag-modal-title">
                         <!-- 태그 모달 헤더: 닫기 / 제목 / 완료 버튼 -->
@@ -716,7 +728,7 @@
                     </div>
                 </div><!-- /.tweet-modal__tag-view -->
 
-                <!-- 미디어 설명 레이어: 첨부 이미지의 설명(alt)만 수정하는 화면 -->
+                <!-- 미디어 설명 서브뷰: 첨부 이미지 ALT 텍스트를 수정하는 화면 -->
                 <div class="tweet-modal__media-view" hidden>
                     <div class="tweet-modal__media-editor" role="dialog" aria-modal="true" aria-labelledby="media-editor-title">
                         <!-- 미디어 설명 헤더: 뒤로가기, 이전/다음, 저장 버튼 -->
@@ -752,7 +764,7 @@
                     </div>
                 </div><!-- /.tweet-modal__media-view -->
 
-                <!-- 임시저장 레이어: 작성 중이던 항목을 다시 불러오거나 삭제하는 영역 -->
+                <!-- 임시저장 서브뷰: compose view 대신 표시되며 draft 목록/삭제 확인을 포함한다 -->
                 <div class="tweet-modal__draft-view" hidden>
                     <!-- 임시저장 헤더: 뒤로가기, 제목, 수정 버튼 -->
                     <div class="draft-panel__header">
@@ -840,8 +852,6 @@
                 </div><!-- /.tweet-modal__draft-view -->
             </div><!-- /.tweet-modal -->
         </div><!-- /.tweet-modal-overlay -->
-
-        <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js" crossorigin="anonymous"></script>
         <script src="/static/js/Notification/event.js"></script>
     </body>
 </html>

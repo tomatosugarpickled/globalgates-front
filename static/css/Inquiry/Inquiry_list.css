@@ -306,6 +306,84 @@ button {
     flex: 1;
 }
 
+/* ===== Header Inquiry Tabs ===== */
+.inquiry-tabnav {
+    overflow: hidden;
+    border-bottom: 1px solid #eff3f4;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+}
+
+.inquiry-tabnav__inner {
+    display: flex;
+    align-items: center;
+}
+
+.inquiry-tabnav__list {
+    display: flex;
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.inquiry-tabnav__list::-webkit-scrollbar {
+    display: none;
+}
+
+.inquiry-tabnav__item {
+    flex: 1;
+    min-width: 120px;
+}
+
+.inquiry-tab {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 52px;
+    padding: 0 12px;
+    color: #536471;
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+}
+
+.inquiry-tab:hover {
+    background-color: rgba(15, 20, 25, 0.04);
+}
+
+.inquiry-tab--active {
+    color: #0f1419;
+    font-weight: 700;
+}
+
+.inquiry-tab__label {
+    display: block;
+    text-align: center;
+    word-break: keep-all;
+}
+
+.inquiry-tab__indicator {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 100%;
+    max-width: 64px;
+    height: 4px;
+    border-radius: 999px;
+    background: #1d9bf0;
+    opacity: 0;
+    transform: translateX(-50%);
+    transition: opacity 0.15s ease;
+}
+
+.inquiry-tab--active .inquiry-tab__indicator {
+    opacity: 1;
+}
+
 .category-banner {
     border-bottom: 1px solid #eff3f4;
 }
@@ -753,6 +831,35 @@ button {
 
     .header-title {
         font-size: 18px;
+    }
+
+    .inquiry-tabnav__list {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        overflow-x: visible;
+    }
+
+    .inquiry-tabnav__item {
+        min-width: 0;
+    }
+
+    .inquiry-tab {
+        min-height: 68px;
+        padding: 8px 6px 10px;
+        font-size: 13px;
+        line-height: 1.25;
+        white-space: normal;
+    }
+
+    .inquiry-tab__label {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .inquiry-tab__indicator {
+        max-width: 44px;
     }
 
     .category-banner-title,

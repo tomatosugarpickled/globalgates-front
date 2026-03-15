@@ -7,12 +7,13 @@
   <link rel="stylesheet" href="/static/css/Advertisement/Advertisement.css" />
 </head>
 <body>
+  <!-- Top Navigation -->
   <div id="webaf-NavRoot" class="WebAfNavbarContainer">
     <nav class="NavigationBar AdsNavbar u-featherBackgroundDark">
       <div class="NavigationBar-content">
         <div class="NavigationBar-itemGroup NavigationBar-itemGroup--alignStart">
           <div class="NavigationBar-item">
-            <a href="/">
+            <a href="">
               <span class="NavigationBar-brand">
                 <img
                   alt="global gates 팀 로고"
@@ -26,7 +27,7 @@
         </div>
         <div class="NavigationBar-itemGroup NavigationBar-itemGroup--alignEnd">
           <div class="NavigationBar-item">
-            <a href="https://ads.x.com/help" rel="noopener noreferrer" target="_blank">도움이 필요하세요?</a>
+            <a href="" rel="noopener noreferrer" target="_blank">도움이 필요하세요?</a>
           </div>
           <div class="NavigationBar-item">
             <button
@@ -69,8 +70,10 @@
     </nav>
   </div>
 
+  <!-- Advertisement App -->
   <div id="root">
     <div class="MarketplaceAdApp">
+      <!-- Sidebar Navigation -->
       <aside class="NavigationSidebar MarketplaceAdSidebar" style="min-height: calc(100vh - 56px); top: 56px;">
         <nav class="NavigationSidebar-main">
           <ul class="NavigationSidebar-itemGroup" role="tree">
@@ -128,7 +131,9 @@
         </div>
       </aside>
 
+      <!-- Main Content -->
       <main class="MarketplaceAdMain">
+        <!-- Page Header -->
         <header class="MarketplaceAdPageHeader">
           <div>
             <div class="MarketplaceAdEyebrow">global gates 광고 센터</div>
@@ -144,8 +149,10 @@
         </header>
 
         <div id="mainContentContainer" class="MarketplaceAdContent">
+          <!-- Apply View -->
           <section class="MarketplaceAdView AdvertisementApplyView is-active" data-view="apply">
             <div class="MarketplaceAdApplyLayout">
+              <!-- Apply Form Column -->
               <div class="MarketplaceAdPrimaryColumn">
                 <section class="MarketplaceAdPanel">
                   <div class="MarketplaceAdPanelHeader">
@@ -187,6 +194,7 @@
                           <button class="MarketplaceAdSecondaryButton" data-upload-clear hidden type="button">첨부파일 삭제</button>
                           <input accept="image/*,video/*" data-upload-input hidden multiple type="file" />
                         </div>
+                        <!-- event.js가 기존 [data-attachment-list] 내부를 replaceChildren()으로 갱신하고, 첨부가 없으면 이 블록을 다시 hidden 처리한다. -->
                         <div class="MarketplaceAdAttachmentPreview" data-attachment-preview data-file-kind="empty" hidden>
                           <div class="MarketplaceAdAttachmentPreviewList" data-attachment-list></div>
                         </div>
@@ -197,6 +205,7 @@
                 </section>
               </div>
 
+              <!-- Summary / Preview Column -->
               <aside class="MarketplaceAdSideColumn">
                 <section class="MarketplaceAdPanel">
                   <div class="MarketplaceAdPanelHeader">
@@ -279,6 +288,7 @@
                           <div class="AdCreativePreviewMedia">
                             <div class="AdCreativePreviewMediaContent">
                               <div class="AdCreativePreviewMediaPlaceholder" data-preview-field="attachmentPlaceholder"></div>
+                              <!-- event.js가 기존 [data-preview-field="attachmentGallery"] 내부 타일을 replaceChildren()으로 다시 그린다. -->
                               <div class="AdCreativePreviewMediaGallery" data-preview-field="attachmentGallery" hidden></div>
                               <img alt="광고 첨부 미리보기" class="AdCreativePreviewMediaImage" data-preview-field="attachmentImage" hidden />
                               <video class="AdCreativePreviewMediaVideo" data-preview-field="attachmentVideo" hidden muted playsinline loop autoplay></video>
@@ -325,6 +335,7 @@
             </div>
           </section>
 
+          <!-- List View -->
           <section class="MarketplaceAdView AdvertisementListView" data-view="list" hidden>
             <section class="MarketplaceAdPanel">
               <div class="MarketplaceAdPanelHeader MarketplaceAdPanelHeader--withActions">
@@ -475,6 +486,7 @@
             </section>
           </section>
 
+          <!-- Detail View -->
           <section class="MarketplaceAdView AdvertisementDetailView" data-view="detail" hidden>
             <div class="MarketplaceAdDetailHeader">
               <div class="MarketplaceAdDetailTitleWrap">
@@ -533,6 +545,7 @@
       </main>
     </div>
 
+    <!-- Existing Dropdown Mounts: event.js가 append 하지 않고 이 노드들의 hidden/position만 제어한다. -->
     <div class="MarketplaceAdDropdown" data-dropdown="account" hidden>
       <button class="MarketplaceAdDropdownItem" type="button">광고 계정 설정</button>
       <button class="MarketplaceAdDropdownItem" type="button">결제 내역</button>
@@ -545,9 +558,12 @@
       <button class="MarketplaceAdDropdownItem" type="button">로그아웃</button>
     </div>
 
+    <!-- Existing Toast: event.js가 이 노드의 텍스트와 hidden 상태만 바꿔 재사용한다. -->
     <div class="MarketplaceAdToast" data-toast hidden></div>
 
+    <!-- Existing Modal Overlay: event.js가 overlay와 내부 modal의 hidden만 토글하며 재사용한다. -->
     <div class="MarketplaceAdModalOverlay" data-modal-overlay hidden>
+      <!-- Guide Modal -->
       <div class="MarketplaceAdModal" data-modal="guide" hidden>
         <div class="MarketplaceAdModalHeader">
           <div>
@@ -566,6 +582,7 @@
         </div>
       </div>
 
+      <!-- Payment Modal -->
       <div class="MarketplaceAdModal" data-modal="payment" hidden>
         <div class="MarketplaceAdModalHeader">
           <div>

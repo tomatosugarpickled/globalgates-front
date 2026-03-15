@@ -9,8 +9,10 @@ window.onload = function () {
     const modalConfirm = document.getElementById("modalConfirm");
     const modalCancel = document.getElementById("modalCancel");
     const headerBack = document.getElementById("headerBack");
+    const inquiryTabs = Array.from(document.querySelectorAll("[data-inquiry-tab]"));
     const tabLinks = document.querySelectorAll(".tab-link");
     const bottombarSlide = document.querySelector(".bottombar-slide");
+    const INQUIRY_TAB_PREVIEW_DURATION_MS = 280;
     const originalChipsHTML = scrollEl ? scrollEl.innerHTML : "";
     let pendingBtn = null;
     let lastScrollY = 0;
@@ -64,6 +66,23 @@ window.onload = function () {
             );
             link.classList.toggle("tab-link--active", active);
         });
+    }
+
+    function setActiveInquiryTab(tabName) {
+        inquiryTabs.forEach((tab) => {
+            const active = tab.dataset.inquiryTab === tabName;
+            tab.classList.toggle("inquiry-tab--active", active);
+            tab.setAttribute("aria-selected", String(active));
+        });
+    }
+
+    function previewInquiryTab(tab) {
+        tab.classList.remove("inquiry-tab--preview");
+        void tab.offsetWidth;
+        tab.classList.add("inquiry-tab--preview");
+        window.setTimeout(() => {
+            tab.classList.remove("inquiry-tab--preview");
+        }, INQUIRY_TAB_PREVIEW_DURATION_MS);
     }
 
     if (scrollEl) {
@@ -164,11 +183,19 @@ window.onload = function () {
     });
 
     setActiveTab("notifications");
+    setActiveInquiryTab("partners");
 
     tabLinks.forEach((link) => {
         link.addEventListener("click", (event) => {
             event.preventDefault();
             setActiveTab(link.dataset.tab);
+        });
+    });
+
+    inquiryTabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+            previewInquiryTab(tab);
+            setActiveInquiryTab(tab.dataset.inquiryTab);
         });
     });
 

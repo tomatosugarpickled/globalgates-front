@@ -11,6 +11,7 @@ window.onload = () => {
     setupComposerToolbar();
     setupComposerDraftPanel();
     setupSearchForm();
+    setupExchangeRates();
     setupTimelineTabs();
     setupExpandablePostText();
     setupMediaPreview();
@@ -23,32 +24,37 @@ window.onload = () => {
 };
 
 function showTimedToast({
+    toastElement,
     message,
-    className,
-    activeToast,
-    setActiveToast,
     duration = 3000,
+    activeTimer = null,
+    setActiveTimer = null,
 }) {
-    activeToast?.remove();
-    const toast = document.createElement("div");
-    toast.className = className;
-    toast.setAttribute("role", "status");
-    toast.setAttribute("aria-live", "polite");
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setActiveToast(toast);
+    if (!toastElement) {
+        return;
+    }
 
-    window.setTimeout(() => {
-        setActiveToast((currentToast) =>
-            currentToast === toast ? null : currentToast,
-        );
-        toast.remove();
+    if (activeTimer) {
+        window.clearTimeout(activeTimer);
+    }
+
+    toastElement.textContent = message;
+    toastElement.hidden = false;
+
+    const nextTimer = window.setTimeout(() => {
+        toastElement.hidden = true;
+        if (typeof setActiveTimer === "function") {
+            setActiveTimer(null);
+        }
     }, duration);
+
+    if (typeof setActiveTimer === "function") {
+        setActiveTimer(nextTimer);
+    }
 }
 
 // 템플릿 문자열에 사용자 입력을 섞는 구간이 많아서 최소한의 HTML 이스케이프를
-// 파일 내부에 둔다. 서버 렌더링이나 Spring API 응답을 붙일 때도 같은 규칙으로
-// 재사용할 수 있어 외부 전역 helper 누락으로 전체 스크립트가 죽는 일을 막는다.
+// 파일 내부에 둔다. 외부 전역 helper 누락으로 전체 스크립트가 죽는 일을 막는다.
 function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, (character) => {
         const escapedByCharacter = {
@@ -64,8 +70,7 @@ function escapeHtml(value) {
 }
 
 // 더보기 메뉴는 버튼 위치를 기준으로 뜨되 화면 밖으로 밀리면 안 된다.
-// Spring 정적 리소스 배포 환경에서도 추가 의존성 없이 동일 계산을 보장하려고
-// 좌표 계산을 파일 안에 유지한다.
+// 추가 의존성 없이 동일 계산을 보장하려고 좌표 계산을 파일 안에 유지한다.
 function calculateMoreMenuPosition({
     windowWidth,
     windowHeight,
@@ -92,8 +97,8 @@ function calculateMoreMenuPosition({
 }
 
 // 피드에서는 긴 본문만 접기/펼치기 UI가 필요하다.
-// 이 상태 계산을 분리해 두면 이후 Spring 서버에서 받은 본문 길이 규칙이 바뀌어도
-// DOM 조작부를 건드리지 않고 여기서만 조정할 수 있다.
+// 이 상태 계산을 분리해 두면 본문 길이 규칙이 바뀌어도 DOM 조작부를 건드리지 않고
+// 여기서만 조정할 수 있다.
 function getCollapsedPostTextState(text, maxLength) {
     const fullText = String(text || "").trim();
     const safeMaxLength = Math.max(0, Number(maxLength) || 0);
@@ -109,200 +114,496 @@ function getCollapsedPostTextState(text, maxLength) {
     };
 }
 
-// Twemoji는 선택 기능이다. 라이브러리가 늦게 오거나 빠져도 메인 기능은 유지되어야
-// 하므로 안전 래퍼를 둔다. 이후 Spring 템플릿에서 CDN 전략이 바뀌어도 본문 입력과
-// 모달 로직은 계속 동작한다.
-function parseTwemoji(scope) {
-    if (!scope || !window.twemoji) {
-        return;
-    }
-
-    window.twemoji.parse(scope, { folder: "svg", ext: ".svg" });
-}
-
 function buildInitialAvatarDataUri(label) {
     const safeLabel = escapeHtml((label || "?").slice(0, 2));
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="20" fill="#1d9bf0"></rect><text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff">${safeLabel}</text></svg>`;
     return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
-// 작성 모달과 댓글 모달에서 공통으로 재사용하는 이모지/임시저장 설정 값들이다.
-const composerEmojiRecentsKey = "main_composer_recent_emojis";
+function buildFileFromDataUrl(dataUrl, fileName, fileType, lastModified) {
+    const [header, base64Payload = ""] = String(dataUrl || "").split(",");
+    const mimeType =
+        fileType ||
+        header.match(/data:([^;]+)/)?.[1] ||
+        "application/octet-stream";
+    const binary = window.atob(base64Payload);
+    const length = binary.length;
+    const bytes = new Uint8Array(length);
+
+    for (let index = 0; index < length; index += 1) {
+        bytes[index] = binary.charCodeAt(index);
+    }
+
+    return new File([bytes], fileName, {
+        type: mimeType,
+        lastModified: lastModified || Date.now(),
+    });
+}
+
+function getTextContent(element) {
+    return element?.textContent?.trim() ?? "";
+}
+
+function cloneUsers(users) {
+    return users.map((user) => ({ ...user }));
+}
+
+function getTaggedUserSummary(users) {
+    return users.length === 0
+        ? "사용자 태그하기"
+        : users.map((user) => user.name).join(", ");
+}
+
+function filterUsersByQuery(users, query, limit = 6) {
+    const normalizedQuery = String(query || "")
+        .trim()
+        .toLowerCase();
+    if (!normalizedQuery) {
+        return [];
+    }
+    return users
+        .filter((user) =>
+            `${user.name} ${user.handle}`
+                .toLowerCase()
+                .includes(normalizedQuery),
+        )
+        .slice(0, limit);
+}
+
+function buildTagChipMarkup(user) {
+    const avatarMarkup = user.avatar
+        ? `<span class="tweet-modal__tag-chip-avatar"><img src="${escapeHtml(user.avatar)}" alt="${escapeHtml(user.name)}" /></span>`
+        : '<span class="tweet-modal__tag-chip-avatar"></span>';
+    return `<button type="button" class="tweet-modal__tag-chip" data-tag-remove-id="${escapeHtml(user.id)}">${avatarMarkup}<span class="tweet-modal__tag-chip-name">${escapeHtml(user.name)}</span><svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-modal__tag-chip-icon"><g><path d="M10.59 12 4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path></g></svg></button>`;
+}
+
+function buildTagResultMarkup(user, isSelected) {
+    const subtitle = isSelected ? `${user.handle} 이미 태그됨` : user.handle;
+    const avatarMarkup = user.avatar
+        ? `<span class="tweet-modal__tag-avatar"><img src="${escapeHtml(user.avatar)}" alt="${escapeHtml(user.name)}" /></span>`
+        : '<span class="tweet-modal__tag-avatar"></span>';
+    return `<div role="option" class="tweet-modal__tag-option" data-testid="typeaheadResult"><div role="checkbox" aria-checked="${String(isSelected)}" aria-disabled="${String(isSelected)}" class="tweet-modal__tag-checkbox"><button type="button" class="tweet-modal__tag-user" data-tag-user-id="${escapeHtml(user.id)}" ${isSelected ? "disabled" : ""}>${avatarMarkup}<span class="tweet-modal__tag-user-body"><span class="tweet-modal__tag-user-name">${escapeHtml(user.name)}</span><span class="tweet-modal__tag-user-handle">${escapeHtml(subtitle)}</span></span></button></div></div>`;
+}
+
+function renderTagResultsPanel({
+    input,
+    resultsElement,
+    users,
+    selectedUsers,
+    resultId,
+}) {
+    if (!input || !resultsElement) {
+        return;
+    }
+
+    if (!input.value.trim()) {
+        input.setAttribute("aria-expanded", "false");
+        input.removeAttribute("aria-controls");
+        resultsElement.removeAttribute("role");
+        resultsElement.removeAttribute("id");
+        resultsElement.innerHTML = "";
+        return;
+    }
+
+    input.setAttribute("aria-expanded", "true");
+    input.setAttribute("aria-controls", resultId);
+    resultsElement.setAttribute("role", "listbox");
+    resultsElement.id = resultId;
+
+    if (users.length === 0) {
+        resultsElement.innerHTML =
+            '<p class="tweet-modal__tag-empty">일치하는 사용자를 찾지 못했습니다.</p>';
+        return;
+    }
+
+    resultsElement.innerHTML = users
+        .map((user) =>
+            buildTagResultMarkup(
+                user,
+                selectedUsers.some((entry) => entry.id === user.id),
+            ),
+        )
+        .join("");
+}
+
+function renderLocationOptions(listElement, locations, selectedLocation) {
+    if (!listElement) {
+        return;
+    }
+
+    if (locations.length === 0) {
+        listElement.innerHTML =
+            '<p class="tweet-modal__location-empty">일치하는 위치를 찾지 못했습니다.</p>';
+        return;
+    }
+
+    listElement.innerHTML = locations
+        .map((location) => {
+            const isSelected = selectedLocation === location;
+            return `<button type="button" class="tweet-modal__location-item" role="menuitem"><span class="tweet-modal__location-item-label">${escapeHtml(location)}</span><span class="tweet-modal__location-item-check">${isSelected ? '<svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9.64 18.952l-5.55-4.861 1.317-1.504 3.951 3.459 8.459-10.948L19.4 6.32 9.64 18.952z"></path></g></svg>' : ""}</span></button>`;
+        })
+        .join("");
+}
+
+// 메인 타임라인에서 태그 가능한 사용자는 현재 계정과 `.postCard` 작성자를 합쳐 만든다.
+// 작성 모달과 답글 모달이 같은 데이터 원본을 쓰도록 여기서 한 번만 만든다.
+function getMainPageTagUsers() {
+    const seenHandles = new Set();
+    const users = [];
+    const accountName = getTextContent(document.getElementById("accountName"));
+    const accountHandle = getTextContent(
+        document.getElementById("accountHandle"),
+    );
+    const accountAvatarLabel =
+        getTextContent(document.getElementById("accountAvatar")) ||
+        accountName.charAt(0) ||
+        "나";
+
+    if (accountName && accountHandle) {
+        seenHandles.add(accountHandle);
+        users.push({
+            id: accountHandle.replace("@", "") || "current-user",
+            name: accountName,
+            handle: accountHandle,
+            avatar: buildInitialAvatarDataUri(accountAvatarLabel),
+        });
+    }
+
+    document.querySelectorAll(".postCard").forEach((postCard, index) => {
+        const name = getTextContent(postCard.querySelector(".postName"));
+        const handle = getTextContent(postCard.querySelector(".postHandle"));
+        const avatar =
+            postCard.querySelector(".postAvatarImage")?.getAttribute("src") ??
+            "";
+
+        if (!name || !handle || seenHandles.has(handle)) {
+            return;
+        }
+
+        seenHandles.add(handle);
+        users.push({
+            id: `${handle.replace("@", "") || "user"}-${index}`,
+            name,
+            handle,
+            avatar,
+        });
+    });
+
+    return users;
+}
+
+// 작성/답글 첨부 미리보기는 같은 마크업 규칙을 써서 공통 helper로 합친다.
+const attachmentGridLayouts = {
+    1: {
+        aspectClassName: "media-aspect-ratio media-aspect-ratio--single",
+        columns: [[{ index: 0, className: "media-cell--single" }]],
+    },
+    2: {
+        aspectClassName: "media-aspect-ratio",
+        columns: [
+            [{ index: 0, className: "media-cell--left" }],
+            [{ index: 1, className: "media-cell--right" }],
+        ],
+    },
+    3: {
+        aspectClassName: "media-aspect-ratio",
+        columns: [
+            [{ index: 0, className: "media-cell--left-tall" }],
+            [
+                { index: 1, className: "media-cell--right-top" },
+                { index: 2, className: "media-cell--right-bottom" },
+            ],
+        ],
+    },
+    4: {
+        aspectClassName: "media-aspect-ratio",
+        columns: [
+            [
+                { index: 0, className: "media-cell--top-left" },
+                { index: 2, className: "media-cell--bottom-left" },
+            ],
+            [
+                { index: 1, className: "media-cell--top-right" },
+                { index: 3, className: "media-cell--bottom-right" },
+            ],
+        ],
+    },
+};
+
+function buildAttachmentActionMarkup({
+    index,
+    deleteLabel,
+    removeAttribute,
+    includeEdit = true,
+    editAttribute = "data-attachment-edit-index",
+}) {
+    const editButtonMarkup = includeEdit
+        ? `<div class="media-btn-row"><button type="button" class="media-btn" ${editAttribute}="${index}"><span>수정</span></button></div>`
+        : "";
+
+    return `${editButtonMarkup}<button type="button" class="media-btn-delete" aria-label="${escapeHtml(deleteLabel)}" ${removeAttribute}="${index}"><svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path></g></svg></button>`;
+}
+
+function buildAttachmentMediaCellMarkup({
+    className,
+    mediaMarkup,
+    actionMarkup,
+}) {
+    return `<div class="media-cell ${className}"><div class="media-cell-inner">${mediaMarkup}${actionMarkup}</div></div>`;
+}
+
+function buildAttachmentImageCellMarkup({
+    index,
+    url,
+    className,
+    alt,
+    actionMarkup,
+}) {
+    const mediaMarkup = `<div class="media-img-container" aria-label="미디어" role="group"><div class="media-bg" style="background-image: url('${url}');"></div><img alt="${escapeHtml(alt)}" draggable="false" src="${url}" class="media-img"></div>`;
+    return buildAttachmentMediaCellMarkup({
+        className,
+        mediaMarkup,
+        actionMarkup,
+    });
+}
+
+function buildAttachmentGridMarkup({
+    count,
+    urls,
+    getAlt,
+    getActionMarkup,
+}) {
+    const layout = attachmentGridLayouts[count] || attachmentGridLayouts[4];
+    const columnsMarkup = layout.columns
+        .map((column) => {
+            const cellsMarkup = column
+                .map(({ index, className }) =>
+                    buildAttachmentImageCellMarkup({
+                        index,
+                        url: urls[index],
+                        className,
+                        alt: getAlt(index),
+                        actionMarkup: getActionMarkup(index),
+                    }),
+                )
+                .join("");
+
+            return `<div class="media-col">${cellsMarkup}</div>`;
+        })
+        .join("");
+
+    if (layout.columns.length === 1) {
+        return `<div class="${layout.aspectClassName}"></div><div class="media-absolute-layer">${columnsMarkup}</div>`;
+    }
+
+    return `<div class="${layout.aspectClassName}"></div><div class="media-absolute-layer"><div class="media-row">${columnsMarkup}</div></div>`;
+}
+
+function buildAttachmentVideoMarkup({
+    index = 0,
+    url,
+    fileType,
+    actionMarkup,
+}) {
+    const mediaMarkup = `<div class="media-img-container" aria-label="미디어" role="group"><video class="tweet-modal__attachment-video" controls preload="metadata"><source src="${url}" type="${escapeHtml(fileType)}"></video></div>`;
+    const cellMarkup = buildAttachmentMediaCellMarkup({
+        className: "media-cell--single",
+        mediaMarkup,
+        actionMarkup,
+    });
+
+    return `<div class="media-aspect-ratio media-aspect-ratio--single"></div><div class="media-absolute-layer">${cellMarkup}</div>`;
+}
+
+function buildAttachmentFileCardMarkup({
+    file,
+    index,
+    objectUrl = "",
+    actionMarkup,
+}) {
+    if (file.type.startsWith("video/")) {
+        return buildAttachmentMediaCellMarkup({
+            className: "media-cell--single",
+            mediaMarkup: `<div class="media-img-container" aria-label="미디어" role="group"><video class="tweet-modal__attachment-video" controls preload="metadata"><source src="${objectUrl}" type="${escapeHtml(file.type)}"></video></div>`,
+            actionMarkup,
+        });
+    }
+
+    return `<div class="tweet-modal__attachment-file"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><g><path d="M14 2H7.75C5.68 2 4 3.68 4 5.75v12.5C4 20.32 5.68 22 7.75 22h8.5C18.32 22 20 20.32 20 18.25V8l-6-6zm0 2.12L17.88 8H14V4.12zm2.25 15.88h-8.5c-.97 0-1.75-.78-1.75-1.75V5.75C6 4.78 6.78 4 7.75 4H12v5.25c0 .41.34.75.75.75H18v8.25c0 .97-.78 1.75-1.75 1.75z"></path></g></svg><span class="tweet-modal__attachment-file-name">${escapeHtml(file.name)}</span>${actionMarkup}</div>`;
+}
+
+function getSharedDraftEmptyCopy() {
+    return {
+        title: "잠시 생각을 정리합니다",
+        body: "아직 게시할 준비가 되지 않았나요? 임시저장해 두고 나중에 이어서 작성하세요.",
+    };
+}
+
+function getSharedDraftConfirmCopy() {
+    return {
+        title: "전송하지 않은 게시물 삭제하기",
+        body: "이 작업은 취소할 수 없으며 선택한 전송하지 않은 게시물이 삭제됩니다.",
+    };
+}
+
+function buildSharedDraftCheckboxMarkup(selected) {
+    return `<span class="draft-panel__checkbox${selected ? " draft-panel__checkbox--checked" : ""}" aria-hidden="true"><svg viewBox="0 0 24 24"><g><path d="M9.86 18a1 1 0 01-.73-.31l-3.9-4.11 1.45-1.38 3.2 3.38 7.46-8.1 1.47 1.36-8.19 8.9A1 1 0 019.86 18z"></path></g></svg></span>`;
+}
+
+function hasSelectedDraftItems(draftPanelState) {
+    return draftPanelState.selectedItems.size > 0;
+}
+
+function areAllDraftIdsSelected(draftPanelState, draftIds) {
+    return (
+        draftIds.length > 0 &&
+        draftIds.every((draftId) => draftPanelState.selectedItems.has(draftId))
+    );
+}
+
+function toggleDraftSelectionState(draftPanelState, draftId) {
+    if (!draftId) {
+        return;
+    }
+
+    if (draftPanelState.selectedItems.has(draftId)) {
+        draftPanelState.selectedItems.delete(draftId);
+    } else {
+        draftPanelState.selectedItems.add(draftId);
+    }
+    draftPanelState.confirmOpen = false;
+}
+
+function toggleDraftSelectAllState(draftPanelState, draftIds) {
+    if (draftIds.length === 0) {
+        return;
+    }
+
+    if (areAllDraftIdsSelected(draftPanelState, draftIds)) {
+        draftPanelState.selectedItems.clear();
+    } else {
+        draftPanelState.selectedItems = new Set(draftIds);
+    }
+    draftPanelState.confirmOpen = false;
+}
+
+function resetSharedDraftPanelState(draftPanelState) {
+    draftPanelState.isEditMode = false;
+    draftPanelState.confirmOpen = false;
+    draftPanelState.selectedItems.clear();
+}
+
+function renderDraftPanelChrome({
+    draftPanelState,
+    itemCount,
+    allSelected,
+    actionButton,
+    empty,
+    emptyTitle,
+    emptyBody,
+    footer,
+    selectAllButton,
+    deleteButton,
+    confirmOverlay,
+    confirmTitle,
+    confirmDesc,
+}) {
+    const hasItems = itemCount > 0;
+    const emptyCopy = getSharedDraftEmptyCopy();
+    const confirmCopy = getSharedDraftConfirmCopy();
+
+    if (actionButton) {
+        actionButton.textContent = draftPanelState.isEditMode ? "완료" : "수정";
+        actionButton.disabled = !hasItems;
+        actionButton.classList.toggle(
+            "draft-panel__action--done",
+            draftPanelState.isEditMode,
+        );
+    }
+    if (empty) {
+        empty.hidden = hasItems;
+    }
+    if (emptyTitle) {
+        emptyTitle.textContent = emptyCopy.title;
+    }
+    if (emptyBody) {
+        emptyBody.textContent = emptyCopy.body;
+    }
+    if (footer) {
+        footer.hidden = !draftPanelState.isEditMode;
+    }
+    if (selectAllButton) {
+        selectAllButton.textContent = allSelected
+            ? "모두 선택 해제"
+            : "모두 선택";
+    }
+    if (deleteButton) {
+        deleteButton.disabled = !hasSelectedDraftItems(draftPanelState);
+    }
+    if (confirmOverlay) {
+        confirmOverlay.hidden = !draftPanelState.confirmOpen;
+    }
+    if (confirmTitle) {
+        confirmTitle.textContent = confirmCopy.title;
+    }
+    if (confirmDesc) {
+        confirmDesc.textContent = confirmCopy.body;
+    }
+}
+
+function renderMediaAltEditorPanel({
+    edits,
+    activeIndex,
+    previewImage,
+    altInput,
+    altCount,
+    titleElement,
+    prevButton,
+    nextButton,
+    imageUrls,
+    maxLength,
+}) {
+    if (!previewImage || !altInput || !altCount) {
+        return;
+    }
+
+    if (edits.length === 0) {
+        altInput.value = "";
+        altCount.textContent = `0 / ${maxLength.toLocaleString("ko-KR")}`;
+        previewImage.src = "";
+        previewImage.alt = "";
+        if (titleElement) {
+            titleElement.textContent = "이미지 설명 수정";
+        }
+        if (prevButton) {
+            prevButton.disabled = true;
+        }
+        if (nextButton) {
+            nextButton.disabled = true;
+        }
+        return;
+    }
+
+    const edit = edits[activeIndex] || { alt: "" };
+    const alt = edit.alt ?? "";
+    altInput.value = alt;
+    altCount.textContent = `${alt.length} / ${maxLength.toLocaleString("ko-KR")}`;
+    previewImage.src = imageUrls[activeIndex] ?? "";
+    previewImage.alt = alt;
+
+    if (titleElement) {
+        titleElement.textContent = `이미지 설명 수정 (${activeIndex + 1}/${edits.length || 1})`;
+    }
+    if (prevButton) {
+        prevButton.disabled = activeIndex <= 0;
+    }
+    if (nextButton) {
+        nextButton.disabled = activeIndex >= edits.length - 1;
+    }
+}
+
+// 작성 모달에서 공통으로 재사용하는 임시저장/서식 설정 값들이다.
 const composerDraftsStorageKey = "main_composer_saved_drafts";
-const composerMaxRecentEmojis = 18;
-const composerEmojiCategoryMeta = {
-    recent: {
-        label: "최근",
-        sectionTitle: "최근",
-        icon: '<svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-modal__emoji-tab-icon"><g><path d="M12 1.75A10.25 10.25 0 112.75 12 10.26 10.26 0 0112 1.75zm0 1.5A8.75 8.75 0 1020.75 12 8.76 8.76 0 0012 3.25zm.75 3.5v5.19l3.03 1.75-.75 1.3-3.78-2.18V6.75h1.5z"></path></g></svg>',
-    },
-    smileys: {
-        label: "스마일리 및 사람",
-        sectionTitle: "스마일리 및 사람",
-        icon: '<svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-modal__emoji-tab-icon"><g><path d="M12 22.75C6.072 22.75 1.25 17.928 1.25 12S6.072 1.25 12 1.25 22.75 6.072 22.75 12 17.928 22.75 12 22.75zm0-20c-5.109 0-9.25 4.141-9.25 9.25s4.141 9.25 9.25 9.25 9.25-4.141 9.25-9.25S17.109 2.75 12 2.75zM9 11.75c-.69 0-1.25-.56-1.25-1.25S8.31 9.25 9 9.25s1.25.56 1.25 1.25S9.69 11.75 9 11.75zm6 0c-.69 0-1.25-.56-1.25-1.25S14.31 9.25 15 9.25s1.25.56 1.25 1.25S15.69 11.75 15 11.75zm-8.071 3.971c.307-.298.771-.397 1.188-.253.953.386 2.403.982 3.883.982s2.93-.596 3.883-.982c.417-.144.88-.044 1.188.253a.846.846 0 01-.149 1.34c-1.254.715-3.059 1.139-4.922 1.139s-3.668-.424-4.922-1.139a.847.847 0 01-.149-1.39z"></path></g></svg>',
-    },
-    animals: {
-        label: "동물 및 자연",
-        sectionTitle: "동물 및 자연",
-        icon: '<svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-modal__emoji-tab-icon"><g><path d="M12 3.5c3.77 0 6.75 2.86 6.75 6.41 0 3.17-1.88 4.94-4.15 6.28-.74.44-1.54.9-1.6 1.86-.02.38-.33.68-.71.68h-.6a.71.71 0 01-.71-.67c-.07-.95-.86-1.42-1.6-1.85C7.13 14.85 5.25 13.08 5.25 9.91 5.25 6.36 8.23 3.5 12 3.5zm-4.79-.97c.61 0 1.1.49 1.1 1.1 0 .32-.14.63-.39.84-.4.34-.78.78-1.08 1.3-.18.3-.49.48-.84.48-.61 0-1.1-.49-1.1-1.1 0-.14.03-.29.09-.42.47-1.04 1.17-1.93 2.02-2.63.19-.15.43-.24.7-.24zm9.58 0c.27 0 .51.09.7.24.85.7 1.55 1.6 2.02 2.63.06.13.09.28.09.42 0 .61-.49 1.1-1.1 1.1-.35 0-.66-.18-.84-.48-.3-.52-.68-.96-1.08-1.3a1.1 1.1 0 01-.39-.84c0-.61.49-1.1 1.1-1.1z"></path></g></svg>',
-    },
-    food: {
-        label: "음식 및 음료",
-        sectionTitle: "음식 및 음료",
-        icon: '<svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-modal__emoji-tab-icon"><g><path d="M5 10.5c0-3.59 3.36-6.5 7.5-6.5s7.5 2.91 7.5 6.5v.58a5.42 5.42 0 01-2.08 4.26L16.5 21H8.5l-1.42-5.66A5.42 5.42 0 015 11.08v-.58zm2 0v.58c0 1.08.5 2.08 1.36 2.76l.3.24.95 3.92h5.78l.95-3.92.3-.24a3.42 3.42 0 001.36-2.76v-.58c0-2.48-2.47-4.5-5.5-4.5S7 8.02 7 10.5z"></path></g></svg>',
-    },
-    activities: {
-        label: "활동",
-        sectionTitle: "활동",
-        icon: '<svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-modal__emoji-tab-icon"><g><path d="M12 2.25c5.385 0 9.75 4.365 9.75 9.75S17.385 21.75 12 21.75 2.25 17.385 2.25 12 6.615 2.25 12 2.25zm0 1.5A8.25 8.25 0 103.75 12 8.26 8.26 0 0012 3.75zm-4.1 4.5c.27 0 .53.12.71.33l1.94 2.55 3.12-2.29c.36-.27.87-.22 1.18.12l2.83 3.12a.88.88 0 01-.07 1.24.88.88 0 01-1.24-.07l-2.3-2.54-3.16 2.33a.88.88 0 01-1.23-.16L7.2 9.64a.88.88 0 01.7-1.39z"></path></g></svg>',
-    },
-    travel: {
-        label: "여행 및 장소",
-        sectionTitle: "여행 및 장소",
-        icon: '<svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-modal__emoji-tab-icon"><g><path d="M12 2.25c-4.142 0-7.5 3.245-7.5 7.248 0 5.207 6.46 11.611 6.735 11.881a1.08 1.08 0 001.53 0c.275-.27 6.735-6.674 6.735-11.881 0-4.003-3.358-7.248-7.5-7.248zm0 17.493c-1.758-1.878-6-6.838-6-10.245 0-3.172 2.686-5.748 6-5.748s6 2.576 6 5.748c0 3.407-4.242 8.367-6 10.245zm0-13.243a3 3 0 100 6 3 3 0 000-6z"></path></g></svg>',
-    },
-    objects: {
-        label: "사물",
-        sectionTitle: "사물",
-        icon: '<svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-modal__emoji-tab-icon"><g><path d="M12 2.5c2.07 0 3.75 1.68 3.75 3.75 0 1.45-.83 2.71-2.04 3.33l-.21.11V11h.5A2.5 2.5 0 0116.5 13.5v1.38c0 1.27-.7 2.43-1.82 3.03l-.93.5V21.5h-3.5v-3.09l-.93-.5A3.44 3.44 0 017.5 14.88V13.5A2.5 2.5 0 0110 11h.5V9.69l-.21-.11A3.75 3.75 0 018.25 6.25 3.75 3.75 0 0112 2.5zm0 1.5a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5zm-2 8.5a1 1 0 00-1 1v1.38c0 .72.4 1.39 1.04 1.73l1.71.92v1.47h.5v-1.47l1.71-.92A1.97 1.97 0 0015 14.88V13.5a1 1 0 00-1-1h-4z"></path></g></svg>',
-    },
-    symbols: {
-        label: "기호",
-        sectionTitle: "기호",
-        icon: '<svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-modal__emoji-tab-icon"><g><path d="M5 4h14v4.5h-2V6H7v2.5H5V4zm2 6h4v4H7v-4zm6 0h4v4h-4v-4zM5 16h6v4H5v-4zm8 0h6v4h-6v-4z"></path></g></svg>',
-    },
-    flags: {
-        label: "깃발",
-        sectionTitle: "깃발",
-        icon: '<svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-modal__emoji-tab-icon"><g><path d="M6 2.75A.75.75 0 016.75 2h.5a.75.75 0 01.75.75V3h9.38c.97 0 1.45 1.17.76 1.85L16.1 6.9l2.05 2.05c.69.68.21 1.85-.76 1.85H8v10.45a.75.75 0 01-.75.75h-.5a.75.75 0 01-.75-.75V2.75z"></path></g></svg>',
-    },
-};
-
-const composerEmojiCategoryData = {
-    smileys: [
-        "😀",
-        "😃",
-        "😄",
-        "😁",
-        "😂",
-        "😊",
-        "😉",
-        "😍",
-        "🥰",
-        "😎",
-        "🤔",
-        "😭",
-        "🥳",
-        "🤩",
-        "😴",
-        "😤",
-        "🤯",
-        "🫠",
-    ],
-    animals: [
-        "🐶",
-        "🐱",
-        "🐻",
-        "🐼",
-        "🦊",
-        "🐯",
-        "🦁",
-        "🐸",
-        "🐵",
-        "🐧",
-        "🐦",
-        "🦄",
-        "🐝",
-        "🦋",
-        "🌸",
-        "🌿",
-        "🌙",
-        "⭐",
-    ],
-    food: [
-        "🍔",
-        "🍕",
-        "🍜",
-        "🍣",
-        "🍩",
-        "🍪",
-        "🍫",
-        "🍿",
-        "🥐",
-        "🍎",
-        "🍓",
-        "🍉",
-        "🍇",
-        "☕",
-        "🍵",
-        "🥤",
-    ],
-    activities: [
-        "⚽",
-        "🏀",
-        "🎮",
-        "🎯",
-        "🎳",
-        "🎸",
-        "🎧",
-        "🎬",
-        "📚",
-        "🧩",
-        "🏆",
-        "🥇",
-        "🏃",
-        "🚴",
-    ],
-    travel: [
-        "🚗",
-        "🚌",
-        "✈️",
-        "🚀",
-        "🚲",
-        "⛵",
-        "🏠",
-        "🏙️",
-        "🏝️",
-        "🌁",
-        "🗼",
-        "🗽",
-        "📍",
-    ],
-    objects: [
-        "💡",
-        "📱",
-        "💻",
-        "⌚",
-        "📷",
-        "🎥",
-        "💰",
-        "💎",
-        "🔑",
-        "🎁",
-        "📌",
-        "🧸",
-        "🛒",
-        "🧠",
-    ],
-    symbols: [
-        "❤️",
-        "💙",
-        "💚",
-        "💛",
-        "💜",
-        "🖤",
-        "✨",
-        "💫",
-        "💥",
-        "💯",
-        "✔️",
-        "❌",
-        "⚠️",
-        "🔔",
-    ],
-    flags: ["🏳️", "🏴", "🏁", "🚩", "🎌", "🏳️‍🌈", "🇰🇷", "🇺🇸", "🇯🇵", "🇫🇷", "🇬🇧"],
-};
-
 const composerFormatButtonLabels = {
     bold: {
         inactive: "굵게, (CTRL+B) 님",
@@ -357,73 +658,17 @@ function syncComposerSubviewState({
 // 주요 역할: 레이어 생성, 버튼 기준 위치 계산, 바깥 클릭/ESC 닫기, 메뉴 항목 마크업 렌더링.
 function setupMoreMenu() {
     const moreButton = document.getElementById("navMore");
-    const layersRoot = document.getElementById("layers");
-    const accountHandle = document.getElementById("accountHandle");
-    if (!moreButton || !layersRoot) {
+    // HTML의 `#layers` 아래에 미리 넣어둔 `#navMoreLayer`를 재사용한다.
+    // 더보기 메뉴는 더 이상 JS에서 append/remove 하지 않고 `hidden`만 토글한다.
+    const moreLayer = document.getElementById("navMoreLayer");
+    const morePopover = document.getElementById("navMorePopover");
+    if (!moreButton || !moreLayer || !morePopover) {
         return;
     }
 
-    const accountSlug =
-        accountHandle?.textContent?.trim().replace(/^@/, "") || "CodeKim1218";
-    const menuItems = [
-        {
-            label: "리스트",
-            href: `/${accountSlug}/lists`,
-            iconPath: moreMenuIconPaths.lists,
-        },
-        {
-            label: "커뮤니티",
-            href: `/${accountSlug}/communities`,
-            iconPath: moreMenuIconPaths.communities,
-        },
-        {
-            label: "북마크",
-            href: "/i/bookmarks",
-            iconPath: moreMenuIconPaths.bookmarks,
-        },
-        {
-            label: "비즈니스",
-            href: "/i/verified-orgs-signup",
-            iconPath: moreMenuIconPaths.business,
-        },
-        {
-            label: "광고",
-            href: "https://ads.x.com/?ref=gl-tw-tw-twitter-ads-rweb",
-            iconPath: moreMenuIconPaths.ads,
-            external: true,
-        },
-        {
-            label: "스페이스 만들기",
-            href: "/i/spaces/start",
-            iconPath: moreMenuIconPaths.spaces,
-        },
-        {
-            label: "설정 및 개인정보",
-            href: "/settings",
-            iconPath: moreMenuIconPaths.settings,
-        },
-    ];
-    let activeLayer = null;
-
-    function renderMoreMenuItemsMarkup() {
-        return menuItems
-            .map((item) => {
-                const targetAttributes = item.external
-                    ? ' target="_blank" rel="noreferrer"'
-                    : "";
-                return `
-                    <a class="nav-more-item" role="menuitem" href="${escapeHtml(item.href)}"${targetAttributes}>
-                        <div class="nav-more-itemInner">
-                            <svg viewBox="0 0 24 24" aria-hidden="true" class="nav-more-itemIcon">
-                                <g><path d="${item.iconPath}"></path></g>
-                            </svg>
-                            <span class="nav-more-itemLabel">${escapeHtml(item.label)}</span>
-                        </div>
-                    </a>
-                `;
-            })
-            .join("");
-    }
+    const menuLinks = Array.from(
+        moreLayer.querySelectorAll("[data-nav-more-item]"),
+    );
 
     // 열린 상태는 클래스와 aria를 같이 맞춘다.
     function setMoreMenuOpen(isOpen) {
@@ -432,63 +677,51 @@ function setupMoreMenu() {
     }
 
     // 열려 있는 팝오버만 현재 화면 기준으로 다시 배치한다.
-    function refreshActiveMoreMenuPosition(
-        popover = activeLayer?.querySelector(".nav-more-popover"),
-    ) {
-        if (!popover) {
+    function refreshActiveMoreMenuPosition() {
+        if (moreLayer.hidden) {
             return;
         }
         const { left, top } = calculateMoreMenuPosition({
             windowWidth: window.innerWidth,
             windowHeight: window.innerHeight,
             buttonRect: moreButton.getBoundingClientRect(),
-            menuWidth: popover.offsetWidth || 318,
-            menuHeight: popover.offsetHeight || 0,
+            menuWidth: morePopover.offsetWidth || 318,
+            menuHeight: morePopover.offsetHeight || 0,
         });
 
-        popover.style.left = `${left}px`;
-        popover.style.top = `${top}px`;
+        morePopover.style.left = `${left}px`;
+        morePopover.style.top = `${top}px`;
+    }
+
+    // front 전용 화면이라 href 라우팅은 HTML의 빈 링크를 유지하고,
+    // JS는 아이콘 path만 동기화한다.
+    function syncMoreMenuIcons() {
+        menuLinks.forEach((link) => {
+            const key = link.getAttribute("data-nav-more-item") || "";
+            link
+                .querySelector("[data-nav-more-icon]")
+                ?.setAttribute("d", moreMenuIconPaths[key] || "");
+        });
     }
 
     function closeMoreMenu() {
-        if (!activeLayer) {
+        if (moreLayer.hidden) {
             return;
         }
-        activeLayer.remove();
-        activeLayer = null;
+        moreLayer.hidden = true;
         setMoreMenuOpen(false);
     }
 
     function openMoreMenu() {
-        closeMoreMenu();
-        const layer = document.createElement("div");
-        layer.className = "nav-more-layer";
-        layer.innerHTML = `
-            <div class="nav-more-overlay" data-nav-more-close="true"></div>
-            <div class="nav-more-popover" role="group" aria-label="더보기 메뉴 그룹">
-                <div class="nav-more-dropdown" data-testid="Dropdown">
-                    <div role="menu" class="nav-more-menu" aria-label="더보기 메뉴">
-                        ${renderMoreMenuItemsMarkup()}
-                    </div>
-                </div>
-            </div>
-        `;
-        const popover = layer.querySelector(".nav-more-popover");
-        layer
-            .querySelector("[data-nav-more-close='true']")
-            ?.addEventListener("click", closeMoreMenu);
-        layer.querySelectorAll(".nav-more-item").forEach((item) => {
-            item.addEventListener("click", closeMoreMenu);
-        });
-        layersRoot.appendChild(layer);
-        activeLayer = layer;
+        syncMoreMenuIcons();
+        moreLayer.hidden = false;
         setMoreMenuOpen(true);
-        refreshActiveMoreMenuPosition(popover);
+        refreshActiveMoreMenuPosition();
     }
 
     function toggleMoreMenu(event) {
         event.preventDefault();
-        if (activeLayer) {
+        if (!moreLayer.hidden) {
             closeMoreMenu();
             return;
         }
@@ -496,9 +729,13 @@ function setupMoreMenu() {
     }
 
     moreButton.addEventListener("click", toggleMoreMenu);
+    moreLayer
+        .querySelector("[data-nav-more-close='true']")
+        ?.addEventListener("click", closeMoreMenu);
+    menuLinks.forEach((link) => link.addEventListener("click", closeMoreMenu));
 
     document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && activeLayer) {
+        if (event.key === "Escape" && !moreLayer.hidden) {
             closeMoreMenu();
             moreButton.focus();
         }
@@ -517,7 +754,6 @@ function setupMoreMenu() {
 // 사용 위치: `main.html`의 `#accountCard`, `#accountMenuPopup`.
 // 주요 역할: 현재 핸들로 로그아웃 문구 동기화, 카드 위 고정 팝업 위치 계산, 바깥 클릭/ESC 닫기.
 function setupAccountMenu() {
-    const layersRoot = document.getElementById("layers");
     const accountCard = document.getElementById("accountCard");
     const accountHandle = document.getElementById("accountHandle");
     const accountMenuPopup = document.getElementById("accountMenuPopup");
@@ -525,16 +761,11 @@ function setupAccountMenu() {
     const accountMoreButton = document.getElementById("accountMoreButton");
 
     if (
-        !layersRoot ||
         !accountCard ||
         !accountMenuPopup ||
         !accountLogoutButton
     ) {
         return;
-    }
-
-    if (accountMenuPopup.parentElement !== layersRoot) {
-        layersRoot.appendChild(accountMenuPopup);
     }
 
     // 열린 상태는 hidden과 aria를 같이 맞춘다.
@@ -635,14 +866,6 @@ function setupPostMoreMenus() {
         document.querySelectorAll(".postMoreButton"),
     );
     const postMoreFollowState = new Map();
-    const postReportReasons = [
-        "다른 회사 제품 도용 신고",
-        "실제 존재하지 않는 제품 등록 신고",
-        "스펙·원산지 허위 표기 신고",
-        "특허 제품 무단 판매 신고",
-        "수출입 제한 품목 신고",
-        "반복적인 동일 게시물 신고",
-    ];
     const postMoreIcons = {
         follow: '<svg viewBox="0 0 24 24" aria-hidden="true" class="post-more-menu__icon"><g><path d="M10 4c-1.105 0-2 .9-2 2s.895 2 2 2 2-.9 2-2-.895-2-2-2zM6 6c0-2.21 1.791-4 4-4s4 1.79 4 4-1.791 4-4 4-4-1.79-4-4zm4 7c-3.053 0-5.563 1.193-7.443 3.596l1.548 1.207C5.573 15.922 7.541 15 10 15s4.427.922 5.895 2.803l1.548-1.207C15.563 14.193 13.053 13 10 13zm8-6V5h-3V3h-2v2h-3v2h3v3h2V7h3z"></path></g></svg>',
         unfollow:
@@ -652,8 +875,14 @@ function setupPostMoreMenus() {
     };
     let activeButton = null;
     let activeMenu = null;
-    let activePostMoreModal = null;
-    let activePostMoreToast = null;
+    let activePostMoreToastTimer = null;
+    const notificationToast = document.getElementById("mainNotificationToast");
+    // 차단/신고 모달은 body 하단에 고정된 HTML을 재사용한다.
+    const blockDialog = document.getElementById("mainPostBlockDialog");
+    const blockHandleTargets = Array.from(
+        document.querySelectorAll("[data-post-block-handle]"),
+    );
+    const reportDialog = document.getElementById("mainPostReportDialog");
 
     if (moreButtons.length === 0) {
         return;
@@ -668,12 +897,7 @@ function setupPostMoreMenus() {
         const postCard = button.closest(".postCard");
         const handle =
             getPostMoreText(postCard?.querySelector(".postHandle")) || "@user";
-        const displayName =
-            getPostMoreText(postCard?.querySelector(".postName")) || "사용자";
-        const postId =
-            postCard?.dataset.postId ||
-            String(Math.max(moreButtons.indexOf(button), 0) + 1);
-        return { postCard, handle, displayName, postId };
+        return { postCard, handle };
     }
 
     function setPostMoreMenuItem(item, action, label, iconMarkup) {
@@ -728,36 +952,31 @@ function setupPostMoreMenus() {
     // 팔로우 토글처럼 가벼운 액션은 별도 모달 대신 짧은 토스트로 피드백을 준다.
     function showPostMoreToast(message) {
         showTimedToast({
+            toastElement: notificationToast,
             message,
-            className: "notification-toast",
-            activeToast: activePostMoreToast,
-            setActiveToast(nextToast) {
-                activePostMoreToast =
-                    typeof nextToast === "function"
-                        ? nextToast(activePostMoreToast)
-                        : nextToast;
+            activeTimer: activePostMoreToastTimer,
+            setActiveTimer(nextTimer) {
+                activePostMoreToastTimer = nextTimer;
             },
         });
     }
 
     function closePostMoreModal() {
-        if (!activePostMoreModal) {
-            return;
+        if (blockDialog) {
+            blockDialog.hidden = true;
         }
-
-        activePostMoreModal.remove();
-        activePostMoreModal = null;
+        if (reportDialog) {
+            reportDialog.hidden = true;
+        }
         document.body.classList.remove("modal-open");
     }
 
-    function showPostMoreModal(className, markup, onClick) {
-        const modal = document.createElement("div");
-        modal.className = className;
-        modal.innerHTML = markup;
-        modal.addEventListener("click", onClick);
-        document.body.appendChild(modal);
+    function openStaticPostMoreModal(modal) {
+        if (!modal) {
+            return;
+        }
         document.body.classList.add("modal-open");
-        activePostMoreModal = modal;
+        modal.hidden = false;
     }
 
     // 차단은 즉시 실행하지 않고 확인 모달을 한 단계 더 띄워 오동작을 막는다.
@@ -765,96 +984,17 @@ function setupPostMoreMenus() {
         const { handle } = getPostMoreMeta(button);
         closePostMoreMenu();
         closePostMoreModal();
-
-        showPostMoreModal(
-            "notification-dialog notification-dialog--block",
-            `
-            <div class="notification-dialog__backdrop"></div>
-            <div class="notification-dialog__card notification-dialog__card--small" role="alertdialog" aria-modal="true" aria-labelledby="main-post-block-title" aria-describedby="main-post-block-desc">
-                <h2 id="main-post-block-title" class="notification-dialog__title">${escapeHtml(handle)} 님을 차단할까요?</h2>
-                <p id="main-post-block-desc" class="notification-dialog__description">내 공개 게시물을 볼 수 있지만 더 이상 게시물에 참여할 수 없습니다. 또한 ${escapeHtml(handle)} 님은 나를 팔로우하거나 쪽지를 보낼 수 없으며, 이 계정과 관련된 알림도 내게 표시되지 않습니다.</p>
-                <div class="notification-dialog__actions">
-                    <button type="button" class="notification-dialog__danger notification-dialog__confirm-block">차단</button>
-                    <button type="button" class="notification-dialog__secondary notification-dialog__close">취소</button>
-                </div>
-            </div>
-        `,
-            (event) => {
-                if (
-                    event.target.classList.contains(
-                        "notification-dialog__backdrop",
-                    ) ||
-                    event.target.closest(".notification-dialog__close")
-                ) {
-                    event.preventDefault();
-                    closePostMoreModal();
-                    return;
-                }
-
-                if (
-                    event.target.closest(".notification-dialog__confirm-block")
-                ) {
-                    event.preventDefault();
-                    closePostMoreModal();
-                }
-            },
-        );
+        blockHandleTargets.forEach((target) => {
+            target.textContent = handle;
+        });
+        openStaticPostMoreModal(blockDialog);
     }
 
     // 신고는 사유 선택이 필요하므로 별도 사유 모달을 구성한다.
     function openPostMoreReportModal(button) {
-        const { postId } = getPostMoreMeta(button);
         closePostMoreMenu();
         closePostMoreModal();
-
-        showPostMoreModal(
-            "notification-dialog notification-dialog--report",
-            `
-            <div class="notification-dialog__backdrop"></div>
-            <div class="notification-dialog__card notification-dialog__card--report" role="dialog" aria-modal="true" aria-labelledby="main-post-report-title-${escapeHtml(postId)}">
-                <div class="notification-dialog__header">
-                    <button type="button" class="notification-dialog__icon-btn notification-dialog__close" aria-label="돌아가기">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"></path></g></svg>
-                    </button>
-                    <h2 id="main-post-report-title-${escapeHtml(postId)}" class="notification-dialog__title">신고하기</h2>
-                </div>
-                <div class="notification-dialog__body">
-                    <p class="notification-dialog__question">이 게시물에 어떤 문제가 있나요?</p>
-                    <ul class="notification-report__list">
-                        ${postReportReasons
-                            .map(
-                                (reason) => `
-                                    <li>
-                                        <button type="button" class="notification-report__item">
-                                            <span>${escapeHtml(reason)}</span>
-                                            <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9.293 6.293 10.707 4.88 17.828 12l-7.121 7.12-1.414-1.413L14.999 12z"></path></g></svg>
-                                        </button>
-                                    </li>
-                                `,
-                            )
-                            .join("")}
-                    </ul>
-                </div>
-            </div>
-        `,
-            (event) => {
-                if (
-                    event.target.classList.contains(
-                        "notification-dialog__backdrop",
-                    ) ||
-                    event.target.closest(".notification-dialog__close")
-                ) {
-                    event.preventDefault();
-                    closePostMoreModal();
-                    return;
-                }
-
-                if (event.target.closest(".notification-report__item")) {
-                    event.preventDefault();
-                    closePostMoreModal();
-                }
-            },
-        );
+        openStaticPostMoreModal(reportDialog);
     }
 
     // 실제 메뉴 항목 클릭 시 어떤 후속 UI로 갈지 분기하는 중심 라우터 역할을 한다.
@@ -967,6 +1107,29 @@ function setupPostMoreMenus() {
         closePostMoreMenu();
     });
 
+    blockDialog?.addEventListener("click", (event) => {
+        if (event.target.closest("[data-post-block-close='true']")) {
+            event.preventDefault();
+            closePostMoreModal();
+            return;
+        }
+
+        if (event.target.closest("[data-post-block-confirm='true']")) {
+            event.preventDefault();
+            closePostMoreModal();
+        }
+    });
+
+    reportDialog?.addEventListener("click", (event) => {
+        if (
+            event.target.closest("[data-post-report-close='true']") ||
+            event.target.closest(".notification-report__item")
+        ) {
+            event.preventDefault();
+            closePostMoreModal();
+        }
+    });
+
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
             closePostMoreModal();
@@ -982,11 +1145,10 @@ function setupPostMoreMenus() {
 // Manage the shared composer card when it switches between inline and modal mode.
 // 게시글 작성 본문의 기본 상태를 관리한다.
 // 사용 위치: `#composerSection` 내부 본문 입력창과 제출 버튼.
-// 주요 역할: 글자 수 게이지, hidden input 동기화, 내용이 없을 때 접힘 상태 복원.
+// 주요 역할: 글자 수 게이지, 본문 상태 동기화, 내용이 없을 때 접힘 상태 복원.
 function setupComposerState() {
     const composerSection = document.getElementById("composerSection");
     const composerTextarea = document.getElementById("postContent");
-    const composerValue = document.getElementById("postContentValue");
     const composerGauge = document.getElementById("composerGauge");
     const composerGaugeText = document.getElementById("composerGaugeText");
     const submitButton = document.getElementById("postSubmitButton");
@@ -1013,9 +1175,6 @@ function setupComposerState() {
             composerTextarea.textContent?.replace(/\u00a0/g, " ") || "";
         if (text.trim() === "") {
             composerTextarea.innerHTML = "";
-            if (composerValue) {
-                composerValue.value = "";
-            }
             return "";
         }
 
@@ -1072,9 +1231,6 @@ function setupComposerState() {
         }
 
         const normalizedContent = content.trim();
-        if (composerValue) {
-            composerValue.value = normalizedContent;
-        }
         if (submitButton) {
             submitButton.disabled = normalizedContent.length === 0;
         }
@@ -1102,10 +1258,6 @@ function setupComposerModal() {
     const composerSection = document.getElementById("composerSection");
     const composeView = document.getElementById("composerComposeView");
     const composerTextarea = document.getElementById("postContent");
-    const emojiPicker = document.getElementById("composerEmojiPicker");
-    const emojiButton = composerSection?.querySelector(
-        "[data-testid='emojiButton']",
-    );
     const boardMenu = document.getElementById("boardMenu");
     const audienceButton = document.getElementById("audienceButton");
     const locationView = document.getElementById("composerLocationView");
@@ -1235,12 +1387,6 @@ function setupComposerModal() {
         }
         syncComposerModalSubviews();
         composerSection.classList.remove("isModalOpen");
-        if (emojiPicker) {
-            emojiPicker.hidden = true;
-        }
-        if (emojiButton) {
-            emojiButton.setAttribute("aria-expanded", "false");
-        }
         if (boardMenu) {
             boardMenu.hidden = true;
         }
@@ -1304,10 +1450,6 @@ function setupComposerModal() {
             return;
         }
 
-        if (emojiPicker && !emojiPicker.hidden) {
-            return;
-        }
-
         if (tagView && !tagView.hidden) {
             if (typeof composerSection.__closeTagPanel === "function") {
                 composerSection.__closeTagPanel();
@@ -1346,14 +1488,13 @@ function setupComposerModal() {
 
 // 게시글 작성 모달의 수동 태그 입력을 담당한다.
 // 사용 위치: `태그 추가` 버튼으로 열리는 작은 입력창과 상단 태그 칩 영역.
-// 주요 역할: Enter 생성, 특수문자/중복 방지, 태그 칩 삭제, hidden input 동기화.
+// 주요 역할: Enter 생성, 특수문자/중복 방지, 태그 칩 삭제.
 function setupComposerTagInput() {
     const composerSection = document.getElementById("composerSection");
     const tagToggle = document.getElementById("composerTagToggle");
     const addTag = document.querySelector("#devTags");
     const tagEditor = document.getElementById("composerTagEditor");
     const inputTag = document.getElementById("composerTagInput");
-    const tagsValue = document.getElementById("postTagsValue");
     const regExp = /[\{\}\[\]\?.,;:|\)*~`!^\-_+<>@\#$%&\\=\(\'\"]/;
     let isTagEditorOpen = false;
 
@@ -1385,16 +1526,6 @@ function setupComposerTagInput() {
         }
     }
 
-    function syncComposerTagsValue() {
-        if (!tagsValue) {
-            return;
-        }
-
-        tagsValue.value = getTagDivs()
-            .map((tagDiv) => tagDiv.textContent)
-            .join(",");
-    }
-
     // 수동 입력 태그와 카테고리 태그가 같은 렌더링/검증 경로를 타도록 공용 추가 함수로 묶는다.
     function addComposerTag(rawTag, { silent = false } = {}) {
         const tag = String(rawTag || "").trim();
@@ -1421,6 +1552,8 @@ function setupComposerTagInput() {
             return false;
         }
 
+        // 수동 태그 칩은 `#composerTagInput` 내부 끝에 span.tagDiv로 추가하고,
+        // 삭제 시에는 click 핸들러에서 해당 노드만 바로 remove 한다.
         const span = document.createElement("span");
         span.className = "tagDiv";
         span.textContent = `#${tag}`;
@@ -1429,7 +1562,6 @@ function setupComposerTagInput() {
         addTag.value = "";
         isTagEditorOpen = false;
         syncTagInputVisibility();
-        syncComposerTagsValue();
         return true;
     }
 
@@ -1471,7 +1603,6 @@ function setupComposerTagInput() {
         if (event.target.classList.contains("tagDiv")) {
             event.target.remove();
             syncTagInputVisibility();
-            syncComposerTagsValue();
         }
     });
 
@@ -1483,7 +1614,6 @@ function setupComposerTagInput() {
         getTagDivs().forEach((tagDiv) => tagDiv.remove());
         isTagEditorOpen = false;
         syncTagInputVisibility();
-        syncComposerTagsValue();
     };
     composerSection.__setComposerTags = (tags = []) => {
         composerSection.__clearComposerTags?.();
@@ -1497,14 +1627,12 @@ function setupComposerTagInput() {
         });
         isTagEditorOpen = false;
         syncTagInputVisibility();
-        syncComposerTagsValue();
     };
     composerSection.__openComposerTagInput = () => {
         isTagEditorOpen = true;
         syncTagInputVisibility({ focus: true });
     };
     syncTagInputVisibility();
-    syncComposerTagsValue();
 }
 
 // Friends 스타일 카테고리 배너를 게시글 작성 모달 안에서 동작시키는 초기화다.
@@ -1608,14 +1736,11 @@ function setupComposerCategoryTags() {
 
 // 게시판/커뮤니티 선택 드롭다운을 제어한다.
 // 사용 위치: 작성 모달 상단 `#audienceButton`.
-// 주요 역할: 버튼 바로 아래 위치 계산, 일반 보드/커뮤니티 값 반영, hidden input 동기화.
+// 주요 역할: 버튼 바로 아래 위치 계산, 일반 보드/커뮤니티 선택 상태 반영.
 function setupBoardSelector() {
     const composerSection = document.getElementById("composerSection");
     const audienceButton = document.getElementById("audienceButton");
     const boardMenu = document.getElementById("boardMenu");
-    const layersRoot = document.getElementById("layers");
-    const boardType = document.getElementById("boardType");
-    const communityId = document.getElementById("communityId");
     const boardOptions = Array.from(
         document.querySelectorAll(".boardMenuOption"),
     );
@@ -1627,9 +1752,11 @@ function setupBoardSelector() {
         return;
     }
 
-    if (layersRoot && boardMenu.parentElement !== layersRoot) {
-        layersRoot.appendChild(boardMenu);
-    }
+    let selectedBoard = {
+        label: "일반",
+        boardValue: "general",
+        communityValue: "",
+    };
 
     function updateBoardMenuPosition() {
         if (boardMenu.hidden) {
@@ -1670,13 +1797,12 @@ function setupBoardSelector() {
         const boardLabel = option.dataset.boardLabel || "일반";
         const boardValue = option.dataset.boardValue || "general";
 
+        selectedBoard = {
+            label: boardLabel,
+            boardValue,
+            communityValue: "",
+        };
         audienceButton.textContent = boardLabel;
-        if (boardType) {
-            boardType.value = boardValue;
-        }
-        if (communityId) {
-            communityId.value = "";
-        }
 
         boardOptions.forEach((item) => {
             const isSelected = item === option;
@@ -1694,13 +1820,12 @@ function setupBoardSelector() {
         const communityLabel = option.dataset.communityLabel || "커뮤니티";
         const communityValue = option.dataset.communityId || "";
 
+        selectedBoard = {
+            label: communityLabel,
+            boardValue: "community",
+            communityValue,
+        };
         audienceButton.textContent = communityLabel;
-        if (boardType) {
-            boardType.value = "community";
-        }
-        if (communityId) {
-            communityId.value = communityValue;
-        }
 
         boardOptions.forEach((item) => {
             item.classList.remove("isSelected");
@@ -1770,11 +1895,7 @@ function setupBoardSelector() {
     );
 
     if (composerSection) {
-        composerSection.__getComposerBoard = () => ({
-            label: audienceButton.textContent?.trim() || "일반",
-            boardValue: boardType?.value || "general",
-            communityValue: communityId?.value || "",
-        });
+        composerSection.__getComposerBoard = () => ({ ...selectedBoard });
         composerSection.__setComposerBoard = ({
             label = "일반",
             boardValue = "general",
@@ -1801,22 +1922,20 @@ function setupBoardSelector() {
             }
 
             audienceButton.textContent = label;
-            if (boardType) {
-                boardType.value = boardValue;
-            }
-            if (communityId) {
-                communityId.value = communityValue;
-            }
+            selectedBoard = {
+                label,
+                boardValue,
+                communityValue,
+            };
         };
         composerSection.__closeBoardMenu = closeBoardMenu;
     }
 }
 
-// Toolbar logic keeps attachments, emoji, formatting, and tag selection in sync.
+// Toolbar logic keeps attachments, formatting, and tag selection in sync.
 // 게시글 작성 모달의 핵심 툴바 로직이다.
 // 사용 위치: 본문 아래 툴바, 첨부 미리보기, 위치/사용자 태그/미디어 설명 서브뷰.
 // 주요 역할:
-// - 이모지 피커 열기와 최근 이모지 관리
 // - 굵게/기울임꼴 서식 적용
 // - 파일 첨부와 미리보기 렌더링
 // - 위치 선택 서브뷰와 사용자 태그 서브뷰 제어
@@ -1825,21 +1944,11 @@ function setupComposerToolbar() {
     const composerSection = document.getElementById("composerSection");
     const composeView = document.getElementById("composerComposeView");
     const tagView = document.getElementById("composerTagView");
-    const layersRoot = document.getElementById("layers");
     const composerTextarea = document.getElementById("postContent");
     const mediaUploadButton = document.querySelector(
         "[data-testid='mediaUploadButton']",
     );
     const fileInput = document.querySelector("[data-testid='fileInput']");
-    const emojiButton = document.querySelector("[data-testid='emojiButton']");
-    const emojiPicker = document.querySelector(".tweet-modal__emoji-picker");
-    const emojiSearchInput = document.querySelector(
-        "[data-testid='emojiSearchInput']",
-    );
-    const emojiTabs = document.querySelectorAll(".tweet-modal__emoji-tab");
-    const emojiContent = document.querySelector(
-        "[data-testid='emojiPickerContent']",
-    );
     const formatButtons = document.querySelectorAll("[data-format]");
     const geoButton = document.querySelector("[data-testid='geoButton']");
     const geoButtonPath = geoButton?.querySelector("path");
@@ -1898,7 +2007,6 @@ function setupComposerToolbar() {
     let selectedLocation = null;
     let pendingLocation = null;
     let cachedLocationNames = [];
-    let activeEmojiCategory = "recent";
     let savedComposerSelection = null;
     let pendingComposerFormats = new Set();
     let attachedComposerFiles = [];
@@ -1914,11 +2022,7 @@ function setupComposerToolbar() {
         return;
     }
 
-    if (layersRoot && emojiPicker && emojiPicker.parentElement !== layersRoot) {
-        layersRoot.appendChild(emojiPicker);
-    }
-
-    // 이모지 삽입/서식 적용 전 현재 커서를 저장해 외부 팝업을 열어도 입력 지점을 복원한다.
+    // 서식 적용이나 서브뷰 전환 뒤에도 입력 지점을 복원하려고 현재 커서를 저장한다.
     function saveComposerSelection() {
         const selection = window.getSelection();
         if (!selection || selection.rangeCount === 0) {
@@ -2003,283 +2107,6 @@ function setupComposerToolbar() {
         selection?.removeAllRanges();
         selection?.addRange(range);
         saveComposerSelection();
-    }
-
-    function getRecentEmojis() {
-        try {
-            const saved = window.localStorage.getItem(composerEmojiRecentsKey);
-            const parsed = saved ? JSON.parse(saved) : [];
-            return Array.isArray(parsed) ? parsed : [];
-        } catch {
-            return [];
-        }
-    }
-
-    function saveRecentEmoji(emoji) {
-        const next = getRecentEmojis().filter((item) => item !== emoji);
-        next.unshift(emoji);
-
-        try {
-            window.localStorage.setItem(
-                composerEmojiRecentsKey,
-                JSON.stringify(next.slice(0, composerMaxRecentEmojis)),
-            );
-        } catch {
-            return;
-        }
-    }
-
-    function clearRecentEmojis() {
-        try {
-            window.localStorage.removeItem(composerEmojiRecentsKey);
-        } catch {
-            return;
-        }
-    }
-
-    function getEmojiSearchTerm() {
-        return emojiSearchInput?.value.trim().toLowerCase() ?? "";
-    }
-
-    function getEmojiEntriesForCategory(category) {
-        if (category === "recent") {
-            return getRecentEmojis().map((emoji) => ({
-                emoji,
-                keywords: [emoji],
-            }));
-        }
-
-        return (composerEmojiCategoryData[category] ?? []).map((emoji) => ({
-            emoji,
-            keywords: [emoji, composerEmojiCategoryMeta[category]?.label ?? ""],
-        }));
-    }
-
-    function getFilteredEmojiEntries(category) {
-        const entries = getEmojiEntriesForCategory(category);
-        const searchTerm = getEmojiSearchTerm();
-
-        if (!searchTerm) {
-            return entries;
-        }
-
-        return entries.filter((entry) =>
-            entry.keywords.some((keyword) =>
-                keyword.toLowerCase().includes(searchTerm),
-            ),
-        );
-    }
-
-    function buildEmojiSection(
-        title,
-        emojis,
-        { clearable = false, emptyText = "" } = {},
-    ) {
-        const headerAction = clearable
-            ? '<button type="button" class="tweet-modal__emoji-clear" data-action="clear-recent">모두 지우기</button>'
-            : "";
-
-        const body = emojis.length
-            ? `
-                <div class="tweet-modal__emoji-grid">
-                    ${emojis
-                        .map(
-                            (emoji) => `
-                                <button type="button" class="tweet-modal__emoji-option" data-emoji="${emoji}" role="menuitem">${emoji}</button>
-                            `,
-                        )
-                        .join("")}
-                </div>
-            `
-            : `<p class="tweet-modal__emoji-empty">${emptyText}</p>`;
-
-        return `
-            <section class="tweet-modal__emoji-section">
-                <div class="tweet-modal__emoji-section-header">
-                    <h3 class="tweet-modal__emoji-section-title">${title}</h3>
-                    ${headerAction}
-                </div>
-                ${body}
-            </section>
-        `;
-    }
-
-    function renderEmojiTabs() {
-        emojiTabs.forEach((tab) => {
-            const category = tab.getAttribute("data-emoji-category");
-            const meta = category ? composerEmojiCategoryMeta[category] : null;
-            const isActive = category === activeEmojiCategory;
-
-            tab.classList.toggle("tweet-modal__emoji-tab--active", isActive);
-            tab.setAttribute("aria-selected", String(isActive));
-            if (meta) {
-                tab.innerHTML = meta.icon;
-            }
-        });
-
-        parseTwemoji(emojiPicker);
-    }
-
-    // 검색어와 카테고리 상태를 바탕으로 이모지 피커의 내부 DOM을 매번 다시 구성한다.
-    function renderEmojiPicker() {
-        if (!emojiContent) {
-            return;
-        }
-
-        const searchTerm = getEmojiSearchTerm();
-        if (searchTerm) {
-            const sections = Object.keys(composerEmojiCategoryData)
-                .map((category) => {
-                    const entries = getFilteredEmojiEntries(category);
-                    if (entries.length === 0) {
-                        return "";
-                    }
-
-                    return buildEmojiSection(
-                        composerEmojiCategoryMeta[category].sectionTitle,
-                        entries.map((entry) => entry.emoji),
-                    );
-                })
-                .join("");
-
-            emojiContent.innerHTML =
-                sections ||
-                buildEmojiSection("검색 결과", [], {
-                    emptyText: "일치하는 이모티콘이 없습니다.",
-                });
-            renderEmojiTabs();
-            parseTwemoji(emojiContent);
-            return;
-        }
-
-        if (activeEmojiCategory === "recent") {
-            const recent = getRecentEmojis();
-            const recentSection = buildEmojiSection("최근", recent, {
-                clearable: recent.length > 0,
-                emptyText: "최근 사용한 이모티콘이 없습니다.",
-            });
-            const smileys = buildEmojiSection(
-                composerEmojiCategoryMeta.smileys.sectionTitle,
-                getEmojiEntriesForCategory("smileys").map(
-                    (entry) => entry.emoji,
-                ),
-            );
-
-            emojiContent.innerHTML = recentSection + smileys;
-            renderEmojiTabs();
-            parseTwemoji(emojiContent);
-            return;
-        }
-
-        const entries = getEmojiEntriesForCategory(activeEmojiCategory).map(
-            (entry) => entry.emoji,
-        );
-        emojiContent.innerHTML = buildEmojiSection(
-            composerEmojiCategoryMeta[activeEmojiCategory].sectionTitle,
-            entries,
-        );
-        renderEmojiTabs();
-        parseTwemoji(emojiContent);
-    }
-
-    // 이모지 피커는 모달 내부가 아니라 레이어 성격이 강해, 버튼과 뷰포트 기준으로 위치를 다시 계산한다.
-    function updateEmojiPickerPosition() {
-        if (!emojiPicker || !emojiButton) {
-            return;
-        }
-
-        const viewportPadding = 16;
-        const offset = 8;
-        const buttonRect = emojiButton.getBoundingClientRect();
-        const pickerWidth = Math.min(
-            565,
-            window.innerWidth - viewportPadding * 2,
-        );
-        const maxLeft = window.innerWidth - pickerWidth - viewportPadding;
-        const left = Math.min(
-            Math.max(viewportPadding, buttonRect.left),
-            Math.max(viewportPadding, maxLeft),
-        );
-        const top = buttonRect.bottom + offset;
-        const maxHeight = Math.max(
-            220,
-            Math.min(560, window.innerHeight - top - viewportPadding),
-        );
-
-        emojiPicker.style.width = `${pickerWidth}px`;
-        emojiPicker.style.left = `${left}px`;
-        emojiPicker.style.top = `${top}px`;
-        emojiPicker.style.maxHeight = `${maxHeight}px`;
-        emojiPicker.style.right = "auto";
-        emojiPicker.style.bottom = "auto";
-    }
-
-    function openEmojiPicker() {
-        if (!emojiPicker || !emojiButton) {
-            return;
-        }
-
-        renderEmojiPicker();
-        emojiPicker.hidden = false;
-        emojiButton.setAttribute("aria-expanded", "true");
-        updateEmojiPickerPosition();
-        parseTwemoji(emojiPicker);
-    }
-
-    function closeEmojiPicker() {
-        if (!emojiPicker || !emojiButton) {
-            return;
-        }
-
-        emojiPicker.hidden = true;
-        emojiButton.setAttribute("aria-expanded", "false");
-    }
-
-    function toggleEmojiPicker() {
-        if (!emojiPicker) {
-            return;
-        }
-
-        if (emojiPicker.hidden) {
-            openEmojiPicker();
-        } else {
-            closeEmojiPicker();
-        }
-    }
-
-    // 선택된 이모지는 저장된 커서 위치에 넣고, 입력 이벤트를 강제로 발생시켜 글자 수/UI를 같이 갱신한다.
-    function insertEmojiAtCaret(emoji) {
-        composerTextarea.focus();
-        if (!restoreComposerSelection()) {
-            placeCaretAtEnd(composerTextarea);
-        }
-
-        if (!document.execCommand("insertText", false, emoji)) {
-            const selection = window.getSelection();
-            if (!selection || selection.rangeCount === 0) {
-                composerTextarea.textContent += emoji;
-                placeCaretAtEnd(composerTextarea);
-                composerTextarea.dispatchEvent(
-                    new Event("input", { bubbles: true }),
-                );
-                return;
-            }
-
-            const range = selection.getRangeAt(0);
-            range.deleteContents();
-            range.insertNode(document.createTextNode(emoji));
-            range.collapse(false);
-            selection.removeAllRanges();
-            selection.addRange(range);
-        }
-
-        applyPendingComposerFormatsToContent();
-        saveRecentEmoji(emoji);
-        saveComposerSelection();
-        composerTextarea.dispatchEvent(new Event("input", { bubbles: true }));
-        syncFormatButtons();
-        renderEmojiPicker();
-        closeEmojiPicker();
     }
 
     // 서식 버튼은 현재 선택 영역이 있으면 즉시 적용하고, 없으면 pending 상태로 저장한다.
@@ -2397,36 +2224,18 @@ function setupComposerToolbar() {
 
     // ALT 편집기는 현재 선택된 첨부 이미지를 기준으로 제목, 본문, 이전/다음 버튼 상태를 다시 그린다.
     function renderMediaEditor() {
-        if (!mediaAltInput || !mediaAltCount || !mediaPreviewImage) {
-            return;
-        }
-
-        if (pendingComposerMediaEdits.length === 0) {
-            mediaAltInput.value = "";
-            mediaAltCount.textContent = `0 / ${maxComposerMediaAltLength.toLocaleString("ko-KR")}`;
-            mediaPreviewImage.src = "";
-            mediaPreviewImage.alt = "";
-            return;
-        }
-
-        const edit = pendingComposerMediaEdits[activeComposerMediaIndex];
-        const alt = edit?.alt ?? "";
-        mediaAltInput.value = alt;
-        mediaAltCount.textContent = `${alt.length} / ${maxComposerMediaAltLength.toLocaleString("ko-KR")}`;
-        mediaPreviewImage.src = attachmentUrls[activeComposerMediaIndex] ?? "";
-        mediaPreviewImage.alt = alt;
-
-        if (mediaTitle) {
-            mediaTitle.textContent = `이미지 설명 수정 (${activeComposerMediaIndex + 1}/${pendingComposerMediaEdits.length || 1})`;
-        }
-        if (mediaPrevButton) {
-            mediaPrevButton.disabled = activeComposerMediaIndex === 0;
-        }
-        if (mediaNextButton) {
-            mediaNextButton.disabled =
-                activeComposerMediaIndex >=
-                pendingComposerMediaEdits.length - 1;
-        }
+        renderMediaAltEditorPanel({
+            edits: pendingComposerMediaEdits,
+            activeIndex: activeComposerMediaIndex,
+            previewImage: mediaPreviewImage,
+            altInput: mediaAltInput,
+            altCount: mediaAltCount,
+            titleElement: mediaTitle,
+            prevButton: mediaPrevButton,
+            nextButton: mediaNextButton,
+            imageUrls: attachmentUrls,
+            maxLength: maxComposerMediaAltLength,
+        });
     }
 
     // 미디어 설명 편집은 이미지 첨부가 있을 때만 열 수 있고, 열리면 기본 작성 뷰를 숨긴다.
@@ -2435,7 +2244,6 @@ function setupComposerToolbar() {
             return;
         }
 
-        closeEmojiPicker();
         activeComposerMediaIndex = Math.min(
             activeComposerMediaIndex,
             Math.max(0, attachedComposerFiles.length - 1),
@@ -2492,72 +2300,12 @@ function setupComposerToolbar() {
         );
     }
 
-    function cloneTaggedUsers(users) {
-        return users.map((user) => ({ ...user }));
-    }
-
-    function getCurrentPageTagUsers() {
-        const seenHandles = new Set();
-        const users = [];
-        const accountName = document
-            .getElementById("accountName")
-            ?.textContent.trim();
-        const accountHandle = document
-            .getElementById("accountHandle")
-            ?.textContent.trim();
-
-        if (accountName && accountHandle) {
-            seenHandles.add(accountHandle);
-            users.push({
-                id: accountHandle.replace("@", "") || "current-user",
-                name: accountName,
-                handle: accountHandle,
-                avatar: "",
-            });
-        }
-
-        document.querySelectorAll(".postCard").forEach((postCard, index) => {
-            const name = postCard
-                .querySelector(".postName")
-                ?.textContent.trim();
-            const handle = postCard
-                .querySelector(".postHandle")
-                ?.textContent.trim();
-            const avatar =
-                postCard
-                    .querySelector(".postAvatarImage")
-                    ?.getAttribute("src") ?? "";
-
-            if (!name || !handle || seenHandles.has(handle)) {
-                return;
-            }
-
-            seenHandles.add(handle);
-            users.push({
-                id: `${handle.replace("@", "") || "user"}-${index}`,
-                name,
-                handle,
-                avatar,
-            });
-        });
-
-        return users;
-    }
-
     function isTagModalOpen() {
         return Boolean(tagView && !tagView.hidden);
     }
 
     function getTagSearchTerm() {
         return tagSearchInput?.value.trim() ?? "";
-    }
-
-    function getTaggedUserSummary(users) {
-        if (users.length === 0) {
-            return "사용자 태그하기";
-        }
-
-        return users.map((user) => user.name).join(", ");
     }
 
     // 사용자 태그 버튼은 "이미지 첨부가 있을 때만" 의미가 있으므로 조건부 노출/비활성화를 함께 처리한다.
@@ -2589,102 +2337,19 @@ function setupComposerToolbar() {
         if (!tagChipList) {
             return;
         }
-
-        if (pendingTaggedUsers.length === 0) {
-            tagChipList.innerHTML = "";
-            return;
-        }
-
-        tagChipList.innerHTML = pendingTaggedUsers
-            .map((user) => {
-                const avatarMarkup = user.avatar
-                    ? `<span class="tweet-modal__tag-chip-avatar"><img src="${escapeHtml(user.avatar)}" alt="${escapeHtml(user.name)}" /></span>`
-                    : '<span class="tweet-modal__tag-chip-avatar"></span>';
-
-                return `
-                    <button type="button" class="tweet-modal__tag-chip" data-tag-remove-id="${escapeHtml(user.id)}">
-                        ${avatarMarkup}
-                        <span class="tweet-modal__tag-chip-name">${escapeHtml(user.name)}</span>
-                        <svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-modal__tag-chip-icon">
-                            <g><path d="M10.59 12 4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path></g>
-                        </svg>
-                    </button>
-                `;
-            })
-            .join("");
-    }
-
-    function getFilteredTagUsers(query) {
-        const normalizedQuery = query.trim().toLowerCase();
-        if (!normalizedQuery) {
-            return [];
-        }
-
-        return getCurrentPageTagUsers()
-            .filter((user) =>
-                `${user.name} ${user.handle}`
-                    .toLowerCase()
-                    .includes(normalizedQuery),
-            )
-            .slice(0, 6);
+        tagChipList.innerHTML = pendingTaggedUsers.map(buildTagChipMarkup).join("");
     }
 
     // 사용자 검색 결과는 현재 페이지의 계정/게시글 작성자를 기반으로 만든 가상 목록을 보여준다.
     function renderTagResults(users) {
-        if (!tagResults || !tagSearchInput) {
-            return;
-        }
-
         currentTagResults = users;
-        const hasQuery = getTagSearchTerm().length > 0;
-
-        if (!hasQuery) {
-            tagSearchInput.setAttribute("aria-expanded", "false");
-            tagSearchInput.removeAttribute("aria-controls");
-            tagResults.removeAttribute("role");
-            tagResults.removeAttribute("id");
-            tagResults.innerHTML = "";
-            return;
-        }
-
-        tagSearchInput.setAttribute("aria-expanded", "true");
-        tagSearchInput.setAttribute("aria-controls", "main-tag-results");
-        tagResults.setAttribute("role", "listbox");
-        tagResults.id = "main-tag-results";
-
-        if (users.length === 0) {
-            tagResults.innerHTML =
-                '<p class="tweet-modal__tag-empty">일치하는 사용자를 찾지 못했습니다.</p>';
-            return;
-        }
-
-        tagResults.innerHTML = users
-            .map((user) => {
-                const isSelected = pendingTaggedUsers.some(
-                    (entry) => entry.id === user.id,
-                );
-                const subtitle = isSelected
-                    ? `${user.handle} 이미 태그됨`
-                    : user.handle;
-                const avatarMarkup = user.avatar
-                    ? `<span class="tweet-modal__tag-avatar"><img src="${escapeHtml(user.avatar)}" alt="${escapeHtml(user.name)}" /></span>`
-                    : '<span class="tweet-modal__tag-avatar"></span>';
-
-                return `
-                    <div role="option" class="tweet-modal__tag-option" data-testid="typeaheadResult">
-                        <div role="checkbox" aria-checked="${String(isSelected)}" aria-disabled="${String(isSelected)}" class="tweet-modal__tag-checkbox">
-                            <button type="button" class="tweet-modal__tag-user" data-tag-user-id="${escapeHtml(user.id)}" ${isSelected ? "disabled" : ""}>
-                                ${avatarMarkup}
-                                <span class="tweet-modal__tag-user-body">
-                                    <span class="tweet-modal__tag-user-name">${escapeHtml(user.name)}</span>
-                                    <span class="tweet-modal__tag-user-handle">${escapeHtml(subtitle)}</span>
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            })
-            .join("");
+        renderTagResultsPanel({
+            input: tagSearchInput,
+            resultsElement: tagResults,
+            users,
+            selectedUsers: pendingTaggedUsers,
+            resultId: "main-tag-results",
+        });
     }
 
     function runTagSearch() {
@@ -2694,7 +2359,7 @@ function setupComposerToolbar() {
             return;
         }
 
-        renderTagResults(getFilteredTagUsers(query));
+        renderTagResults(filterUsersByQuery(getMainPageTagUsers(), query));
     }
 
     // Switch the shared composer from the write view to the tag-selection view.
@@ -2704,7 +2369,6 @@ function setupComposerToolbar() {
             return;
         }
 
-        closeEmojiPicker();
         pendingTaggedUsers = cloneTaggedUsers(selectedTaggedUsers);
         composerSection.__syncComposerSubviewState?.(tagView);
 
@@ -2753,70 +2417,6 @@ function setupComposerToolbar() {
     }
 
     composerSection.__closeTagPanel = closeTagPanel;
-    emojiButton?.addEventListener("mousedown", (event) => {
-        event.preventDefault();
-    });
-
-    emojiButton?.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        toggleEmojiPicker();
-    });
-
-    emojiSearchInput?.addEventListener("input", renderEmojiPicker);
-
-    emojiPicker?.addEventListener("click", (event) => {
-        event.stopPropagation();
-    });
-
-    emojiTabs.forEach((tab) => {
-        tab.addEventListener("click", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            const category = tab.getAttribute("data-emoji-category");
-            if (!category) {
-                return;
-            }
-
-            activeEmojiCategory = category;
-            renderEmojiPicker();
-        });
-    });
-
-    emojiContent?.addEventListener("mousedown", (event) => {
-        const target = event.target.closest(
-            ".tweet-modal__emoji-option, .tweet-modal__emoji-clear",
-        );
-        if (target) {
-            event.preventDefault();
-        }
-    });
-
-    emojiContent?.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        const clearButton = event.target.closest(
-            "[data-action='clear-recent']",
-        );
-        if (clearButton) {
-            clearRecentEmojis();
-            activeEmojiCategory = "recent";
-            renderEmojiPicker();
-            return;
-        }
-
-        const option = event.target.closest(".tweet-modal__emoji-option");
-        if (!option) {
-            return;
-        }
-
-        const emoji = option.getAttribute("data-emoji");
-        if (!emoji) {
-            return;
-        }
-
-        insertEmojiAtCaret(emoji);
-    });
 
     formatButtons.forEach((button) => {
         button.addEventListener("mousedown", (event) => {
@@ -2864,37 +2464,10 @@ function setupComposerToolbar() {
         event.preventDefault();
         applyComposerFormat(key === "b" ? "bold" : "italic");
     });
-    window.addEventListener("resize", updateEmojiPickerPosition);
-    window.addEventListener(
-        "scroll",
-        () => {
-            if (emojiPicker && !emojiPicker.hidden) {
-                updateEmojiPickerPosition();
-            }
-        },
-        { passive: true },
-    );
-    composerSection.addEventListener(
-        "scroll",
-        () => {
-            if (emojiPicker && !emojiPicker.hidden) {
-                updateEmojiPickerPosition();
-            }
-        },
-        { passive: true },
-    );
     document.addEventListener("selectionchange", () => {
-        if (
-            emojiPicker?.hidden === false ||
-            document.activeElement === composerTextarea
-        ) {
+        if (document.activeElement === composerTextarea) {
             saveComposerSelection();
             syncFormatButtons();
-        }
-    });
-    document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && emojiPicker && !emojiPicker.hidden) {
-            closeEmojiPicker();
         }
     });
 
@@ -3087,17 +2660,6 @@ function setupComposerToolbar() {
         closeLocationModal();
     });
 
-    document.addEventListener("click", (event) => {
-        if (
-            emojiPicker &&
-            !emojiPicker.hidden &&
-            !emojiPicker.contains(event.target) &&
-            !emojiButton?.contains(event.target)
-        ) {
-            closeEmojiPicker();
-        }
-    });
-
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && isTagModalOpen()) {
             closeTagPanel();
@@ -3105,7 +2667,6 @@ function setupComposerToolbar() {
     });
 
     syncUserTagTrigger();
-    renderEmojiPicker();
     syncFormatButtons();
 
     // Rebuild the preview area whenever the attachment set changes.
@@ -3157,9 +2718,22 @@ function setupComposerToolbar() {
             return objectUrl;
         });
 
+        // 첨부 미리보기는 `#composerAttachmentList` 전체를 매번 다시 그려
+        // HTML에 고정된 미리보기 슬롯 안에서만 내용이 바뀌게 유지한다.
         if (limitedFiles.every((file) => file.type.startsWith("image/"))) {
             syncComposerMediaEditsToAttachments();
-            attachmentList.innerHTML = renderAttachmentImageGrid(objectUrls);
+            attachmentList.innerHTML = buildAttachmentGridMarkup({
+                count: objectUrls.length,
+                urls: objectUrls,
+                getAlt: getComposerMediaImageAlt,
+                getActionMarkup(index) {
+                    return buildAttachmentActionMarkup({
+                        index,
+                        deleteLabel: "미디어 삭제하기",
+                        removeAttribute: "data-remove-attachment",
+                    });
+                },
+            });
             return;
         }
 
@@ -3168,16 +2742,33 @@ function setupComposerToolbar() {
             limitedFiles[0].type.startsWith("video/")
         ) {
             syncComposerMediaEditsToAttachments();
-            attachmentList.innerHTML = renderAttachmentVideo(
-                limitedFiles[0],
-                objectUrls[0],
-            );
+            attachmentList.innerHTML = buildAttachmentVideoMarkup({
+                url: objectUrls[0],
+                fileType: limitedFiles[0].type,
+                actionMarkup: buildAttachmentActionMarkup({
+                    index: 0,
+                    deleteLabel: "미디어 삭제하기",
+                    removeAttribute: "data-remove-attachment",
+                }),
+            });
             return;
         }
         syncComposerMediaEditsToAttachments();
         attachmentList.innerHTML = limitedFiles
             .map((file, index) =>
-                renderAttachmentFileCard(file, index, objectUrls[index]),
+                buildAttachmentFileCardMarkup({
+                    file,
+                    index,
+                    objectUrl: objectUrls[index],
+                    actionMarkup: buildAttachmentActionMarkup({
+                        index,
+                        deleteLabel: file.type.startsWith("video/")
+                            ? "미디어 삭제하기"
+                            : "파일 삭제하기",
+                        removeAttribute: "data-remove-attachment",
+                        includeEdit: file.type.startsWith("video/"),
+                    }),
+                }),
             )
             .join("");
     }
@@ -3202,17 +2793,15 @@ function setupComposerToolbar() {
             }
 
             try {
-                const response = await fetch(attachment.dataUrl);
-                const blob = await response.blob();
-                const file = new File(
-                    [blob],
-                    attachment.name || `draft-attachment-${files.length + 1}`,
-                    {
-                        type: attachment.type || blob.type || "",
-                        lastModified: attachment.lastModified || Date.now(),
-                    },
+                files.push(
+                    buildFileFromDataUrl(
+                        attachment.dataUrl,
+                        attachment.name ||
+                            `draft-attachment-${files.length + 1}`,
+                        attachment.type || "",
+                        attachment.lastModified,
+                    ),
                 );
-                files.push(file);
             } catch {
                 continue;
             }
@@ -3225,159 +2814,6 @@ function setupComposerToolbar() {
         pendingComposerMediaEdits = cloneComposerMediaEdits(composerMediaEdits);
         activeComposerMediaIndex = 0;
         renderAttachments(files);
-    }
-
-    function getAttachmentImageCell(index, imageUrl, cellClass) {
-        const alt = getComposerMediaImageAlt(index);
-        return `
-            <div class="media-cell ${cellClass}">
-                <div class="media-cell-inner">
-                    <div class="media-img-container" aria-label="미디어" role="group">
-                        <div class="media-bg" style="background-image: url('${imageUrl}');"></div>
-                        <img alt="${escapeHtml(alt)}" draggable="false" src="${imageUrl}" class="media-img">
-                    </div>
-                    <div class="media-btn-row">
-                        <button type="button" class="media-btn" data-attachment-edit-index="${index}">
-                            <span>수정</span>
-                        </button>
-                    </div>
-                    <button type="button" class="media-btn-delete" aria-label="미디어 삭제하기" data-remove-attachment="${index}">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <g><path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path></g>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        `;
-    }
-
-    function renderAttachmentImageGrid(objectUrls) {
-        const imageCount = objectUrls.length;
-
-        if (imageCount === 1) {
-            return `
-                <div class="media-aspect-ratio media-aspect-ratio--single"></div>
-                <div class="media-absolute-layer">
-                    ${getAttachmentImageCell(0, objectUrls[0], "media-cell--single")}
-                </div>
-            `;
-        }
-
-        if (imageCount === 2) {
-            return `
-                <div class="media-aspect-ratio"></div>
-                <div class="media-absolute-layer">
-                    <div class="media-row">
-                        <div class="media-col">
-                            ${getAttachmentImageCell(0, objectUrls[0], "media-cell--left")}
-                        </div>
-                        <div class="media-col">
-                            ${getAttachmentImageCell(1, objectUrls[1], "media-cell--right")}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        if (imageCount === 3) {
-            return `
-                <div class="media-aspect-ratio"></div>
-                <div class="media-absolute-layer">
-                    <div class="media-row">
-                        <div class="media-col">
-                            ${getAttachmentImageCell(0, objectUrls[0], "media-cell--left-tall")}
-                        </div>
-                        <div class="media-col">
-                            ${getAttachmentImageCell(1, objectUrls[1], "media-cell--right-top")}
-                            ${getAttachmentImageCell(2, objectUrls[2], "media-cell--right-bottom")}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        return `
-            <div class="media-aspect-ratio"></div>
-            <div class="media-absolute-layer">
-                <div class="media-row">
-                    <div class="media-col">
-                        ${getAttachmentImageCell(0, objectUrls[0], "media-cell--top-left")}
-                        ${getAttachmentImageCell(2, objectUrls[2], "media-cell--bottom-left")}
-                    </div>
-                    <div class="media-col">
-                        ${getAttachmentImageCell(1, objectUrls[1], "media-cell--top-right")}
-                        ${getAttachmentImageCell(3, objectUrls[3], "media-cell--bottom-right")}
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    function renderAttachmentVideo(file, objectUrl) {
-        return `
-            <div class="media-aspect-ratio media-aspect-ratio--single"></div>
-            <div class="media-absolute-layer">
-                <div class="media-cell media-cell--single">
-                    <div class="media-cell-inner">
-                        <div class="media-img-container" aria-label="미디어" role="group">
-                            <video class="tweet-modal__attachment-video" controls preload="metadata">
-                                <source src="${objectUrl}" type="${file.type}">
-                            </video>
-                        </div>
-                        <div class="media-btn-row">
-                            <button type="button" class="media-btn" data-attachment-edit-index="0">
-                                <span>수정</span>
-                            </button>
-                        </div>
-                        <button type="button" class="media-btn-delete" aria-label="미디어 삭제하기" data-remove-attachment="0">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <g><path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path></g>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    function renderAttachmentFileCard(file, index, objectUrl) {
-        if (file.type.startsWith("video/")) {
-            return `
-                <div class="media-cell media-cell--single">
-                    <div class="media-cell-inner">
-                        <div class="media-img-container" aria-label="미디어" role="group">
-                            <video class="tweet-modal__attachment-video" controls preload="metadata">
-                                <source src="${objectUrl}" type="${file.type}">
-                            </video>
-                        </div>
-                        <div class="media-btn-row">
-                            <button type="button" class="media-btn" data-attachment-edit-index="${index}">
-                                <span>수정</span>
-                            </button>
-                        </div>
-                        <button type="button" class="media-btn-delete" aria-label="미디어 삭제하기" data-remove-attachment="${index}">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <g><path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path></g>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        return `
-            <div class="tweet-modal__attachment-file">
-                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                    <g><path d="M14 2H7.75C5.68 2 4 3.68 4 5.75v12.5C4 20.32 5.68 22 7.75 22h8.5C18.32 22 20 20.32 20 18.25V8l-6-6zm0 2.12L17.88 8H14V4.12zm2.25 15.88h-8.5c-.97 0-1.75-.78-1.75-1.75V5.75C6 4.78 6.78 4 7.75 4H12v5.25c0 .41.34.75.75.75H18v8.25c0 .97-.78 1.75-1.75 1.75z"></path></g>
-                </svg>
-                <span class="tweet-modal__attachment-file-name">${file.name}</span>
-                <button type="button" class="media-btn-delete" aria-label="파일 삭제하기" data-remove-attachment="${index}">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <g><path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path></g>
-                    </svg>
-                </button>
-            </div>
-        `;
     }
 
     function getLocationSearchTerm() {
@@ -3446,23 +2882,11 @@ function setupComposerToolbar() {
     }
 
     function renderLocationList() {
-        if (!locationModalList) {
-            return;
-        }
-
-        const locations = getFilteredLocations();
-        if (locations.length === 0) {
-            locationModalList.innerHTML =
-                '<p class="tweet-modal__location-empty">일치하는 위치를 찾지 못했습니다.</p>';
-            return;
-        }
-
-        locationModalList.innerHTML = locations
-            .map((location) => {
-                const isSelected = pendingLocation === location;
-                return `<button type="button" class="tweet-modal__location-item" role="menuitem"><span class="tweet-modal__location-item-label">${location}</span><span class="tweet-modal__location-item-check">${isSelected ? '<svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9.64 18.952l-5.55-4.861 1.317-1.504 3.951 3.459 8.459-10.948L19.4 6.32 9.64 18.952z"></path></g></svg>' : ""}</span></button>`;
-            })
-            .join("");
+        renderLocationOptions(
+            locationModalList,
+            getFilteredLocations(),
+            pendingLocation,
+        );
     }
 
     function applyLocation(location) {
@@ -3487,7 +2911,6 @@ function setupComposerToolbar() {
             return;
         }
 
-        closeEmojiPicker();
         pendingLocation = selectedLocation;
         composerSection.__syncComposerSubviewState?.(locationView);
         if (locationModalSearchInput) {
@@ -3554,7 +2977,6 @@ function setupComposerToolbar() {
         restoreComposerAttachmentsFromDraft;
     composerSection.__closeComposerMediaEditor = closeMediaEditor;
     composerSection.__closeComposerLocationModal = closeLocationModal;
-    composerSection.__closeComposerEmojiPicker = closeEmojiPicker;
 }
 
 // 게시글 작성 모달의 임시저장 패널을 담당한다.
@@ -3794,20 +3216,6 @@ function setupComposerDraftPanel() {
         );
     }
 
-    function getDraftEmptyCopy() {
-        return {
-            title: "잠시 생각을 정리합니다",
-            body: "아직 게시할 준비가 되지 않았나요? 임시저장해 두고 나중에 이어서 작성하세요.",
-        };
-    }
-
-    function getDraftConfirmCopy() {
-        return {
-            title: "전송하지 않은 게시물 삭제하기",
-            body: "이 작업은 취소할 수 없으며 선택한 전송하지 않은 게시물이 삭제됩니다.",
-        };
-    }
-
     function getDraftPreviewText(draft) {
         if (draft.content) {
             return draft.content;
@@ -3868,22 +3276,11 @@ function setupComposerDraftPanel() {
         draftPanelState.confirmOpen = false;
     }
 
-    function areAllDraftItemsSelected() {
-        const draftIds = getDraftIds();
-        return (
-            draftIds.length > 0 &&
-            draftIds.every((draftId) =>
-                draftPanelState.selectedItems.has(draftId),
-            )
-        );
-    }
-
-    function hasDraftSelection() {
-        return draftPanelState.selectedItems.size > 0;
-    }
-
     function openDraftConfirm() {
-        if (draftPanelState.isEditMode && hasDraftSelection()) {
+        if (
+            draftPanelState.isEditMode &&
+            hasSelectedDraftItems(draftPanelState)
+        ) {
             draftPanelState.confirmOpen = true;
         }
     }
@@ -3896,43 +3293,14 @@ function setupComposerDraftPanel() {
         if (!draftPanelState.isEditMode || !draftId) {
             return;
         }
-
-        if (draftPanelState.selectedItems.has(draftId)) {
-            draftPanelState.selectedItems.delete(draftId);
-        } else {
-            draftPanelState.selectedItems.add(draftId);
-        }
-        draftPanelState.confirmOpen = false;
+        toggleDraftSelectionState(draftPanelState, draftId);
     }
 
     function toggleDraftSelectAll() {
         if (!draftPanelState.isEditMode) {
             return;
         }
-
-        const draftIds = getDraftIds();
-        if (draftIds.length === 0) {
-            return;
-        }
-
-        if (areAllDraftItemsSelected()) {
-            draftPanelState.selectedItems.clear();
-        } else {
-            draftPanelState.selectedItems = new Set(draftIds);
-        }
-        draftPanelState.confirmOpen = false;
-    }
-
-    function buildDraftCheckboxMarkup(selected) {
-        return `
-            <span class="draft-panel__checkbox${selected ? " draft-panel__checkbox--checked" : ""}" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                    <g>
-                        <path d="M9.86 18a1 1 0 01-.73-.31l-3.9-4.11 1.45-1.38 3.2 3.38 7.46-8.1 1.47 1.36-8.19 8.9A1 1 0 019.86 18z"></path>
-                    </g>
-                </svg>
-            </span>
-        `;
+        toggleDraftSelectAllState(draftPanelState, getDraftIds());
     }
 
     function buildDraftItemMarkup(draft) {
@@ -3959,7 +3327,7 @@ function setupComposerDraftPanel() {
                 data-draft-id="${escapeHtml(draft.id)}"
                 aria-pressed="${draftPanelState.isEditMode ? String(isSelected) : "false"}"
             >
-                ${draftPanelState.isEditMode ? buildDraftCheckboxMarkup(isSelected) : ""}
+                ${draftPanelState.isEditMode ? buildSharedDraftCheckboxMarkup(isSelected) : ""}
                 <span class="draft-panel__avatar">${avatarText}</span>
                 <span class="draft-panel__item-body">
                     <span class="draft-panel__meta">${metaText}</span>
@@ -3984,49 +3352,21 @@ function setupComposerDraftPanel() {
             draftList.innerHTML = drafts.map(buildDraftItemMarkup).join("");
         }
 
-        const hasItems = drafts.length > 0;
-        const emptyCopy = getDraftEmptyCopy();
-        const confirmCopy = getDraftConfirmCopy();
-
-        if (draftActionButton) {
-            draftActionButton.textContent = draftPanelState.isEditMode
-                ? "완료"
-                : "수정";
-            draftActionButton.disabled = !hasItems;
-            draftActionButton.classList.toggle(
-                "draft-panel__action--done",
-                draftPanelState.isEditMode,
-            );
-        }
-        if (draftEmpty) {
-            draftEmpty.hidden = hasItems;
-        }
-        if (draftEmptyTitle) {
-            draftEmptyTitle.textContent = emptyCopy.title;
-        }
-        if (draftEmptyBody) {
-            draftEmptyBody.textContent = emptyCopy.body;
-        }
-        if (draftFooter) {
-            draftFooter.hidden = !draftPanelState.isEditMode;
-        }
-        if (draftSelectAllButton) {
-            draftSelectAllButton.textContent = areAllDraftItemsSelected()
-                ? "모두 선택 해제"
-                : "모두 선택";
-        }
-        if (draftDeleteButton) {
-            draftDeleteButton.disabled = !hasDraftSelection();
-        }
-        if (draftConfirmOverlay) {
-            draftConfirmOverlay.hidden = !draftPanelState.confirmOpen;
-        }
-        if (draftConfirmTitle) {
-            draftConfirmTitle.textContent = confirmCopy.title;
-        }
-        if (draftConfirmDesc) {
-            draftConfirmDesc.textContent = confirmCopy.body;
-        }
+        renderDraftPanelChrome({
+            draftPanelState,
+            itemCount: drafts.length,
+            allSelected: areAllDraftIdsSelected(draftPanelState, getDraftIds()),
+            actionButton: draftActionButton,
+            empty: draftEmpty,
+            emptyTitle: draftEmptyTitle,
+            emptyBody: draftEmptyBody,
+            footer: draftFooter,
+            selectAllButton: draftSelectAllButton,
+            deleteButton: draftDeleteButton,
+            confirmOverlay: draftConfirmOverlay,
+            confirmTitle: draftConfirmTitle,
+            confirmDesc: draftConfirmDesc,
+        });
     }
 
     function removeComposerDraftById(draftId) {
@@ -4075,7 +3415,7 @@ function setupComposerDraftPanel() {
     }
 
     function deleteSelectedDrafts() {
-        if (!hasDraftSelection()) {
+        if (!hasSelectedDraftItems(draftPanelState)) {
             return;
         }
 
@@ -4094,7 +3434,6 @@ function setupComposerDraftPanel() {
     }
 
     async function openDraftPanel() {
-        composerSection.__closeComposerEmojiPicker?.();
         composerSection.__closeBoardMenu?.();
         composerSection.__closeComposerMediaEditor?.({
             restoreFocus: false,
@@ -4328,6 +3667,80 @@ function setupSearchForm() {
     updateSearchPanel();
 }
 
+// 우측 환율 피드는 HTML의 `#exchangeRateFeedContent` 내부만 다시 그린다.
+// 외부 요청 없이 화면 확인용 샘플 수치만 정적으로 렌더링한다.
+function setupExchangeRates() {
+    const exchangeRateFeedContent = document.getElementById(
+        "exchangeRateFeedContent",
+    );
+    const exchangeRateFeedSubtitle = document.getElementById(
+        "exchangeRateFeedSubtitle",
+    );
+
+    if (!exchangeRateFeedContent) {
+        return;
+    }
+
+    const currencies = ["KRW", "EUR", "JPY", "CNY", "GBP"];
+    const currencyLabels = {
+        KRW: "대한민국 원",
+        EUR: "유로",
+        JPY: "일본 엔",
+        CNY: "중국 위안",
+        GBP: "영국 파운드",
+    };
+
+    function formatExchangeDate(value) {
+        if (!value) {
+            return "";
+        }
+
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) {
+            return value;
+        }
+
+        return new Intl.DateTimeFormat("ko-KR", {
+            month: "long",
+            day: "numeric",
+        }).format(date);
+    }
+
+    function formatExchangeValue(code, value) {
+        const fractionDigits = code === "JPY" ? 2 : 4;
+        return new Intl.NumberFormat("ko-KR", {
+            minimumFractionDigits: fractionDigits,
+            maximumFractionDigits: fractionDigits,
+        }).format(value);
+    }
+
+    const sampleRates = {
+        date: "2026-03-13",
+        rates: {
+            KRW: 1456.42,
+            EUR: 0.9184,
+            JPY: 148.27,
+            CNY: 7.2318,
+            GBP: 0.7813,
+        },
+    };
+    const updatedText = formatExchangeDate(sampleRates.date);
+
+    if (exchangeRateFeedSubtitle) {
+        exchangeRateFeedSubtitle.textContent = updatedText
+            ? `USD 기준 주요 통화 · 샘플 기준일 ${updatedText}`
+            : "USD 기준 주요 통화";
+    }
+
+    exchangeRateFeedContent.innerHTML = currencies
+        .map((code) => {
+            const value = sampleRates.rates?.[code];
+            const label = currencyLabels[code] || code;
+            return `<div class="exchangeRateRow"><div class="exchangeRateMain"><div class="exchangeRateCurrencyLine"><span class="exchangeRateCurrency">${code}</span><span class="exchangeRateCurrencyName">${label}</span></div><span class="exchangeRateMeta">1 USD</span></div><div class="exchangeRateValueWrap"><span class="exchangeRateValue">${formatExchangeValue(code, value)}</span></div></div>`;
+        })
+        .join("");
+}
+
 // 중앙 상단 탭이 피드/Experts 화면을 전환할 때 active 상태와 섹션 표시를 맞춘다.
 function setupTimelineTabs() {
     const tabFeed = document.getElementById("tabFeed");
@@ -4479,7 +3892,7 @@ function setupConnectButtons() {
 // 사용 위치: 각 게시글 카드의 reply 아이콘.
 // 주요 역할:
 // - 클릭된 원본 게시글 정보를 읽어 모달 상단 컨텍스트 채우기
-// - 본문/이모지/서식/첨부/위치/사용자 태그/미디어 ALT 편집
+// - 본문/서식/첨부/위치/사용자 태그/미디어 ALT 편집
 // - 임시저장 패널과 삭제 확인
 // - ESC와 포커스 트랩 우선순위 관리
 function setupReplyModal() {
@@ -4512,11 +3925,6 @@ function setupReplyModal() {
     const replyMediaView = q(".tweet-modal__media-view");
     const draftView = q(".tweet-modal__draft-view");
     const replyFormatButtons = qAll("[data-format]");
-    const replyEmojiButton = q("[data-testid='emojiButton']");
-    const replyEmojiPicker = q(".tweet-modal__emoji-picker");
-    const replyEmojiSearchInput = q("[data-testid='emojiSearchInput']");
-    const replyEmojiTabs = qAll(".tweet-modal__emoji-tab");
-    const replyEmojiContent = q("[data-testid='emojiPickerContent']");
     const replyMediaUploadButton = q("[data-testid='mediaUploadButton']");
     const replyFileInput = q("[data-testid='fileInput']");
     const replyAttachmentPreview = q("[data-attachment-preview]");
@@ -4568,7 +3976,6 @@ function setupReplyModal() {
     let activeReplyTrigger = null;
     let savedReplySelection = null;
     let pendingReplyFormats = new Set();
-    let activeEmojiCategory = "recent";
     let selectedLocation = null;
     let pendingLocation = null;
     let selectedTaggedUsers = [];
@@ -4581,8 +3988,6 @@ function setupReplyModal() {
     let pendingReplyMediaEdits = [];
     let activeReplyMediaIndex = 0;
     let pendingAttachmentEditIndex = null;
-    const emojiRecentsKey = "main_reply_recent_emojis";
-    const maxRecentEmojis = 18;
     const maxReplyImages = 4;
     const maxReplyMediaAltLength = 1000;
     const replyMaxLength = 500;
@@ -4612,10 +4017,6 @@ function setupReplyModal() {
 
     replyModalOverlay.__syncReplyModalSubviewState = syncReplyModalSubviewState;
 
-    function getTextContent(element) {
-        return element?.textContent?.trim() ?? "";
-    }
-
     function getCurrentAccountAvatar() {
         const avatarText =
             document.getElementById("accountAvatar")?.textContent?.trim() ||
@@ -4636,181 +4037,6 @@ function setupReplyModal() {
         draftAvatarImages.forEach((image) => {
             image.src = avatar;
         });
-    }
-
-    function getRecentEmojis() {
-        try {
-            const saved = window.localStorage.getItem(emojiRecentsKey);
-            const parsed = saved ? JSON.parse(saved) : [];
-            return Array.isArray(parsed) ? parsed : [];
-        } catch {
-            return [];
-        }
-    }
-
-    function saveRecentEmoji(emoji) {
-        const next = getRecentEmojis().filter((item) => item !== emoji);
-        next.unshift(emoji);
-        try {
-            window.localStorage.setItem(
-                emojiRecentsKey,
-                JSON.stringify(next.slice(0, maxRecentEmojis)),
-            );
-        } catch {
-            return;
-        }
-    }
-
-    function clearRecentEmojis() {
-        try {
-            window.localStorage.removeItem(emojiRecentsKey);
-        } catch {
-            return;
-        }
-    }
-
-    function getEmojiEntriesForCategory(category) {
-        if (category === "recent") {
-            return getRecentEmojis().map((emoji) => ({
-                emoji,
-                keywords: [emoji],
-            }));
-        }
-        return (composerEmojiCategoryData[category] ?? []).map((emoji) => ({
-            emoji,
-            keywords: [emoji, composerEmojiCategoryMeta[category]?.label ?? ""],
-        }));
-    }
-
-    function buildEmojiSection(
-        title,
-        emojis,
-        { clearable = false, emptyText = "" } = {},
-    ) {
-        const headerAction = clearable
-            ? '<button type="button" class="tweet-modal__emoji-clear" data-action="clear-recent">모두 지우기</button>'
-            : "";
-        const body = emojis.length
-            ? `<div class="tweet-modal__emoji-grid">${emojis.map((emoji) => `<button type="button" class="tweet-modal__emoji-option" data-emoji="${emoji}" role="menuitem">${emoji}</button>`).join("")}</div>`
-            : `<p class="tweet-modal__emoji-empty">${emptyText}</p>`;
-        return `<section class="tweet-modal__emoji-section"><div class="tweet-modal__emoji-section-header"><h3 class="tweet-modal__emoji-section-title">${title}</h3>${headerAction}</div>${body}</section>`;
-    }
-
-    function renderEmojiTabs() {
-        replyEmojiTabs.forEach((tab) => {
-            const category = tab.getAttribute("data-emoji-category");
-            const meta = category ? composerEmojiCategoryMeta[category] : null;
-            const isActive = category === activeEmojiCategory;
-            tab.classList.toggle("tweet-modal__emoji-tab--active", isActive);
-            tab.setAttribute("aria-selected", String(isActive));
-            if (meta) {
-                tab.innerHTML = meta.icon;
-            }
-        });
-        parseTwemoji(replyEmojiPicker);
-    }
-
-    // 댓글 모달도 게시글 작성 모달과 같은 이모지 데이터 구조를 쓰되, 자체 DOM만 다시 그린다.
-    function renderEmojiPicker() {
-        if (!replyEmojiContent) {
-            return;
-        }
-        const searchTerm =
-            replyEmojiSearchInput?.value.trim().toLowerCase() ?? "";
-        if (searchTerm) {
-            const sections = Object.keys(composerEmojiCategoryData)
-                .map((category) => {
-                    const entries = getEmojiEntriesForCategory(category).filter(
-                        (entry) =>
-                            entry.keywords.some((keyword) =>
-                                keyword.toLowerCase().includes(searchTerm),
-                            ),
-                    );
-                    if (entries.length === 0) {
-                        return "";
-                    }
-                    return buildEmojiSection(
-                        composerEmojiCategoryMeta[category].sectionTitle,
-                        entries.map((entry) => entry.emoji),
-                    );
-                })
-                .join("");
-            replyEmojiContent.innerHTML =
-                sections ||
-                buildEmojiSection("검색 결과", [], {
-                    emptyText: "일치하는 이모티콘이 없습니다.",
-                });
-            renderEmojiTabs();
-            parseTwemoji(replyEmojiContent);
-            return;
-        }
-        if (activeEmojiCategory === "recent") {
-            const recent = getRecentEmojis();
-            replyEmojiContent.innerHTML =
-                buildEmojiSection("최근", recent, {
-                    clearable: recent.length > 0,
-                    emptyText: "최근 사용한 이모티콘이 없습니다.",
-                }) +
-                buildEmojiSection(
-                    composerEmojiCategoryMeta.smileys.sectionTitle,
-                    getEmojiEntriesForCategory("smileys").map(
-                        (entry) => entry.emoji,
-                    ),
-                );
-        } else {
-            replyEmojiContent.innerHTML = buildEmojiSection(
-                composerEmojiCategoryMeta[activeEmojiCategory].sectionTitle,
-                getEmojiEntriesForCategory(activeEmojiCategory).map(
-                    (entry) => entry.emoji,
-                ),
-            );
-        }
-        renderEmojiTabs();
-        parseTwemoji(replyEmojiContent);
-    }
-
-    function updateEmojiPickerPosition() {
-        if (!replyEmojiPicker || !replyEmojiButton) {
-            return;
-        }
-        const rect = replyEmojiButton.getBoundingClientRect();
-        const pickerWidth = Math.min(565, window.innerWidth - 32);
-        const maxLeft = Math.max(16, window.innerWidth - pickerWidth - 16);
-        const left = Math.min(Math.max(16, rect.left), maxLeft);
-        const top = rect.bottom + 8;
-        const maxHeight = Math.max(220, window.innerHeight - top - 16);
-        replyEmojiPicker.style.left = `${left}px`;
-        replyEmojiPicker.style.top = `${top}px`;
-        replyEmojiPicker.style.maxHeight = `${maxHeight}px`;
-    }
-
-    function openEmojiPicker() {
-        if (!replyEmojiPicker || !replyEmojiButton) {
-            return;
-        }
-        renderEmojiPicker();
-        replyEmojiPicker.hidden = false;
-        replyEmojiButton.setAttribute("aria-expanded", "true");
-        updateEmojiPickerPosition();
-    }
-
-    function closeEmojiPicker() {
-        if (!replyEmojiPicker || !replyEmojiButton) {
-            return;
-        }
-        replyEmojiPicker.hidden = true;
-        replyEmojiButton.setAttribute("aria-expanded", "false");
-    }
-
-    function toggleEmojiPicker() {
-        if (!replyEmojiPicker) {
-            return;
-        }
-        if (replyEmojiPicker.hidden) {
-            openEmojiPicker();
-        } else {
-            closeEmojiPicker();
-        }
     }
 
     function saveReplySelection() {
@@ -4928,84 +4154,6 @@ function setupReplyModal() {
         syncReplyFormatButtons();
     }
 
-    function insertReplyEmoji(emoji) {
-        if (!replyEditor) {
-            return;
-        }
-        replyEditor.focus();
-        if (!restoreReplySelection()) {
-            placeCaretAtEnd(replyEditor);
-        }
-        if (!document.execCommand("insertText", false, emoji)) {
-            const selection = window.getSelection();
-            if (!selection || selection.rangeCount === 0) {
-                replyEditor.textContent += emoji;
-                placeCaretAtEnd(replyEditor);
-            } else {
-                const range = selection.getRangeAt(0);
-                range.deleteContents();
-                range.insertNode(document.createTextNode(emoji));
-                range.collapse(false);
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-        }
-        applyPendingReplyFormatsToContent();
-        saveRecentEmoji(emoji);
-        saveReplySelection();
-        syncReplySubmitState();
-        syncReplyFormatButtons();
-        renderEmojiPicker();
-    }
-
-    function cloneTaggedUsers(users) {
-        return users.map((user) => ({ ...user }));
-    }
-
-    function getCurrentPageTagUsers() {
-        const users = [];
-        const seenHandles = new Set();
-        const accountName =
-            document.getElementById("accountName")?.textContent.trim() || "";
-        const accountHandle =
-            document.getElementById("accountHandle")?.textContent.trim() || "";
-        if (accountName && accountHandle) {
-            seenHandles.add(accountHandle);
-            users.push({
-                id: accountHandle.replace("@", "") || "current-user",
-                name: accountName,
-                handle: accountHandle,
-                avatar: getCurrentAccountAvatar(),
-            });
-        }
-        document.querySelectorAll(".postCard").forEach((postCard, index) => {
-            const name = getTextContent(postCard.querySelector(".postName"));
-            const handle = getTextContent(
-                postCard.querySelector(".postHandle"),
-            );
-            const avatar =
-                postCard
-                    .querySelector(".postAvatarImage")
-                    ?.getAttribute("src") ||
-                buildInitialAvatarDataUri(
-                    getTextContent(postCard.querySelector(".postAvatar")) ||
-                        name.charAt(0) ||
-                        "?",
-                );
-            if (!name || !handle || seenHandles.has(handle)) {
-                return;
-            }
-            seenHandles.add(handle);
-            users.push({
-                id: `${handle.replace("@", "") || "user"}-${index}`,
-                name,
-                handle,
-                avatar,
-            });
-        });
-        return users;
-    }
-
     function isReplyImageSet() {
         return (
             attachedReplyFiles.length > 0 &&
@@ -5116,6 +4264,8 @@ function setupReplyModal() {
             return;
         }
 
+        // 답글 첨부 미리보기 역시 `[data-attachment-media]` 내부만 교체하고
+        // 별도 노드를 body에 추가하지 않는다.
         if (attachedReplyFiles.length === 0) {
             replyFileInput.value = "";
             return;
@@ -5124,111 +4274,6 @@ function setupReplyModal() {
         const dataTransfer = new DataTransfer();
         attachedReplyFiles.forEach((file) => dataTransfer.items.add(file));
         replyFileInput.files = dataTransfer.files;
-    }
-
-    function getReplyAttachmentActionMarkup(
-        index,
-        { deleteLabel, includeEdit = true } = {},
-    ) {
-        const editButtonMarkup = includeEdit
-            ? `<div class="media-btn-row"><button type="button" class="media-btn" data-attachment-edit-index="${index}"><span>수정</span></button></div>`
-            : "";
-
-        return `${editButtonMarkup}<button type="button" class="media-btn-delete" aria-label="${deleteLabel}" data-attachment-remove-index="${index}"><svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path></g></svg></button>`;
-    }
-
-    function getReplyImageCell(index, url, className) {
-        const alt = getReplyMediaImageAlt(index);
-        const actionMarkup = getReplyAttachmentActionMarkup(index, {
-            deleteLabel: "미디어 삭제하기",
-        });
-        return `<div class="media-cell ${className}"><div class="media-cell-inner"><div class="media-img-container" aria-label="미디어" role="group"><div class="media-bg" style="background-image: url('${url}');"></div><img alt="${escapeHtml(alt)}" draggable="false" src="${url}" class="media-img"></div>${actionMarkup}</div></div>`;
-    }
-
-    function buildReplyImageGridMarkup() {
-        const urls = attachedReplyFileUrls;
-        const layouts = {
-            1: {
-                aspectClassName:
-                    "media-aspect-ratio media-aspect-ratio--single",
-                columns: [[{ index: 0, className: "media-cell--single" }]],
-            },
-            2: {
-                aspectClassName: "media-aspect-ratio",
-                columns: [
-                    [{ index: 0, className: "media-cell--left" }],
-                    [{ index: 1, className: "media-cell--right" }],
-                ],
-            },
-            3: {
-                aspectClassName: "media-aspect-ratio",
-                columns: [
-                    [{ index: 0, className: "media-cell--left-tall" }],
-                    [
-                        { index: 1, className: "media-cell--right-top" },
-                        { index: 2, className: "media-cell--right-bottom" },
-                    ],
-                ],
-            },
-            4: {
-                aspectClassName: "media-aspect-ratio",
-                columns: [
-                    [
-                        { index: 0, className: "media-cell--top-left" },
-                        { index: 2, className: "media-cell--bottom-left" },
-                    ],
-                    [
-                        { index: 1, className: "media-cell--top-right" },
-                        { index: 3, className: "media-cell--bottom-right" },
-                    ],
-                ],
-            },
-        };
-        const layout = layouts[attachedReplyFiles.length] || layouts[4];
-        const columnsMarkup = layout.columns
-            .map((column) => {
-                const cellsMarkup = column
-                    .map(({ index, className }) =>
-                        getReplyImageCell(index, urls[index], className),
-                    )
-                    .join("");
-
-                return `<div class="media-col">${cellsMarkup}</div>`;
-            })
-            .join("");
-
-        if (layout.columns.length === 1) {
-            return `<div class="${layout.aspectClassName}"></div><div class="media-absolute-layer">${columnsMarkup}</div>`;
-        }
-
-        return `<div class="${layout.aspectClassName}"></div><div class="media-absolute-layer"><div class="media-row">${columnsMarkup}</div></div>`;
-    }
-
-    function renderReplyImageGrid() {
-        if (!replyAttachmentMedia) {
-            return;
-        }
-        replyAttachmentMedia.innerHTML = buildReplyImageGridMarkup();
-    }
-
-    function renderReplyVideoAttachment() {
-        if (!replyAttachmentMedia || attachedReplyFiles.length === 0) {
-            return;
-        }
-        const [file] = attachedReplyFiles;
-        const [url] = attachedReplyFileUrls;
-        const actionMarkup = getReplyAttachmentActionMarkup(0, {
-            deleteLabel: "미디어 삭제하기",
-        });
-        replyAttachmentMedia.innerHTML = `<div class="media-aspect-ratio media-aspect-ratio--single"></div><div class="media-absolute-layer"><div class="media-cell media-cell--single"><div class="media-cell-inner"><div class="media-img-container" aria-label="미디어" role="group"><video class="tweet-modal__attachment-video" controls preload="metadata"><source src="${url}" type="${file.type}"></video></div>${actionMarkup}</div></div></div>`;
-    }
-
-    function renderReplyAttachmentFileCard(file, index) {
-        const actionMarkup = getReplyAttachmentActionMarkup(index, {
-            deleteLabel: "파일 삭제하기",
-            includeEdit: false,
-        });
-        return `<div class="tweet-modal__attachment-file"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><g><path d="M14 2H7.75C5.68 2 4 3.68 4 5.75v12.5C4 20.32 5.68 22 7.75 22h8.5C18.32 22 20 20.32 20 18.25V8l-6-6zm0 2.12L17.88 8H14V4.12zm2.25 15.88h-8.5c-.97 0-1.75-.78-1.75-1.75V5.75C6 4.78 6.78 4 7.75 4H12v5.25c0 .41.34.75.75.75H18v8.25c0 .97-.78 1.75-1.75 1.75z"></path></g></svg><span class="tweet-modal__attachment-file-name">${escapeHtml(file.name)}</span>${actionMarkup}</div>`;
     }
 
     // 댓글 첨부 상태는 별도 배열과 input.files를 같이 맞춰야 삭제/복원이 안정적으로 동작한다.
@@ -5276,16 +4321,49 @@ function setupReplyModal() {
         createReplyAttachmentUrls();
         if (isReplyImageSet()) {
             syncReplyAttachmentDerivedState({ keepTaggedUsers: true });
-            renderReplyImageGrid();
+            replyAttachmentMedia.innerHTML = buildAttachmentGridMarkup({
+                count: attachedReplyFileUrls.length,
+                urls: attachedReplyFileUrls,
+                getAlt: getReplyMediaImageAlt,
+                getActionMarkup(index) {
+                    return buildAttachmentActionMarkup({
+                        index,
+                        deleteLabel: "미디어 삭제하기",
+                        removeAttribute: "data-attachment-remove-index",
+                    });
+                },
+            });
             return;
         }
         syncReplyAttachmentDerivedState();
         if (isReplyVideoSet()) {
-            renderReplyVideoAttachment();
+            replyAttachmentMedia.innerHTML = buildAttachmentVideoMarkup({
+                url: attachedReplyFileUrls[0],
+                fileType: attachedReplyFiles[0].type,
+                actionMarkup: buildAttachmentActionMarkup({
+                    index: 0,
+                    deleteLabel: "미디어 삭제하기",
+                    removeAttribute: "data-attachment-remove-index",
+                }),
+            });
             return;
         }
         replyAttachmentMedia.innerHTML = attachedReplyFiles
-            .map((file, index) => renderReplyAttachmentFileCard(file, index))
+            .map((file, index) =>
+                buildAttachmentFileCardMarkup({
+                    file,
+                    index,
+                    objectUrl: attachedReplyFileUrls[index],
+                    actionMarkup: buildAttachmentActionMarkup({
+                        index,
+                        deleteLabel: file.type.startsWith("video/")
+                            ? "미디어 삭제하기"
+                            : "파일 삭제하기",
+                        removeAttribute: "data-attachment-remove-index",
+                        includeEdit: false,
+                    }),
+                }),
+            )
             .join("");
     }
 
@@ -5346,52 +4424,18 @@ function setupReplyModal() {
         if (!replyTagChipList) {
             return;
         }
-        replyTagChipList.innerHTML = pendingTaggedUsers
-            .map(buildReplyTagChipMarkup)
-            .join("");
-    }
-
-    function buildReplyTagChipMarkup(user) {
-        const avatarMarkup = user.avatar
-            ? `<span class="tweet-modal__tag-chip-avatar"><img src="${escapeHtml(user.avatar)}" alt="${escapeHtml(user.name)}" /></span>`
-            : '<span class="tweet-modal__tag-chip-avatar"></span>';
-
-        return `<button type="button" class="tweet-modal__tag-chip" data-tag-remove-id="${escapeHtml(user.id)}">${avatarMarkup}<span class="tweet-modal__tag-chip-name">${escapeHtml(user.name)}</span><svg viewBox="0 0 24 24" aria-hidden="true" class="tweet-modal__tag-chip-icon"><g><path d="M10.59 12 4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path></g></svg></button>`;
-    }
-
-    function buildReplyTagResultMarkup(user) {
-        const isSelected = pendingTaggedUsers.some(
-            (entry) => entry.id === user.id,
-        );
-        const subtitle = isSelected
-            ? `${user.handle} 이미 태그됨`
-            : user.handle;
-        const avatarMarkup = user.avatar
-            ? `<span class="tweet-modal__tag-avatar"><img src="${escapeHtml(user.avatar)}" alt="${escapeHtml(user.name)}" /></span>`
-            : '<span class="tweet-modal__tag-avatar"></span>';
-
-        return `<div role="option" class="tweet-modal__tag-option" data-testid="typeaheadResult"><div role="checkbox" aria-checked="${String(isSelected)}" aria-disabled="${String(isSelected)}" class="tweet-modal__tag-checkbox"><button type="button" class="tweet-modal__tag-user" data-tag-user-id="${escapeHtml(user.id)}" ${isSelected ? "disabled" : ""}>${avatarMarkup}<span class="tweet-modal__tag-user-body"><span class="tweet-modal__tag-user-name">${escapeHtml(user.name)}</span><span class="tweet-modal__tag-user-handle">${escapeHtml(subtitle)}</span></span></button></div></div>`;
+        replyTagChipList.innerHTML = pendingTaggedUsers.map(buildTagChipMarkup).join("");
     }
 
     function renderTagResults(users) {
-        if (!replyTagResults || !replyTagSearchInput) {
-            return;
-        }
         currentTagResults = users;
-        if (!replyTagSearchInput.value.trim()) {
-            replyTagSearchInput.setAttribute("aria-expanded", "false");
-            replyTagResults.innerHTML = "";
-            return;
-        }
-        replyTagSearchInput.setAttribute("aria-expanded", "true");
-        if (users.length === 0) {
-            replyTagResults.innerHTML =
-                '<p class="tweet-modal__tag-empty">일치하는 사용자를 찾지 못했습니다.</p>';
-            return;
-        }
-        replyTagResults.innerHTML = users
-            .map(buildReplyTagResultMarkup)
-            .join("");
+        renderTagResultsPanel({
+            input: replyTagSearchInput,
+            resultsElement: replyTagResults,
+            users,
+            selectedUsers: pendingTaggedUsers,
+            resultId: "main-reply-tag-results",
+        });
     }
 
     function runTagSearch() {
@@ -5400,20 +4444,13 @@ function setupReplyModal() {
             renderTagResults([]);
             return;
         }
-        renderTagResults(
-            getCurrentPageTagUsers()
-                .filter((user) =>
-                    `${user.name} ${user.handle}`.toLowerCase().includes(query),
-                )
-                .slice(0, 6),
-        );
+        renderTagResults(filterUsersByQuery(getMainPageTagUsers(), query));
     }
 
     function openTagPanel() {
         if (!composeView || !replyTagView || !isReplyImageSet()) {
             return;
         }
-        closeEmojiPicker();
         pendingTaggedUsers = cloneTaggedUsers(selectedTaggedUsers);
         renderTagChipList();
         runTagSearch();
@@ -5496,23 +4533,7 @@ function setupReplyModal() {
         const locations = query
             ? cachedLocationNames.filter((location) => location.includes(query))
             : cachedLocationNames;
-        if (locations.length === 0) {
-            replyLocationList.innerHTML =
-                '<p class="tweet-modal__location-empty">일치하는 위치를 찾지 못했습니다.</p>';
-            return;
-        }
-        replyLocationList.innerHTML = locations
-            .map(buildReplyLocationItemMarkup)
-            .join("");
-    }
-
-    function buildReplyLocationItemMarkup(location) {
-        const isSelected = pendingLocation === location;
-        const checkMarkup = isSelected
-            ? '<svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9.64 18.952l-5.55-4.861 1.317-1.504 3.951 3.459 8.459-10.948L19.4 6.32 9.64 18.952z"></path></g></svg>'
-            : "";
-
-        return `<button type="button" class="tweet-modal__location-item" role="menuitem"><span class="tweet-modal__location-item-label">${location}</span><span class="tweet-modal__location-item-check">${checkMarkup}</span></button>`;
+        renderLocationOptions(replyLocationList, locations, pendingLocation);
     }
 
     function applyLocation(location) {
@@ -5535,7 +4556,6 @@ function setupReplyModal() {
         if (!composeView || !replyLocationView) {
             return;
         }
-        closeEmojiPicker();
         pendingLocation = selectedLocation;
         replyModalOverlay.__syncReplyModalSubviewState?.(replyLocationView);
         if (replyLocationSearchInput) {
@@ -5567,36 +4587,24 @@ function setupReplyModal() {
     }
 
     function renderMediaEditor() {
-        if (
-            !replyMediaPreviewImage ||
-            !replyMediaAltInput ||
-            !replyMediaAltCount
-        ) {
-            return;
-        }
-        const edit = pendingReplyMediaEdits[activeReplyMediaIndex];
-        const url = attachedReplyFileUrls[activeReplyMediaIndex] || "";
-        replyMediaPreviewImage.src = url;
-        replyMediaPreviewImage.alt = edit?.alt ?? "";
-        replyMediaAltInput.value = edit?.alt ?? "";
-        replyMediaAltCount.textContent = `${replyMediaAltInput.value.length} / 1,000`;
-        if (replyMediaTitle) {
-            replyMediaTitle.textContent = `이미지 설명 수정 (${activeReplyMediaIndex + 1}/${pendingReplyMediaEdits.length || 1})`;
-        }
-        if (replyMediaPrevButton) {
-            replyMediaPrevButton.disabled = activeReplyMediaIndex <= 0;
-        }
-        if (replyMediaNextButton) {
-            replyMediaNextButton.disabled =
-                activeReplyMediaIndex >= pendingReplyMediaEdits.length - 1;
-        }
+        renderMediaAltEditorPanel({
+            edits: pendingReplyMediaEdits,
+            activeIndex: activeReplyMediaIndex,
+            previewImage: replyMediaPreviewImage,
+            altInput: replyMediaAltInput,
+            altCount: replyMediaAltCount,
+            titleElement: replyMediaTitle,
+            prevButton: replyMediaPrevButton,
+            nextButton: replyMediaNextButton,
+            imageUrls: attachedReplyFileUrls,
+            maxLength: maxReplyMediaAltLength,
+        });
     }
 
     function openMediaEditor() {
         if (!composeView || !replyMediaView || !isReplyImageSet()) {
             return;
         }
-        closeEmojiPicker();
         pendingReplyMediaEdits = cloneReplyMediaEdits(replyMediaEdits);
         activeReplyMediaIndex = 0;
         replyModalOverlay.__syncReplyModalSubviewState?.(replyMediaView);
@@ -5746,27 +4754,6 @@ function setupReplyModal() {
         return item.dataset.replyDraftId;
     }
 
-    function hasDraftSelection() {
-        return draftPanelState.selectedItems.size > 0;
-    }
-
-    function areAllDraftItemsSelected() {
-        const items = getDraftItems();
-        return (
-            items.length > 0 &&
-            draftPanelState.selectedItems.size === items.length
-        );
-    }
-
-    function buildDraftCheckbox(selected) {
-        const checkbox = document.createElement("span");
-        checkbox.className = `draft-panel__checkbox${selected ? " draft-panel__checkbox--checked" : ""}`;
-        checkbox.setAttribute("aria-hidden", "true");
-        checkbox.innerHTML =
-            '<svg viewBox="0 0 24 24"><g><path d="M9.86 18a1 1 0 01-.73-.31l-3.9-4.11 1.45-1.38 3.2 3.38 7.46-8.1 1.47 1.36-8.19 8.9A1 1 0 019.86 18z"></path></g></svg>';
-        return checkbox;
-    }
-
     function renderDraftItems() {
         getDraftItems().forEach((item, index) => {
             const draftId = getDraftItemId(item, index);
@@ -5782,62 +4769,40 @@ function setupReplyModal() {
                 draftPanelState.isEditMode ? String(isSelected) : "false",
             );
             if (draftPanelState.isEditMode) {
-                item.prepend(buildDraftCheckbox(isSelected));
+                // 체크박스는 기존 `.draft-panel__item` 시작 부분에만 추가되고,
+                // 편집 모드를 끄거나 다시 렌더링하면 먼저 remove 된다.
+                item.insertAdjacentHTML(
+                    "afterbegin",
+                    buildSharedDraftCheckboxMarkup(isSelected),
+                );
             }
         });
     }
 
     function renderDraftPanel() {
         const items = getDraftItems();
-        const hasItems = items.length > 0;
-        if (draftActionButton) {
-            draftActionButton.textContent = draftPanelState.isEditMode
-                ? "완료"
-                : "수정";
-            draftActionButton.disabled = !hasItems;
-            draftActionButton.classList.toggle(
-                "draft-panel__action--done",
-                draftPanelState.isEditMode,
-            );
-        }
+        const draftIds = items.map((item, index) => getDraftItemId(item, index));
         renderDraftItems();
-        if (draftEmpty) {
-            draftEmpty.hidden = hasItems;
-        }
-        if (draftEmptyTitle) {
-            draftEmptyTitle.textContent = "잠시 생각을 정리합니다";
-        }
-        if (draftEmptyBody) {
-            draftEmptyBody.textContent =
-                "아직 게시할 준비가 되지 않았나요? 임시저장해 두고 나중에 이어서 작성하세요.";
-        }
-        if (draftFooter) {
-            draftFooter.hidden = !draftPanelState.isEditMode;
-        }
-        if (draftSelectAllButton) {
-            draftSelectAllButton.textContent = areAllDraftItemsSelected()
-                ? "모두 선택 해제"
-                : "모두 선택";
-        }
-        if (draftDeleteButton) {
-            draftDeleteButton.disabled = !hasDraftSelection();
-        }
-        if (draftConfirmOverlay) {
-            draftConfirmOverlay.hidden = !draftPanelState.confirmOpen;
-        }
-        if (draftConfirmTitle) {
-            draftConfirmTitle.textContent = "전송하지 않은 게시물 삭제하기";
-        }
-        if (draftConfirmDesc) {
-            draftConfirmDesc.textContent =
-                "이 작업은 취소할 수 없으며 선택한 전송하지 않은 게시물이 삭제됩니다.";
-        }
+
+        renderDraftPanelChrome({
+            draftPanelState,
+            itemCount: items.length,
+            allSelected: areAllDraftIdsSelected(draftPanelState, draftIds),
+            actionButton: draftActionButton,
+            empty: draftEmpty,
+            emptyTitle: draftEmptyTitle,
+            emptyBody: draftEmptyBody,
+            footer: draftFooter,
+            selectAllButton: draftSelectAllButton,
+            deleteButton: draftDeleteButton,
+            confirmOverlay: draftConfirmOverlay,
+            confirmTitle: draftConfirmTitle,
+            confirmDesc: draftConfirmDesc,
+        });
     }
 
     function resetDraftPanel() {
-        draftPanelState.isEditMode = false;
-        draftPanelState.confirmOpen = false;
-        draftPanelState.selectedItems.clear();
+        resetSharedDraftPanelState(draftPanelState);
     }
 
     function openDraftPanel() {
@@ -5862,25 +4827,14 @@ function setupReplyModal() {
 
     function toggleDraftSelection(item) {
         const draftId = getDraftItemId(item, getDraftItems().indexOf(item));
-        if (draftPanelState.selectedItems.has(draftId)) {
-            draftPanelState.selectedItems.delete(draftId);
-        } else {
-            draftPanelState.selectedItems.add(draftId);
-        }
-        draftPanelState.confirmOpen = false;
+        toggleDraftSelectionState(draftPanelState, draftId);
     }
 
     function toggleDraftSelectAll() {
-        if (areAllDraftItemsSelected()) {
-            draftPanelState.selectedItems.clear();
-        } else {
-            draftPanelState.selectedItems = new Set(
-                getDraftItems().map((item, index) =>
-                    getDraftItemId(item, index),
-                ),
-            );
-        }
-        draftPanelState.confirmOpen = false;
+        toggleDraftSelectAllState(
+            draftPanelState,
+            getDraftItems().map((item, index) => getDraftItemId(item, index)),
+        );
     }
 
     function deleteSelectedDrafts() {
@@ -5940,7 +4894,6 @@ function setupReplyModal() {
     }
 
     function resetReplySearchInputs() {
-        if (replyEmojiSearchInput) replyEmojiSearchInput.value = "";
         if (replyLocationSearchInput) replyLocationSearchInput.value = "";
         if (replyTagSearchInput) replyTagSearchInput.value = "";
     }
@@ -5951,7 +4904,6 @@ function setupReplyModal() {
         }
         savedReplySelection = null;
         pendingReplyFormats = new Set();
-        activeEmojiCategory = "recent";
         selectedLocation = null;
         pendingLocation = null;
         resetReplyAttachment();
@@ -5971,7 +4923,6 @@ function setupReplyModal() {
         replyModalOverlay.hidden = false;
         syncReplyAvatars();
         populateReplyModal(button);
-        closeEmojiPicker();
         resetReplyModalState();
         closeDraftPanel({ restoreFocus: false });
         window.requestAnimationFrame(() => {
@@ -5990,7 +4941,6 @@ function setupReplyModal() {
         }
         replyModalOverlay.hidden = true;
         document.body.classList.remove("modal-open");
-        closeEmojiPicker();
         closeLocationPanel({ restoreFocus: false });
         closeTagPanel({ restoreFocus: false });
         closeMediaEditor({ restoreFocus: false, discardChanges: true });
@@ -6099,49 +5049,6 @@ function setupReplyModal() {
                 applyReplyFormat(format);
             }
         });
-    });
-
-    replyEmojiButton?.addEventListener("mousedown", (event) =>
-        event.preventDefault(),
-    );
-    replyEmojiButton?.addEventListener("click", (event) => {
-        event.preventDefault();
-        toggleEmojiPicker();
-    });
-    replyEmojiSearchInput?.addEventListener("input", renderEmojiPicker);
-    replyEmojiTabs.forEach((tab) => {
-        tab.addEventListener("click", () => {
-            const category = tab.getAttribute("data-emoji-category");
-            if (!category) {
-                return;
-            }
-            activeEmojiCategory = category;
-            renderEmojiPicker();
-        });
-    });
-    replyEmojiContent?.addEventListener("mousedown", (event) => {
-        if (
-            event.target.closest(
-                ".tweet-modal__emoji-option, .tweet-modal__emoji-clear",
-            )
-        ) {
-            event.preventDefault();
-        }
-    });
-    replyEmojiContent?.addEventListener("click", (event) => {
-        if (event.target.closest("[data-action='clear-recent']")) {
-            clearRecentEmojis();
-            activeEmojiCategory = "recent";
-            renderEmojiPicker();
-            return;
-        }
-        const emojiButton = event.target.closest(".tweet-modal__emoji-option");
-        const emoji = emojiButton?.getAttribute("data-emoji");
-        if (!emoji) {
-            return;
-        }
-        insertReplyEmoji(emoji);
-        closeEmojiPicker();
     });
 
     replyMediaUploadButton?.addEventListener("click", (event) => {
@@ -6353,30 +5260,6 @@ function setupReplyModal() {
         closeReplyModal({ skipConfirm: true });
     });
 
-    document.addEventListener("click", (event) => {
-        if (
-            replyEmojiPicker &&
-            !replyEmojiPicker.hidden &&
-            !replyEmojiPicker.contains(event.target) &&
-            !replyEmojiButton?.contains(event.target)
-        ) {
-            closeEmojiPicker();
-        }
-    });
-    window.addEventListener("resize", () => {
-        if (replyEmojiPicker && !replyEmojiPicker.hidden) {
-            updateEmojiPickerPosition();
-        }
-    });
-    window.addEventListener(
-        "scroll",
-        () => {
-            if (replyEmojiPicker && !replyEmojiPicker.hidden) {
-                updateEmojiPickerPosition();
-            }
-        },
-        { passive: true },
-    );
 }
 
 // 피드 카드 하단 액션 바를 제어한다.
@@ -6384,10 +5267,31 @@ function setupReplyModal() {
 // 주요 역할: 좋아요/북마크 토글, 공유 드롭다운/공유 모달, 채팅 공유, 링크 복사.
 function setupTweetActions() {
     const layersRoot = document.getElementById("layers");
-    let activeShareDropdown = null;
+    // 공유 드롭다운은 `main.html`의 `#mainShareDropdown`을 `#layers`에서 재사용한다.
+    const shareDropdown = document.getElementById("mainShareDropdown");
+    const shareDropdownMenu = document.getElementById("mainShareDropdownMenu");
+    // 공유 바텀시트/토스트는 body 하단의 고정 노드만 토글한다.
+    const shareToast = document.getElementById("mainShareToast");
+    const shareChatSheet = document.getElementById("mainShareChatSheet");
+    const shareChatSearch = document.getElementById("mainShareChatSearch");
+    const shareChatUserList = document.getElementById("mainShareChatUserList");
+    const shareBookmarkSheet = document.getElementById("mainShareBookmarkSheet");
+    const shareBookmarkFolder = document.getElementById(
+        "mainShareBookmarkFolder",
+    );
+    const shareBookmarkCheck = document.getElementById(
+        "mainShareBookmarkCheck",
+    );
+    const shareBookmarkCreateFolder = document.getElementById(
+        "mainShareBookmarkCreateFolder",
+    );
     let activeShareButton = null;
-    let activeShareToast = null;
-    let activeShareModal = null;
+    let activeShareToastTimer = null;
+    let activeShareBookmarkButton = null;
+
+    if (!layersRoot || !shareDropdown || !shareDropdownMenu) {
+        return;
+    }
 
     function getShareUsers() {
         const users = [];
@@ -6461,31 +5365,24 @@ function setupTweetActions() {
             "1";
         const bookmarkButton =
             postCard?.querySelector(".tweet-action-btn--bookmark") ?? null;
-        const url = new URL(window.location.href);
-
-        url.pathname = `/${handle.replace("@", "") || "user"}/status/${postId}`;
-        url.hash = "";
-        url.search = "";
+        const permalink = `#post-${postId}`;
 
         return {
             handle,
             postCard,
             postId,
-            permalink: url.toString(),
+            permalink,
             bookmarkButton,
         };
     }
 
     function showShareToast(message) {
         showTimedToast({
+            toastElement: shareToast,
             message,
-            className: "share-toast",
-            activeToast: activeShareToast,
-            setActiveToast(nextToast) {
-                activeShareToast =
-                    typeof nextToast === "function"
-                        ? nextToast(activeShareToast)
-                        : nextToast;
+            activeTimer: activeShareToastTimer,
+            setActiveTimer(nextTimer) {
+                activeShareToastTimer = nextTimer;
             },
         });
     }
@@ -6514,32 +5411,22 @@ function setupTweetActions() {
     }
 
     function closeShareModal() {
-        if (!activeShareModal) {
-            return;
+        if (shareChatSheet) {
+            shareChatSheet.hidden = true;
         }
-        activeShareModal.remove();
-        activeShareModal = null;
+        if (shareBookmarkSheet) {
+            shareBookmarkSheet.hidden = true;
+        }
         document.body.classList.remove("modal-open");
-    }
-
-    function showShareSheet(markup, onClick) {
-        const modal = document.createElement("div");
-        modal.className = "share-sheet";
-        modal.innerHTML = markup;
-        modal.addEventListener("click", onClick);
-        document.body.appendChild(modal);
-        document.body.classList.add("modal-open");
-        activeShareModal = modal;
-        return modal;
+        activeShareBookmarkButton = null;
     }
 
     // 공유 드롭다운은 더보기 드롭다운과 동시에 남지 않도록 공용 레이어 정리 대상에 포함된다.
     function closeShareDropdown() {
-        if (!activeShareDropdown) {
+        if (shareDropdown.hidden) {
             return;
         }
-        activeShareDropdown.remove();
-        activeShareDropdown = null;
+        shareDropdown.hidden = true;
         if (activeShareButton) {
             activeShareButton.setAttribute("aria-expanded", "false");
             activeShareButton = null;
@@ -6598,60 +5485,30 @@ function setupTweetActions() {
         });
     }
 
+    // 채팅 공유 사용자 목록은 고정 시트 내부 `#mainShareChatUserList`만 다시 그린다.
+    function renderShareUsers(users) {
+        if (!shareChatUserList) {
+            return;
+        }
+        shareChatUserList.innerHTML = getShareUserRows(users);
+    }
+
     function openShareChatModal(button) {
         closeShareDropdown();
         closeShareModal();
 
         const users = getShareUsers();
-        const modal = showShareSheet(
-            `
-            <div class="share-sheet__backdrop" data-share-close="true"></div>
-            <div class="share-sheet__card" role="dialog" aria-modal="true" aria-labelledby="share-chat-title">
-                <div class="share-sheet__header">
-                    <button type="button" class="share-sheet__icon-btn" data-share-close="true" aria-label="돌아가기">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <g><path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"></path></g>
-                        </svg>
-                    </button>
-                    <h2 id="share-chat-title" class="share-sheet__title">공유하기</h2>
-                    <span class="share-sheet__header-spacer"></span>
-                </div>
-                <div class="share-sheet__search">
-                    <input type="text" class="share-sheet__search-input" placeholder="검색" aria-label="검색" />
-                </div>
-                <div class="share-sheet__list">${getShareUserRows(users)}</div>
-            </div>
-        `,
-            (event) => {
-                const userButton = event.target.closest(".share-sheet__user");
-                if (
-                    event.target.closest("[data-share-close='true']") ||
-                    event.target.classList.contains("share-sheet__backdrop")
-                ) {
-                    event.preventDefault();
-                    closeShareModal();
-                    return;
-                }
-
-                if (userButton) {
-                    event.preventDefault();
-                    const userName =
-                        userButton.getAttribute("data-share-user-name") ||
-                        "선택한 사용자";
-                    closeShareModal();
-                    showShareToast(`${userName}에게 전송함`);
-                }
-            },
-        );
-
-        const searchInput = modal.querySelector(".share-sheet__search-input");
-        const list = modal.querySelector(".share-sheet__list");
-        searchInput?.addEventListener("input", () => {
-            const filteredUsers = filterShareUsers(users, searchInput.value);
-            if (list) {
-                list.innerHTML = getShareUserRows(filteredUsers);
-            }
-        });
+        renderShareUsers(users);
+        if (shareChatSearch) {
+            shareChatSearch.value = "";
+            shareChatSearch.oninput = () => {
+                renderShareUsers(filterShareUsers(users, shareChatSearch.value));
+            };
+        }
+        if (shareChatSheet) {
+            shareChatSheet.hidden = false;
+        }
+        document.body.classList.add("modal-open");
     }
 
     function openShareBookmarkModal(button) {
@@ -6661,111 +5518,15 @@ function setupTweetActions() {
 
         const isBookmarked =
             bookmarkButton?.classList.contains("active") ?? false;
-        showShareSheet(
-            `
-            <div class="share-sheet__backdrop" data-share-close="true"></div>
-            <div class="share-sheet__card share-sheet__card--bookmark" role="dialog" aria-modal="true" aria-labelledby="share-bookmark-title">
-                <div class="share-sheet__header">
-                    <button type="button" class="share-sheet__icon-btn" data-share-close="true" aria-label="닫기">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <g><path d="M10.59 12 4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path></g>
-                        </svg>
-                    </button>
-                    <h2 id="share-bookmark-title" class="share-sheet__title">폴더에 추가</h2>
-                    <span class="share-sheet__header-spacer"></span>
-                </div>
-                <button type="button" class="share-sheet__create-folder">새 북마크 폴더 만들기</button>
-                <button type="button" class="share-sheet__folder" data-share-folder="all-bookmarks">
-                    <span class="share-sheet__folder-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <g><path d="M2.998 8.5c0-1.38 1.119-2.5 2.5-2.5h9c1.381 0 2.5 1.12 2.5 2.5v14.12l-7-3.5-7 3.5V8.5zM18.5 2H8.998v2H18.5c.275 0 .5.224.5.5V15l2 1.4V4.5c0-1.38-1.119-2.5-2.5-2.5z"></path></g>
-                        </svg>
-                    </span>
-                    <span class="share-sheet__folder-name">모든 북마크</span>
-                    <span class="share-sheet__folder-check${isBookmarked ? " share-sheet__folder-check--active" : ""}">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <g><path d="M9.64 18.952l-5.55-4.861 1.317-1.504 3.951 3.459 8.459-10.948L19.4 6.32 9.64 18.952z"></path></g>
-                        </svg>
-                    </span>
-                </button>
-            </div>
-        `,
-            (event) => {
-                if (
-                    event.target.closest("[data-share-close='true']") ||
-                    event.target.classList.contains("share-sheet__backdrop")
-                ) {
-                    event.preventDefault();
-                    closeShareModal();
-                    return;
-                }
-
-                if (event.target.closest(".share-sheet__create-folder")) {
-                    event.preventDefault();
-                    closeShareModal();
-                    showShareToast("새 북마크 폴더 만들기는 준비 중입니다");
-                    return;
-                }
-
-                if (
-                    event.target.closest("[data-share-folder='all-bookmarks']")
-                ) {
-                    event.preventDefault();
-                    setBookmarkButtonState(bookmarkButton, !isBookmarked);
-                    closeShareModal();
-                }
-            },
+        activeShareBookmarkButton = bookmarkButton;
+        shareBookmarkCheck?.classList.toggle(
+            "share-sheet__folder-check--active",
+            isBookmarked,
         );
-    }
-
-    function buildShareDropdownMarkup(top, right) {
-        const items = [
-            {
-                modifier: "copy",
-                label: "링크 복사하기",
-                iconPath:
-                    "M18.36 5.64c-1.95-1.96-5.11-1.96-7.07 0L9.88 7.05 8.46 5.64l1.42-1.42c2.73-2.73 7.16-2.73 9.9 0 2.73 2.74 2.73 7.17 0 9.9l-1.42 1.42-1.41-1.42 1.41-1.41c1.96-1.96 1.96-5.12 0-7.07zm-2.12 3.53l-7.07 7.07-1.41-1.41 7.07-7.07 1.41 1.41zm-12.02.71l1.42-1.42 1.41 1.42-1.41 1.41c-1.96 1.96-1.96 5.12 0 7.07 1.95 1.96 5.11 1.96 7.07 0l1.41-1.41 1.42 1.41-1.42 1.42c-2.73 2.73-7.16 2.73-9.9 0-2.73-2.74-2.73-7.17 0-9.9z",
-            },
-            {
-                modifier: "chat",
-                label: "Chat으로 전송하기",
-                iconPath:
-                    "M1.998 5.5c0-1.381 1.119-2.5 2.5-2.5h15c1.381 0 2.5 1.119 2.5 2.5v13c0 1.381-1.119 2.5-2.5 2.5h-15c-1.381 0-2.5-1.119-2.5-2.5v-13zm2.5-.5c-.276 0-.5.224-.5.5v2.764l8 3.638 8-3.636V5.5c0-.276-.224-.5-.5-.5h-15zm15.5 5.463l-8 3.636-8-3.638V18.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5v-8.037z",
-            },
-            {
-                modifier: "bookmark",
-                label: "폴더에 북마크 추가하기",
-                iconPath:
-                    "M18 3V0h2v3h3v2h-3v3h-2V5h-3V3zm-7.5 1a.5.5 0 00-.5.5V7h3.5A2.5 2.5 0 0116 9.5v3.48l3 2.1V11h2v7.92l-5-3.5v7.26l-6.5-3.54L3 22.68V9.5A2.5 2.5 0 015.5 7H8V4.5A2.5 2.5 0 0110.5 2H12v2zm-5 5a.5.5 0 00-.5.5v9.82l4.5-2.46 4.5 2.46V9.5a.5.5 0 00-.5-.5z",
-            },
-        ];
-
-        const itemsMarkup = items
-            .map(
-                ({ modifier, label, iconPath }) => `
-                            <button type="button" role="menuitem" class="menu-item share-menu-item share-menu-item--${modifier}">
-                                <span class="menu-item__icon share-menu-item__icon">
-                                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                                        <g><path d="${iconPath}"></path></g>
-                                    </svg>
-                                </span>
-                                <span class="menu-item__label">${label}</span>
-                            </button>`,
-            )
-            .join("");
-
-        return `
-            <div class="layers-overlay"></div>
-            <div class="layers-dropdown-inner">
-                <div role="menu" class="dropdown-menu" style="top: ${top}px; right: ${right}px;">
-                    <div>
-                        <div class="dropdown-inner" data-testid="Dropdown">
-${itemsMarkup}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+        if (shareBookmarkSheet) {
+            shareBookmarkSheet.hidden = false;
+        }
+        document.body.classList.add("modal-open");
     }
 
     function handleShareDropdownAction(actionButton) {
@@ -6773,15 +5534,16 @@ ${itemsMarkup}
             return;
         }
 
-        if (actionButton.classList.contains("share-menu-item--copy")) {
+        const action = actionButton.getAttribute("data-share-action");
+        if (action === "copy") {
             copyShareLink(activeShareButton);
             return;
         }
-        if (actionButton.classList.contains("share-menu-item--chat")) {
+        if (action === "chat") {
             openShareChatModal(activeShareButton);
             return;
         }
-        if (actionButton.classList.contains("share-menu-item--bookmark")) {
+        if (action === "bookmark") {
             openShareBookmarkModal(activeShareButton);
         }
     }
@@ -6798,26 +5560,9 @@ ${itemsMarkup}
 
         closeShareDropdown();
         const rect = button.getBoundingClientRect();
-        const top = rect.bottom + window.scrollY + 8;
-        const right = Math.max(6, window.innerWidth - rect.right - 10);
-        const layerContainer = document.createElement("div");
-        layerContainer.className = "layers-dropdown-container";
-        layerContainer.innerHTML = buildShareDropdownMarkup(top, right);
-
-        layerContainer.addEventListener("click", (event) => {
-            const actionButton = event.target.closest(".share-menu-item");
-            if (!actionButton || !activeShareButton) {
-                event.stopPropagation();
-                return;
-            }
-
-            event.preventDefault();
-            event.stopPropagation();
-            handleShareDropdownAction(actionButton);
-        });
-
-        layersRoot.appendChild(layerContainer);
-        activeShareDropdown = layerContainer;
+        shareDropdownMenu.style.top = `${rect.bottom + window.scrollY + 8}px`;
+        shareDropdownMenu.style.right = `${Math.max(6, window.innerWidth - rect.right - 10)}px`;
+        shareDropdown.hidden = false;
         activeShareButton = button;
         activeShareButton.setAttribute("aria-expanded", "true");
     }
@@ -6889,10 +5634,72 @@ ${itemsMarkup}
             });
         });
 
+    shareDropdown.addEventListener("click", (event) => {
+        if (event.target.closest("[data-share-dropdown-close='true']")) {
+            closeShareDropdown();
+            return;
+        }
+
+        const actionButton = event.target.closest(".share-menu-item");
+        if (!actionButton) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        handleShareDropdownAction(actionButton);
+    });
+
+    shareChatSheet?.addEventListener("click", (event) => {
+        if (event.target.closest("[data-share-chat-close='true']")) {
+            event.preventDefault();
+            closeShareModal();
+            return;
+        }
+
+        const userButton = event.target.closest(".share-sheet__user");
+        if (!userButton) {
+            return;
+        }
+
+        event.preventDefault();
+        closeShareModal();
+        showShareToast(
+            `${userButton.getAttribute("data-share-user-name") || "선택한 사용자"}에게 전송함`,
+        );
+    });
+
+    shareBookmarkSheet?.addEventListener("click", (event) => {
+        if (event.target.closest("[data-share-bookmark-close='true']")) {
+            event.preventDefault();
+            closeShareModal();
+            return;
+        }
+
+        if (event.target === shareBookmarkCreateFolder) {
+            event.preventDefault();
+            closeShareModal();
+            showShareToast("새 북마크 폴더 만들기는 준비 중입니다");
+            return;
+        }
+
+        if (
+            event.target.closest("[data-share-folder='all-bookmarks']") &&
+            activeShareBookmarkButton
+        ) {
+            event.preventDefault();
+            setBookmarkButtonState(
+                activeShareBookmarkButton,
+                !activeShareBookmarkButton.classList.contains("active"),
+            );
+            closeShareModal();
+        }
+    });
+
     document.addEventListener("click", (event) => {
         if (
-            activeShareDropdown &&
-            !activeShareDropdown.contains(event.target) &&
+            !shareDropdown.hidden &&
+            !shareDropdown.contains(event.target) &&
             !activeShareButton?.contains(event.target)
         ) {
             closeShareDropdown();
@@ -6913,6 +5720,7 @@ ${itemsMarkup}
 }
 
 // 긴 게시글 본문은 피드에서 기본 높이를 유지하기 위해 접기/펼치기 버튼을 동적으로 붙인다.
+// 버튼과 텍스트 span은 각 `.postText` 내부에 append 되고, 펼친 뒤 버튼만 remove 된다.
 function setupExpandablePostText() {
     const maxLength = 200;
 

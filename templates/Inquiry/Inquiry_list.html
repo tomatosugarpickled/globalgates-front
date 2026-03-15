@@ -37,6 +37,69 @@
                     </button>
                 </div>
 
+                <nav
+                    class="inquiry-tabnav"
+                    aria-label="거래처 활동 탭"
+                    role="navigation"
+                >
+                    <div class="inquiry-tabnav__inner">
+                        <div
+                            role="tablist"
+                            class="inquiry-tabnav__list"
+                            data-testid="ScrollSnap-List"
+                        >
+                            <div role="presentation" class="inquiry-tabnav__item">
+                                <button
+                                    type="button"
+                                    role="tab"
+                                    aria-selected="false"
+                                    class="inquiry-tab"
+                                    data-inquiry-tab="summary"
+                                >
+                                    <span class="inquiry-tab__label">요약</span>
+                                    <span class="inquiry-tab__indicator"></span>
+                                </button>
+                            </div>
+                            <div role="presentation" class="inquiry-tabnav__item">
+                                <button
+                                    type="button"
+                                    role="tab"
+                                    aria-selected="true"
+                                    class="inquiry-tab inquiry-tab--active"
+                                    data-inquiry-tab="partners"
+                                >
+                                    <span class="inquiry-tab__label">거래처 등록 목록</span>
+                                    <span class="inquiry-tab__indicator"></span>
+                                </button>
+                            </div>
+                            <div role="presentation" class="inquiry-tabnav__item">
+                                <button
+                                    type="button"
+                                    role="tab"
+                                    aria-selected="false"
+                                    class="inquiry-tab"
+                                    data-inquiry-tab="activity"
+                                >
+                                    <span class="inquiry-tab__label">거래처 활동 목록</span>
+                                    <span class="inquiry-tab__indicator"></span>
+                                </button>
+                            </div>
+                            <div role="presentation" class="inquiry-tabnav__item">
+                                <button
+                                    type="button"
+                                    role="tab"
+                                    aria-selected="false"
+                                    class="inquiry-tab"
+                                    data-inquiry-tab="quotes"
+                                >
+                                    <span class="inquiry-tab__label">견적 요청 목록</span>
+                                    <span class="inquiry-tab__indicator"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+
                 <div class="category-banner">
                     <p class="category-banner-title">거래처 유형</p>
                     <div class="category-scroll-wrap">

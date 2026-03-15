@@ -1,5 +1,6 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
     const wraps = document.querySelectorAll(".name-placeholder-wrap, .phone-number-placeholder");
+    const userIdInput = document.querySelector(".phone-number-placeholder .phone-input");
 
     wraps.forEach((wrap) => {
         const input = wrap.querySelector("input");
@@ -22,6 +23,7 @@
 
         input.addEventListener("input", () => {
             shrink(labelText);
+            updateNextButtonState(userIdInput);
         });
 
         input.addEventListener("blur", () => {
@@ -33,6 +35,8 @@
             }
         });
     });
+
+    updateNextButtonState(userIdInput);
 });
 
 function shrink(labelText) {
@@ -46,3 +50,18 @@ function expand(labelText) {
     labelText.style.paddingTop = "16px";
     labelText.style.color = "rgb(83, 100, 113)";
 }
+
+function updateNextButtonState(input) {
+    const nextButton = document.querySelector(".next-button");
+    const nextText = document.querySelector(".next-button-wrap-in-text-next");
+
+    if (!input || !nextButton || !nextText) {
+        return;
+    }
+
+    const hasUserId = input.value.trim() !== "";
+    nextText.textContent = hasUserId ? "\uB2E4\uC74C" : "\uAC74\uB108\uB6F0\uAE30";
+    nextButton.style.backgroundColor = "rgb(15, 20, 25)";
+    nextButton.style.opacity = hasUserId ? "1" : "0.5";
+}
+

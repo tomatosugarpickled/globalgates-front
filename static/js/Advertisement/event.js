@@ -1,12 +1,5 @@
-(function () {
+window.onload = () => {
     "use strict";
-
-    // 기존 onload 핸들러 참조를 보관한다.
-    const previousWindowOnload = window.onload;
-    window.onload = (loadEvent) => {
-        if (typeof previousWindowOnload === "function") {
-            previousWindowOnload.call(window, loadEvent);
-        }
 
         // 자주 쓰는 단일/복수 DOM 조회를 짧은 헬퍼로 묶는다.
         const $ = (selector, scope = document) => scope.querySelector(selector);
@@ -48,12 +41,16 @@
         };
 
         // 반복 접근하는 DOM 노드를 초기에 캐시해서 이후 로직을 단순하게 유지한다.
+        // modal/dropdown/toast는 HTML에 이미 선언된 노드를 재사용하고, attachment/preview 영역만 내부 자식이 다시 렌더링된다.
         const root = {
             title: $("[data-view-title]"),
             description: $("[data-view-description]"),
             views: $$(".MarketplaceAdView"),
+            // HTML의 [data-modal-overlay] 기존 오버레이다. event.js는 hidden만 토글한다.
             overlay: $("[data-modal-overlay]"),
+            // HTML의 [data-modal] 목록이다. event.js는 append/remove 없이 hidden만 바꾼다.
             modals: $$("[data-modal]"),
+            // HTML의 [data-dropdown] 목록이다. event.js는 위치 계산과 hidden 토글만 수행한다.
             dropdowns: $$("[data-dropdown]"),
             accountTrigger: $(".AccountTriggerButton"),
             profileTrigger: $(".ProfileTriggerButton"),
@@ -64,11 +61,14 @@
             uploadInput: $("[data-upload-input]"),
             uploadClearButton: $("[data-upload-clear]"),
             attachmentPreview: $("[data-attachment-preview]"),
+            // HTML의 [data-attachment-list] 내부는 renderAttachmentGallery()가 replaceChildren()으로 매번 다시 그린다.
             attachmentList: $("[data-attachment-list]"),
             previewAttachmentPlaceholder: $('[data-preview-field="attachmentPlaceholder"]'),
+            // HTML의 attachmentGallery 내부는 renderPreviewGallery()가 타일을 지우고 다시 추가하는 마운트 지점이다.
             previewAttachmentGallery: $('[data-preview-field="attachmentGallery"]'),
             previewAttachmentImage: $('[data-preview-field="attachmentImage"]'),
             previewAttachmentVideo: $('[data-preview-field="attachmentVideo"]'),
+            // HTML의 [data-toast]는 새 노드를 만들지 않고 텍스트/hidden만 바꿔 재사용한다.
             toast: $("[data-toast]"),
             navApplyItem: $(".AdNavigationApplyItem"),
             navListItem: $(".AdNavigationListItem"),
@@ -239,7 +239,8 @@
             return item;
         }
 
-        // 현재 첨부 상태를 카드 목록으로 다시 그린다.
+        // 현재 첨부 상태를 HTML의 기존 [data-attachment-list] 안에 다시 그린다.
+        // 이전 카드들은 replaceChildren()으로 제거되고, 새 카드만 appendChild() 된다.
         function renderAttachmentGallery(container, compact = false) {
             if (!container) return;
             container.replaceChildren();
@@ -248,7 +249,8 @@
             });
         }
 
-        // 광고 미리보기 영역에는 이미지 최대 4장만 타일 갤러리로 보여 준다.
+        // 광고 미리보기 영역의 기존 [data-preview-field="attachmentGallery"] 안에 이미지 타일을 다시 렌더링한다.
+        // 이 컨테이너도 replaceChildren()으로 비운 뒤 새 타일만 appendChild() 된다.
         function renderPreviewGallery() {
             if (!root.previewAttachmentGallery) return;
 
@@ -467,7 +469,8 @@
             }
         }
 
-        // 열려 있는 드롭다운 하나만 보이도록 하고 트리거의 접근성 속성도 맞춘다.
+        // HTML에 이미 있는 [data-dropdown] 노드들 중 현재 대상만 보이게 한다.
+        // 드롭다운 DOM을 새로 만들지 않고 hidden과 aria-expanded만 갱신한다.
         function syncDropdowns() {
             root.dropdowns.forEach((dropdown) => {
                 dropdown.hidden = dropdown.dataset.dropdown !== state.currentDropdown;
@@ -482,7 +485,8 @@
             });
         }
 
-        // 현재 열린 모달 상태를 오버레이와 각 모달 hidden 속성에 반영한다.
+        // HTML에 이미 있는 [data-modal-overlay] / [data-modal] 노드의 hidden만 토글한다.
+        // 모달 DOM은 동적으로 추가/삭제하지 않고 같은 마크업을 계속 재사용한다.
         function syncModals() {
             // 모달 이름이 있으면 오버레이까지 함께 보여 준다.
             const isOpen = Boolean(state.currentModal);
@@ -650,7 +654,7 @@
             syncDetailView();
         }
 
-        // 짧은 안내 메시지는 토스트 하나를 재사용하면서 타이머를 매번 초기화한다.
+        // 짧은 안내 메시지는 HTML의 기존 [data-toast] 노드를 재사용하면서 타이머만 초기화한다.
         function showToast(message) {
             if (!root.toast) return;
             root.toast.textContent = message;
@@ -667,13 +671,13 @@
             syncAll();
         }
 
-        // 모달은 이름 하나만 상태에 기록하고 실제 DOM 반영은 syncModals에 위임한다.
+        // 모달은 이름 하나만 상태에 기록하고, 실제로는 HTML의 [data-modal-overlay] / [data-modal] hidden 토글만 일어난다.
         function openModal(name) {
             state.currentModal = name;
             syncModals();
         }
 
-        // 열린 모달 상태를 비운다.
+        // 열린 모달 상태를 비우면 syncModals()가 기존 HTML modal/overlay를 다시 숨긴다.
         function closeModal() {
             state.currentModal = null;
             syncModals();
@@ -691,7 +695,7 @@
             dropdown.style.left = `${Math.max(16, rect.right - 180)}px`;
         }
 
-        // 같은 드롭다운을 다시 누르면 닫히고, 새로 열리면 위치를 다시 계산한다.
+        // 같은 드롭다운을 다시 누르면 닫히고, 새로 열리면 HTML의 기존 [data-dropdown] 위치를 다시 계산한다.
         function toggleDropdown(name, trigger) {
             state.currentDropdown = state.currentDropdown === name ? null : name;
             if (state.currentDropdown) {
@@ -700,7 +704,7 @@
             syncDropdowns();
         }
 
-        // 문서 바깥 클릭이나 ESC 입력 시 모든 드롭다운을 닫는다.
+        // 문서 바깥 클릭이나 ESC 입력 시 HTML의 기존 [data-dropdown]들을 다시 hidden 처리한다.
         function closeDropdowns() {
             state.currentDropdown = null;
             syncDropdowns();
@@ -983,5 +987,4 @@
 
         // 첫 진입 시 현재 state 기준으로 전체 화면을 한 번 렌더링한다.
         syncAll();
-    };
-})();
+};

@@ -4087,6 +4087,9 @@ input::-webkit-search-cancel-button, input::-webkit-search-decoration, input::-w
 
 /* global gates advertisement center: simplified admin-style overrides */
 .MarketplaceAdApp {
+  margin-top: 20px;
+  min-height: calc(100vh - 56px);
+  padding-top: 0;
   background: #fff;
 }
 
@@ -4155,7 +4158,7 @@ input::-webkit-search-cancel-button, input::-webkit-search-decoration, input::-w
 
 .MarketplaceAdContent {
   width: min(1180px, 100%);
-  margin: 24px auto 0 0;
+  margin: 0 auto 0 0;
 }
 
 .MarketplaceAdPageHeader {

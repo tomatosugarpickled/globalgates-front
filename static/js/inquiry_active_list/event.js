@@ -1,26 +1,50 @@
 // inquiry_active_list 화면에서 사용하는 모든 상호작용을 한 곳에서 초기화한다.
 window.onload = () => {
     // 상단 탭 / 패널 / 필터 / 기간 버튼처럼 처음부터 HTML에 존재하는 고정 UI 참조들이다.
-    const tabButtons = Array.from(document.querySelectorAll("[data-inquiry-tab]"));
-    const panels = Array.from(document.querySelectorAll("[data-inquiry-panel]"));
-    const periodChips = Array.from(document.querySelectorAll("[data-period-chip]"));
-    const filterTrigger = document.querySelector("[data-activity-filter-trigger]");
+    const tabButtons = Array.from(
+        document.querySelectorAll("[data-inquiry-tab]"),
+    );
+    const panels = Array.from(
+        document.querySelectorAll("[data-inquiry-panel]"),
+    );
+    const periodChips = Array.from(
+        document.querySelectorAll("[data-period-chip]"),
+    );
+    const filterTrigger = document.querySelector(
+        "[data-activity-filter-trigger]",
+    );
     const filterMenu = document.querySelector("[data-activity-filter-menu]");
     const filterLabel = document.querySelector("[data-activity-filter-label]");
-    const filterItems = Array.from(document.querySelectorAll("[data-activity-filter-item]"));
+    const filterItems = Array.from(
+        document.querySelectorAll("[data-activity-filter-item]"),
+    );
 
     // 답글 모달은 HTML의 [data-reply-modal] 골격을 재사용하고, 열릴 때마다 내용만 채운다.
     const replyModalOverlay = document.querySelector("[data-reply-modal]");
     const replyModal = replyModalOverlay?.querySelector(".tweet-modal");
-    const replyCloseButton = replyModalOverlay?.querySelector(".tweet-modal__close");
+    const replyCloseButton = replyModalOverlay?.querySelector(
+        ".tweet-modal__close",
+    );
     const replyEditor = replyModalOverlay?.querySelector("[data-reply-editor]");
-    const replySubmitButton = replyModalOverlay?.querySelector("[data-reply-submit]");
-    const replySourceAvatar = replyModalOverlay?.querySelector("[data-reply-source-avatar]");
+    const replySubmitButton = replyModalOverlay?.querySelector(
+        "[data-reply-submit]",
+    );
+    const replySourceAvatar = replyModalOverlay?.querySelector(
+        "[data-reply-source-avatar]",
+    );
     const replyAvatar = replyModalOverlay?.querySelector("[data-reply-avatar]");
-    const replySourceName = replyModalOverlay?.querySelector("[data-reply-source-name]");
-    const replySourceHandle = replyModalOverlay?.querySelector("[data-reply-source-handle]");
-    const replySourceTime = replyModalOverlay?.querySelector("[data-reply-source-time]");
-    const replySourceText = replyModalOverlay?.querySelector("[data-reply-source-text]");
+    const replySourceName = replyModalOverlay?.querySelector(
+        "[data-reply-source-name]",
+    );
+    const replySourceHandle = replyModalOverlay?.querySelector(
+        "[data-reply-source-handle]",
+    );
+    const replySourceTime = replyModalOverlay?.querySelector(
+        "[data-reply-source-time]",
+    );
+    const replySourceText = replyModalOverlay?.querySelector(
+        "[data-reply-source-text]",
+    );
 
     // 공유 드롭다운은 HTML의 #layers 루트에 동적으로 추가된다.
     const layersRoot = document.getElementById("layers");
@@ -66,7 +90,9 @@ window.onload = () => {
         const avatarImage = postCard?.querySelector(".postAvatarImage");
         return (
             avatarImage?.getAttribute("src") ||
-            buildAvatarDataUrl(getTextContent(postCard?.querySelector(".postAvatar")))
+            buildAvatarDataUrl(
+                getTextContent(postCard?.querySelector(".postAvatar")),
+            )
         );
     };
 
@@ -173,11 +199,19 @@ window.onload = () => {
         }
 
         button.classList.toggle("active", isActive);
-        button.setAttribute("data-testid", isActive ? "removeBookmark" : "bookmark");
-        button.setAttribute("aria-label", isActive ? "북마크에 추가됨" : "북마크");
+        button.setAttribute(
+            "data-testid",
+            isActive ? "removeBookmark" : "bookmark",
+        );
+        button.setAttribute(
+            "aria-label",
+            isActive ? "북마크에 추가됨" : "북마크",
+        );
         path.setAttribute(
             "d",
-            isActive ? path.dataset.pathActive || path.getAttribute("d") : path.dataset.pathInactive || path.getAttribute("d"),
+            isActive
+                ? path.dataset.pathActive || path.getAttribute("d")
+                : path.dataset.pathInactive || path.getAttribute("d"),
         );
     };
 
@@ -188,7 +222,8 @@ window.onload = () => {
             return 0;
         }
 
-        const currentCount = Number.parseInt(getTextContent(countElement) || "0", 10) || 0;
+        const currentCount =
+            Number.parseInt(getTextContent(countElement) || "0", 10) || 0;
         const nextCount = Math.max(0, currentCount + delta);
         countElement.textContent = String(nextCount);
         return nextCount;
@@ -211,9 +246,13 @@ window.onload = () => {
     // 공유 대상 사용자 목록은 하단 추천 카드(.user-card)에서 읽어와 재사용한다.
     const getShareUsers = () =>
         Array.from(document.querySelectorAll(".user-card")).map((card) => ({
-            id: card.dataset.handle || getTextContent(card.querySelector(".user-handle")),
+            id:
+                card.dataset.handle ||
+                getTextContent(card.querySelector(".user-handle")),
             name: getTextContent(card.querySelector(".user-name")),
-            handle: card.dataset.handle || getTextContent(card.querySelector(".user-handle")),
+            handle:
+                card.dataset.handle ||
+                getTextContent(card.querySelector(".user-handle")),
             avatar: buildAvatarDataUrl(
                 getTextContent(card.querySelector(".user-avatar")) ||
                     getTextContent(card.querySelector(".user-name")),
@@ -289,7 +328,8 @@ window.onload = () => {
     // 북마크 폴더 바텀시트도 body에 동적으로 추가되는 UI다.
     const openShareBookmarkModal = (button) => {
         const { bookmarkButton } = getSharePostMeta(button);
-        const isBookmarked = bookmarkButton?.classList.contains("active") ?? false;
+        const isBookmarked =
+            bookmarkButton?.classList.contains("active") ?? false;
         closeShareDropdown();
         closeShareModal();
 
@@ -408,10 +448,15 @@ window.onload = () => {
 
         filterItems.forEach((item) => {
             item.addEventListener("click", () => {
-                const label = item.querySelector(".activity-filter-menu__label");
+                const label = item.querySelector(
+                    ".activity-filter-menu__label",
+                );
                 filterItems.forEach((entry) => {
                     const isSelected = entry === item;
-                    entry.classList.toggle("activity-filter-menu__item--selected", isSelected);
+                    entry.classList.toggle(
+                        "activity-filter-menu__item--selected",
+                        isSelected,
+                    );
                     entry.setAttribute("aria-checked", String(isSelected));
                 });
                 filterLabel.textContent = getTextContent(label);
@@ -452,7 +497,9 @@ window.onload = () => {
                 const isExpanded = textElement.dataset.expanded === "true";
                 textElement.dataset.expanded = String(!isExpanded);
                 content.textContent = isExpanded
-                    ? textElement.dataset.collapsedText || textElement.dataset.fullText || ""
+                    ? textElement.dataset.collapsedText ||
+                      textElement.dataset.fullText ||
+                      ""
                     : textElement.dataset.fullText || "";
                 button.textContent = isExpanded ? "더보기" : "접기";
             });
@@ -487,65 +534,85 @@ window.onload = () => {
 
     // 좋아요는 아이콘 path, 활성 클래스, 숫자, aria-label을 함께 갱신한다.
     const initializeLikeButtons = () => {
-        document.querySelectorAll(".tweet-action-btn--like").forEach((button) => {
-            button.addEventListener("click", (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                const isActive = button.classList.toggle("active");
-                const path = button.querySelector("path");
-                const nextCount = updateCount(button, isActive ? 1 : -1);
+        document
+            .querySelectorAll(".tweet-action-btn--like")
+            .forEach((button) => {
+                button.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const isActive = button.classList.toggle("active");
+                    const path = button.querySelector("path");
+                    const nextCount = updateCount(button, isActive ? 1 : -1);
 
-                if (path) {
-                    path.setAttribute(
-                        "d",
-                        isActive
-                            ? path.dataset.pathActive || path.getAttribute("d")
-                            : path.dataset.pathInactive || path.getAttribute("d"),
+                    if (path) {
+                        path.setAttribute(
+                            "d",
+                            isActive
+                                ? path.dataset.pathActive ||
+                                      path.getAttribute("d")
+                                : path.dataset.pathInactive ||
+                                      path.getAttribute("d"),
+                        );
+                    }
+
+                    button.setAttribute(
+                        "aria-label",
+                        `마음에 들어요 ${nextCount}`,
                     );
-                }
-
-                button.setAttribute("aria-label", `마음에 들어요 ${nextCount}`);
+                });
             });
-        });
     };
 
     // 북마크는 공통 상태 반영 함수만 호출한다.
     const initializeBookmarkButtons = () => {
-        document.querySelectorAll(".tweet-action-btn--bookmark").forEach((button) => {
-            button.addEventListener("click", (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                setBookmarkButtonState(button, !button.classList.contains("active"));
+        document
+            .querySelectorAll(".tweet-action-btn--bookmark")
+            .forEach((button) => {
+                button.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setBookmarkButtonState(
+                        button,
+                        !button.classList.contains("active"),
+                    );
+                });
             });
-        });
     };
 
     // 공유 버튼은 같은 버튼을 다시 누르면 닫고, 아니면 #layers 드롭다운을 연다.
     const initializeShareButtons = () => {
-        document.querySelectorAll(".tweet-action-btn--share").forEach((button) => {
-            button.addEventListener("click", (event) => {
-                event.preventDefault();
-                event.stopPropagation();
+        document
+            .querySelectorAll(".tweet-action-btn--share")
+            .forEach((button) => {
+                button.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
 
-                if (activeShareButton === button) {
-                    closeShareDropdown();
-                    return;
-                }
+                    if (activeShareButton === button) {
+                        closeShareDropdown();
+                        return;
+                    }
 
-                openShareDropdown(button);
+                    openShareDropdown(button);
+                });
             });
-        });
     };
 
     // 답글 모달은 HTML에 이미 있는 [data-reply-modal] 골격을 게시물 데이터로 채워서 사용한다.
     const initializeReplyModal = () => {
-        if (!replyModalOverlay || !replyModal || !replyEditor || !replySubmitButton) {
+        if (
+            !replyModalOverlay ||
+            !replyModal ||
+            !replyEditor ||
+            !replySubmitButton
+        ) {
             return;
         }
 
         // 입력이 비어 있으면 하단 답글 버튼을 비활성화한다.
         const syncReplySubmitState = () => {
-            replySubmitButton.disabled = getTextContent(replyEditor).length === 0;
+            replySubmitButton.disabled =
+                getTextContent(replyEditor).length === 0;
         };
 
         // 눌린 게시물 카드의 작성자/본문을 모달 상단 요약 영역에 복사한다.
@@ -557,7 +624,9 @@ window.onload = () => {
 
             if (replySourceAvatar) {
                 replySourceAvatar.src = avatarSrc;
-                replySourceAvatar.alt = getTextContent(postCard?.querySelector(".postName"));
+                replySourceAvatar.alt = getTextContent(
+                    postCard?.querySelector(".postName"),
+                );
             }
 
             if (replyAvatar) {
@@ -565,15 +634,21 @@ window.onload = () => {
             }
 
             if (replySourceName) {
-                replySourceName.textContent = getTextContent(postCard?.querySelector(".postName"));
+                replySourceName.textContent = getTextContent(
+                    postCard?.querySelector(".postName"),
+                );
             }
 
             if (replySourceHandle) {
-                replySourceHandle.textContent = getTextContent(postCard?.querySelector(".postHandle"));
+                replySourceHandle.textContent = getTextContent(
+                    postCard?.querySelector(".postHandle"),
+                );
             }
 
             if (replySourceTime) {
-                replySourceTime.textContent = getTextContent(postCard?.querySelector(".postTime"));
+                replySourceTime.textContent = getTextContent(
+                    postCard?.querySelector(".postTime"),
+                );
             }
 
             if (replySourceText) {

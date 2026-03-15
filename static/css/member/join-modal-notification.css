@@ -1,0 +1,222 @@
+﻿* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: TwitterChirp, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.join-modal-line1 {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    pointer-events: none;
+}
+
+.join-modal-line2,
+.join-modal-line3,
+.join-modal-line4,
+.join-modal-line5,
+.join-modal-line6,
+.join-modal-line7 {
+    display: flex;
+    flex: 1;
+}
+
+.join-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+}
+
+.join-modal-all {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.join-modal-box1 {
+    position: relative;
+    width: min(620px, 92vw);
+    height: min(640px, 92vh);
+    border-radius: 20px;
+    overflow: hidden;
+    z-index: 2;
+}
+
+.join-modal-box2,
+.join-modal-box3,
+.join-modal-in {
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+}
+
+.join-modal-header {
+    height: 56px;
+}
+
+.join-modal-header-in1,
+.join-modal-header-in2,
+.join-modal-header-in3,
+.join-modal-header-in4 {
+    width: 100%;
+    height: 100%;
+}
+
+.join-modal-header-in4 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+}
+
+.join-modal-header-left,
+.join-modal-header-right {
+    width: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.join-modal-header-right {
+    justify-content: flex-end;
+}
+
+.join-modal-header-middle {
+    flex: 1;
+}
+
+.join-modal-header-close-button {
+    width: 36px;
+    height: 36px;
+    border: 0;
+    background: transparent;
+    border-radius: 9999px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+}
+
+.X-img {
+    width: 20px;
+    height: 20px;
+    color: #0f1419;
+    fill: currentColor;
+}
+
+.notification-main {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 40px 56px;
+    text-align: left;
+}
+
+.notification-icon-wrap {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    align-self: center;
+}
+
+.notification-icon {
+    width: 48px;
+    height: 48px;
+}
+
+.notification-icon path {
+    fill: none;
+    stroke: #1d9bf0;
+    stroke-width: 1.8;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+.notification-title {
+    margin: 24px 0 8px;
+    font-size: 36px;
+    line-height: 1.15;
+    color: #0f1419;
+    font-weight: 800;
+}
+
+.notification-desc {
+    margin: 0;
+    max-width: 440px;
+    font-size: 16px;
+    line-height: 1.45;
+    color: #536471;
+}
+
+.notification-actions {
+    margin-top: 36px;
+    width: 100%;
+    max-width: 360px;
+    display: grid;
+    gap: 14px;
+    align-self: center;
+}
+
+.notification-btn {
+    width: 100%;
+    min-height: 52px;
+    border-radius: 9999px;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.notification-btn-primary {
+    border: 1px solid #0f1419;
+    background: #0f1419;
+    color: #ffffff;
+}
+
+.notification-btn-secondary {
+    border: 1px solid #cfd9de;
+    background: #ffffff;
+    color: #0f1419;
+}
+
+.notification-btn.is-bouncing {
+    animation: btnBounce 220ms ease;
+}
+
+@keyframes btnBounce {
+    0% {
+        transform: scale(1);
+    }
+    35% {
+        transform: scale(0.92);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 520px) {
+    .join-modal-box1 {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+    }
+
+    .notification-main {
+        padding: 12px 24px 40px;
+    }
+
+    .notification-title {
+        font-size: 30px;
+    }
+
+    .notification-desc {
+        font-size: 15px;
+    }
+}

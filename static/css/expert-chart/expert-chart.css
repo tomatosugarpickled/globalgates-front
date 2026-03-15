@@ -1,0 +1,622 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+    --color-bg:           #ffffff;
+    --color-surface:      #ffffff;
+    --color-surface-2:    #f7f9f9;
+    --color-border:       #eff3f4;
+    --color-border-input: #d6dce3;
+
+    
+    --color-primary:      #1d9bf0;
+    --color-primary-soft: #e8f5fd;
+    --color-primary-dark: #1a8cd8;
+
+    --color-text-primary:   #0f1419;
+    --color-text-secondary: #536471;
+    --color-text-tertiary:  #9CA3AF;
+
+    --color-positive:  #10B981;
+    --color-negative:  #EF4444;
+
+    --radius-sm:  5px;
+    --radius-md:  10px;
+    --radius-lg:  16px;
+    --radius-xl:  20px;
+
+    --shadow-card: 0 0 0 1px #eff3f4;
+    --shadow-dropdown: rgba(101, 119, 134, 0.2) 0px 0px 15px 0px,
+                       rgba(101, 119, 134, 0.15) 0px 0px 3px 1px;
+
+    --font-sans: 'DM Sans', 'Noto Sans KR', sans-serif;
+
+    --transition-fast: 140ms ease;
+    --transition-base: 200ms ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+    font-family: var(--font-sans);
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+}
+
+.Activity-Page {
+    min-height: 100vh;
+}
+
+.Activity-Layout {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.Activity-Shell {
+    min-height: 100vh;
+    border-left: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    background: var(--color-surface);
+}
+
+.Activity-Header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.Activity-Header-Inner {
+    padding: 14px 16px 8px;
+}
+
+.Activity-Header-Title {
+    font-family: var(--font-sans);
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+}
+
+.Inquiry-Tabnav {
+    overflow: hidden;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.Inquiry-Tabnav-Inner {
+    display: flex;
+    align-items: center;
+    scrollbar-width: none;
+}
+.Inquiry-Tabnav-Inner::-webkit-scrollbar { display: none; }
+
+.Inquiry-Tabnav-List {
+    display: flex;
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
+    gap: 0;
+}
+.Inquiry-Tabnav-List::-webkit-scrollbar { display: none; }
+
+.Inquiry-Tabnav-Item {
+    flex: 1;
+    min-width: 120px;
+}
+
+.Inquiry-Tab {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 52px;
+    padding: 0 12px;
+    border: none;
+    background-color: transparent;
+    color: var(--color-text-secondary);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color var(--transition-base);
+}
+
+.Inquiry-Tab:hover {
+    background-color: rgba(15, 20, 25, 0.04);
+}
+
+.Inquiry-Tab--Active {
+    color: var(--color-text-primary);
+    font-weight: 700;
+}
+
+.Inquiry-Tab-Label {
+    display: block;
+    text-align: center;
+    word-break: keep-all;
+}
+
+.Inquiry-Tab-Indicator {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 100%;
+    max-width: 64px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--color-primary);
+    opacity: 0;
+    transform: translateX(-50%);
+    transition: opacity 0.15s ease;
+}
+
+.Inquiry-Tab--Active .Inquiry-Tab-Indicator {
+    opacity: 1;
+}
+
+.Inquiry-Panel--Blank {
+    min-height: 540px;
+}
+
+.Expert-State-Grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+    margin-bottom: 12px;
+    padding: 0 16px;
+}
+
+.Expert-State-Card {
+    padding: 20px;
+    text-align: center;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.Expert-State-Card:hover {
+    box-shadow: 0 4px 16px rgba(29, 155, 240, 0.08), 0 1px 4px rgba(0,0,0,.04);
+    transform: translateY(-1px);
+}
+
+.Expert-State-Label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+}
+
+.Expert-State-Value {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+    margin-top: 6px;
+}
+
+.Expert-Chart-Wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+}
+
+.Expert-Chart-Single {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: visible;
+}
+
+.Expert-Chart-Double {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 720px) {
+    .Expert-Chart-Double {
+        grid-template-columns: 1fr;
+    }
+}
+
+.Double-Chart-Area {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+.Chart-Header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.Chart-Header-Text {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.Chart-Body {
+    padding: 24px;
+}
+
+.Chart-Body-Area {
+    width: 100%;
+    height: 280px;
+}
+
+.Chart-Body-Area--Geo {
+    height: 420px;
+}
+
+.Chart-Body-Area.is-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface-2);
+    border-radius: var(--radius-md);
+}
+
+.Chart-Body-Area.is-loading::after {
+    content: '';
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.Single-Chart-Header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.Chart-Header-Dropbox {
+    position: relative;
+    border: none;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.Chart-Header-Title {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: none;
+    border: 1px solid var(--color-text-secondary);
+    border-radius: 8px;
+    padding: 5px 12px;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.Chart-Header-Title:hover {
+    background: var(--color-surface-2);
+    border-color: var(--color-primary);
+}
+
+.Chart-Header-Title[aria-expanded="true"] {
+    border-color: var(--color-primary);
+    background: var(--color-primary-soft);
+}
+
+.Chart-Header-Title[aria-expanded="true"] .Chart-Header-Icon {
+    transform: rotate(180deg);
+}
+
+.Chart-Header-Title .Chart-Header-Text {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+}
+
+.Chart-Header-Icon {
+    width: 20px;
+    height: 20px;
+    fill: var(--color-text-secondary);
+    flex-shrink: 0;
+    transition: transform var(--transition-base);
+}
+
+.Chart-Header-Options {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 179px;
+    background: var(--color-surface);
+    border-radius: 5px;
+    box-shadow: 0 0 2px rgb(0, 0, 0);
+    list-style: none;
+    z-index: 200;
+    animation: fadeDown 0.14s ease;
+}
+
+@keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.Chart-Option {
+    width: 100%;
+    text-align: center;
+    list-style: none;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.Chart-Option:hover {
+    background: var(--color-border);
+}
+
+.Chart-Option[aria-selected="true"] {
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+.Chart-Header-Filter {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 0;
+}
+
+.Header-Filter-Button {
+    padding: 5px 14px;
+    font-size: 13px;
+    border-radius: 20px;
+    border: 1px solid var(--color-border-input);
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.Header-Filter-Button:hover {
+    background: var(--color-surface-2);
+    color: var(--color-text-primary);
+}
+
+.Header-Filter-Button--Active,
+.Header-Filter-Button.active {
+    background: var(--color-text-primary);
+    border-color: var(--color-text-primary);
+    color: #ffffff;
+}
+
+.Header-Filter-Button--Active:hover,
+.Header-Filter-Button.active:hover {
+    background: #2a2a2a;
+    border-color: #2a2a2a;
+    color: #ffffff;
+}
+
+.off {
+    display: none;
+}
+
+.Share-Toast {
+    position: fixed;
+    left: 50%;
+    bottom: 88px;
+    transform: translateX(-50%);
+    z-index: 1200;
+    padding: 12px 20px;
+    border-radius: 999px;
+    background: var(--color-primary);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(15, 20, 25, 0.2);
+    white-space: nowrap;
+}
+
+.Layers-Overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.Layers-Dropdown-Container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.Layers-Dropdown-Inner {
+    position: relative;
+    pointer-events: auto;
+}
+
+.Dropdown-Menu {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-surface);
+    border-radius: 12px;
+    box-shadow: var(--shadow-dropdown);
+    overflow: hidden;
+    max-width: 400px;
+    width: max-content;
+    pointer-events: auto;
+}
+
+.Dropdown-Inner {
+    display: flex;
+    flex-direction: column;
+}
+
+.Menu-Item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 11px 14px;
+    border: none;
+    background-color: transparent;
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 20px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.Menu-Item:hover,
+.Menu-Item:focus {
+    background-color: rgba(0, 0, 0, 0.03);
+    outline: none;
+}
+
+.Menu-Item-Icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.Menu-Item-Icon svg {
+    width: 18.75px;
+    height: 18.75px;
+    fill: currentColor;
+}
+
+.Menu-Item-Label {
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .Activity-Header-Title {
+        font-size: 22px;
+    }
+
+    .Expert-Chart-Double {
+        grid-template-columns: 1fr;
+    }
+
+    .Single-Chart-Header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 16px;
+    }
+
+    .Chart-Header {
+        padding: 16px;
+    }
+
+    .Chart-Body {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 640px) {
+    .Expert-State-Grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .Chart-Body-Area {
+        height: 220px;
+    }
+
+    .Chart-Body-Area--Geo {
+        height: 280px;
+    }
+}
+
+@media (max-width: 400px) {
+    .Activity-Shell {
+        border-left: 0;
+        border-right: 0;
+    }
+
+    .Activity-Header-Inner {
+        padding: 14px 12px 6px;
+    }
+
+    .Inquiry-Tabnav-List {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        overflow-x: visible;
+    }
+
+    .Inquiry-Tabnav-Item {
+        min-width: 0;
+    }
+
+    .Inquiry-Tab {
+        min-height: 68px;
+        padding: 8px 6px 10px;
+        font-size: 13px;
+        line-height: 1.25;
+        white-space: normal;
+    }
+
+    .Inquiry-Tab-Label {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .Inquiry-Tab-Indicator {
+        max-width: 44px;
+    }
+
+    .Expert-State-Grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .Expert-State-Value {
+        font-size: 22px;
+    }
+
+    .Expert-Chart-Wrapper {
+        padding: 12px;
+        gap: 12px;
+    }
+}

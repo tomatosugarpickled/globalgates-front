@@ -1,0 +1,696 @@
+.video-start {
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    text-decoration: none;
+    z-index: 0;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    transition: transform 200ms ease-out;
+    transform: translateY(-67px);
+    pointer-events: none !important;
+}
+
+.video {
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+    pointer-events: none !important;
+}
+
+
+
+.video-chat {
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+    width: 408px;
+    align-self: flex-end;
+    pointer-events: auto;
+    align-items: center;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+
+.video-chat-wrap {
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+    transform: translate3d(0px, 0px, 0px);
+    height: 812px;
+    opacity: 2;
+    width: 100%;
+}
+
+.video-chat-wrap-in1 {
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+    padding-top: 4px;
+    width: 100%;
+    margin-left: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    border-radius: 12px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+
+.video-chat-wrap-in1-wrap {
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+    height: 804px;
+    transform: translate3d(0px, 0px, 0px) translateY(0px);
+    box-shadow: rgba(101, 119, 134, 0.2) 0px 0px 7px, rgba(101, 119, 134, 0.15) 0px 1px 3px 1px;
+    width: 100%;
+    border-radius: inherit;
+}
+
+.video-chat-wrap-in1-wrap-in {
+    height: 100%;
+    background-color: rgba(255, 255, 255, 1.00);
+    border-radius: inherit;
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+}
+
+.video-chat-header {
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+    margin-top: 8px;
+}
+
+.video-chat-header-top {
+    justify-content: space-between;
+    flex-direction: row;
+    padding-left: 16px;
+    padding-right: 16px;
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+}
+
+.video-chat-header-top-icons {
+    justify-content: space-between;
+    flex-direction: row;
+    padding-left: 16px;
+    padding-right: 16px;
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+}
+
+.video-chat-fold {
+    align-items: stretch;
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+    border-color: rgba(0, 0, 0, 0);
+    margin-left: calc(-9px);
+    background-color: rgba(0, 0, 0, 0);
+    cursor: pointer;
+    transition-duration: 0.2s;
+    user-select: none;
+    transition-property: background-color, box-shadow;
+    min-height: 36px;
+    min-width: 36px;
+    outline-style: none;
+    border-bottom-left-radius: 9999px;
+    border-bottom-right-radius: 9999px;
+    border-top-left-radius: 9999px;
+    border-top-right-radius: 9999px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-style: solid;
+    border-left-style: solid;
+    border-right-style: solid;
+    border-top-style: solid;
+}
+
+.video-chat-fold-wrap {
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    white-space: pre-wrap;
+    color: rgb(15, 20, 25);
+    font-family: TwitterChirp, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 20px;
+    word-wrap: break-word;
+    text-align: center;
+    min-width: 0px;
+    font-weight: 700;
+    font-size: 15px;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    flex-grow: 1;
+    display: flex;
+}
+
+.video-chat-fold-wrap-in {
+    height: 20px;
+    fill: currentcolor;
+    vertical-align: text-bottom;
+    user-select: none;
+    max-width: 100%;
+    position: relative;
+    width: 16px;
+    color: rgba(15, 20, 25, 1.00);
+    display: inline-block;
+}
+
+.video-chat-fold-junk {
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+    display: inline-flex;
+}
+
+.video-chat-fold-junk-content {
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    color: inherit;
+    display: inline;
+    font: inherit;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    border-bottom: 2px solid rgb(15, 20, 25);
+    line-height: 20px;
+    word-wrap: break-word;
+    font-family: inherit;
+    max-width: 100%;
+    min-width: 0px;
+    font-size: 15px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: inherit;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.video-chat-header-icons {
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+    flex-direction: row;
+}
+
+/* 화상채팅 녹음 재생 바튼 */
+.play {
+    background-color: rgba(0, 0, 0, 0);
+    border-color: rgba(0, 0, 0, 0);
+    cursor: pointer;
+    transition-duration: 0.2s;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -moz-transition-property: background-color, box-shadow;
+    -webkit-transition-property: background-color, box-shadow;
+    transition-property: background-color, box-shadow;
+    min-height: 36px;
+    min-width: 36px;
+    outline-style: none;
+    cursor: pointer;
+    border-bottom-left-radius: 9999px;
+    border-bottom-right-radius: 9999px;
+    border-top-left-radius: 9999px;
+    border-top-right-radius: 9999px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-style: solid;
+    border-left-style: solid;
+    border-right-style: solid;
+    border-top-style: solid;
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+}
+
+
+/* 화상채팅 녹음 일시 정지 버튼 */
+.stop {
+    align-items: stretch;
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+    background-color: rgba(0, 0, 0, 0);
+    border-color: rgba(0, 0, 0, 0);
+    cursor: pointer;
+    transition-duration: 0.2s;
+    user-select: none;
+    transition-property: background-color, box-shadow;
+    min-height: 36px;
+    min-width: 36px;
+    outline-style: none;
+    border-bottom-left-radius: 9999px;
+    border-bottom-right-radius: 9999px;
+    border-top-left-radius: 9999px;
+    border-top-right-radius: 9999px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-style: solid;
+    border-left-style: solid;
+    border-right-style: solid;
+    border-top-style: solid;
+}
+
+.stop-btn {
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    white-space: pre-wrap;
+    color: rgb(15, 20, 25);
+    font-family: TwitterChirp, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 20px;
+    word-wrap: break-word;
+    text-align: center;
+    min-width: 0px;
+    font-weight: 700;
+    font-size: 15px;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    flex-grow: 1;
+    display: flex;
+}
+
+.stop-btn-content {
+    height: 20px;
+    fill: currentcolor;
+    vertical-align: text-bottom;
+    user-select: none;
+    max-width: 100%;
+    position: relative;
+    width: 20px;
+    display: inline-block;
+}
+
+.video-chat-close {
+    align-items: stretch;
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+    border-color: rgba(0, 0, 0, 0);
+    margin-right: calc(-16px);
+    background-color: rgba(0, 0, 0, 0);
+    cursor: pointer;
+    transition-duration: 0.2s;
+    user-select: none;
+    transition-property: background-color, box-shadow;
+    min-height: 36px;
+    min-width: 36px;
+    outline-style: none;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-bottom-left-radius: 9999px;
+    border-bottom-right-radius: 9999px;
+    border-top-left-radius: 9999px;
+    border-top-right-radius: 9999px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-style: solid;
+    border-left-style: solid;
+    border-right-style: solid;
+    border-top-style: solid;
+}
+
+.video-chat-close-wrap {
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    white-space: pre-wrap;
+    color: rgb(244, 33, 46);
+    font-family: TwitterChirp, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 20px;
+    word-wrap: break-word;
+    text-align: center;
+    min-width: 0px;
+    font-weight: 700;
+    font-size: 15px;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    flex-grow: 1;
+    display: flex;
+}
+
+.video-chat-close-wrap-in {
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+    display: inline-flex;
+}
+
+.video-chat-close-text {
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    color: inherit;
+    display: inline;
+    font: inherit;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    line-height: 20px;
+    word-wrap: break-word;
+    font-family: inherit;
+    max-width: 100%;
+    min-width: 0px;
+    font-size: 15px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: inherit;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.video-chat-close-text-in {
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    color: inherit;
+    display: inline;
+    font: inherit;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    white-space: inherit;
+    line-height: 20px;
+    word-wrap: break-word;
+    font-family: inherit;
+    min-width: 0px;
+    font-weight: 700;
+    font-size: 15px;
+    text-align: inherit;
+}
+
+.video-chat-close-text-in-content {
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    color: inherit;
+    display: inline;
+    font: inherit;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    white-space: inherit;
+    word-wrap: break-word;
+    font-family: inherit;
+    min-width: 0px;
+    text-align: inherit;
+}
+
+
+
+.video-chat-main {
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0;
+    padding-bottom: 100px;
+    scrollbar-width: none;
+    padding-left: 8px;
+    padding-right: 8px;
+    overflow: scroll;
+    flex: 1;
+}
+
+
+.video-chat-wrap-in2 {
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.00);
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0px;
+    min-height: 0px;
+    min-width: 0px;
+    padding: 0px;
+    text-decoration: none;
+    z-index: 0;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    left: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
