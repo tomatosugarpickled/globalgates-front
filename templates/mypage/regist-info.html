@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../static/css/mypage/regist-info.css">
+    <script src="../../static/js/mypage/regist-info-event.js"></script>
+    <title>이 계정에 대해 - </title>
+</head>
+<body>
+    <div class="Primary-Column-Container">
+        <!-- ── 상단 Sticky 헤더 ── -->
+        <div class="Header-Sticky-Wrapper">
+            <div class="Header-Bar-Row">
+                <!-- 뒤로가기 버튼 -->
+                <button class="Header-Back-Button" aria-label="돌아가기">
+                    <svg viewBox="0 0 24 24"><path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"/></svg>
+                </button>
+                <!-- 페이지 제목 -->
+                <h2 class="Header-Title-Text">이 계정에 대해</h2>
+            </div>
+        </div>
+        <!-- ── 프로필 섹션 ── -->
+        <div class="Profile-Section-Wrapper">
+            <div class="Profile-Center-Container">
+                <!-- 아바타 -->
+                <div class="Profile-Avatar-Outer-Wrapper">
+                    <div class="Profile-Avatar-Image-Container">
+                        <!-- 서버에서 유저 프로필 가져오기 -->
+                        <img
+                            class="Profile-Avatar-Image"
+                            src=""
+                            alt="user-avatar"
+                        />
+                    </div>
+                </div>
+                <!-- 이름 + 인증 뱃지 -->
+                <div class="Profile-Name-Badge-Row">
+                    <!-- 서버에서 유저 이름 가져오기 -->
+                    <span class="Profile-Name-Text">유저 이름</span>
+                    <!-- 인증 뱃지 -->
+                    <svg class="Profile-Verified-Badge" viewBox="0 0 24 24" fill="#1d9bf0"><path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>
+                </div>
+                <!-- 서버에서 유저 아이디 가져오기 -->
+                <span class="Profile-Handle-Text">@유저 아이디</span>
+            </div>
+        </div>
+        <!-- ── 정보 탭 리스트 ── -->
+        <div class="Info-Tab-List-Container">
+            <!-- 가입한 날짜 -->
+            <div class="Info-Tab-Item">
+                <div class="Info-Tab-Item-Inner-Row">
+                    <div class="Info-Tab-Icon-Container">
+                        <!-- 달력 아이콘 -->
+                        <svg viewBox="0 0 24 24">
+                            <path d="M7 4V3h2v1h6V3h2v1h1.5C19.89 4 21 5.12 21 6.5v12c0 1.38-1.11 2.5-2.5 2.5h-13C4.12 21 3 19.88 3 18.5v-12C3 5.12 4.12 4 5.5 4H7zm0 2H5.5c-.27 0-.5.22-.5.5v12c0 .28.23.5.5.5h13c.28 0 .5-.22.5-.5v-12c0-.28-.22-.5-.5-.5H17v1h-2V6H9v1H7V6zm0 6h2v-2H7v2zm0 4h2v-2H7v2zm4-4h2v-2h-2v2zm0 4h2v-2h-2v2zm4-4h2v-2h-2v2z"/>
+                        </svg>
+                    </div>
+                    <div class="Info-Tab-Text-Block">
+                        <span class="Info-Tab-Label-Text">가입한 날짜</span>
+                        <!-- 여기에 가입한 날짜 넣기 -->
+                        <span class="Info-Tab-Value-Text">2022년 3월</span>
+                    </div>
+                </div>
+            </div>
+            <!-- 탭 2: 계정 사용자 거주 국가 (ⓘ 버튼 있음) -->
+            <div class="Info-Tab-Item">
+                <div class="Info-Tab-Item-Inner-Row">
+                    <div class="Info-Tab-Icon-Container">
+                        <!-- 위치 핀 아이콘 -->
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 7c-1.93 0-3.5 1.57-3.5 3.5S10.07 14 12 14s3.5-1.57 3.5-3.5S13.93 7 12 7zm0 5c-.827 0-1.5-.673-1.5-1.5S11.173 9 12 9s1.5.673 1.5 1.5S12.827 12 12 12zm0-10c-4.687 0-8 3.313-8 8 0 5.25 7.042 11.746 7.349 12.018.181.159.407.238.651.238.243 0 .469-.08.65-.238C12.958 21.746 20 15.25 20 10c0-4.687-3.313-8-8-8zm0 18.013C9.78 18.101 6 13.568 6 10c0-3.584 2.416-6 6-6s6 2.416 6 6c0 3.568-3.78 8.101-6 10.013z"/>
+                        </svg>
+                    </div>
+                    <div class="Info-Tab-Text-Block">
+                        <span class="Info-Tab-Label-Text">계정 사용자 거주 국가:</span>
+                        <!-- 유저 Region 가져와서 표시 -->
+                        <span class="Info-Tab-Value-Text">South Asia</span>
+                    </div>
+                    <!-- ⓘ 정보 버튼 -->
+                    <button class="Info-Tab-Info-Button" aria-label="거주 국가 정보">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M13.5 8.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5S11.17 7 12 7s1.5.67 1.5 1.5zM13 17V11h-2v6h2zm-1 5.25c-5.66 0-10.25-4.59-10.25-10.25S6.34 1.75 12 1.75 22.25 6.34 22.25 12 17.66 22.25 12 22.25zm0-18.5c-4.56 0-8.25 3.69-8.25 8.25s3.69 8.25 8.25 8.25 8.25-3.69 8.25-8.25S16.56 3.75 12 3.75z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 구독한 유저일 경우 보이게 하기 th:if -->
+            <!-- 다른 유저일 경우 누르면 모달 보여주기 -->
+            <div class="Info-Tab-Item Subscribe" style="cursor: pointer;">
+                <div class="Info-Tab-Item-Inner-Row">
+                    <div class="Info-Tab-Icon-Container">
+                        <!-- 인증 체크 아이콘 -->
+                        <svg viewBox="0 0 24 24" aria-hidden="true" class="r-4qtqp9 r-yyyyoo r-bnwqim r-lrvibr r-m6rgpd r-18jsvk2 r-1472mwg r-1me0s30 r-7v430y r-lrsllp"><g><path d="M8.52 3.59c.8-1.1 2.04-1.84 3.48-1.84s2.68.74 3.49 1.84c1.34-.21 2.74.14 3.76 1.16s1.37 2.42 1.16 3.77c1.1.8 1.84 2.04 1.84 3.48s-.74 2.68-1.84 3.48c.21 1.34-.14 2.75-1.16 3.77s-2.42 1.37-3.76 1.16c-.8 1.1-2.05 1.84-3.49 1.84s-2.68-.74-3.48-1.84c-1.34.21-2.75-.14-3.77-1.16-1.01-1.02-1.37-2.42-1.16-3.77-1.09-.8-1.84-2.04-1.84-3.48s.75-2.68 1.84-3.48c-.21-1.35.14-2.75 1.16-3.77s2.43-1.37 3.77-1.16zm3.48.16c-.85 0-1.66.53-2.12 1.43l-.38.77-.82-.27c-.96-.32-1.91-.12-2.51.49-.6.6-.8 1.54-.49 2.51l.27.81-.77.39c-.9.46-1.43 1.27-1.43 2.12s.53 1.66 1.43 2.12l.77.39-.27.81c-.31.97-.11 1.91.49 2.51.6.61 1.55.81 2.51.49l.82-.27.38.77c.46.9 1.27 1.43 2.12 1.43s1.66-.53 2.12-1.43l.39-.77.82.27c.96.32 1.9.12 2.51-.49.6-.6.8-1.55.48-2.51l-.26-.81.76-.39c.91-.46 1.43-1.27 1.43-2.12s-.52-1.66-1.43-2.12l-.77-.39.27-.81c.32-.97.12-1.91-.48-2.51-.61-.61-1.55-.81-2.51-.49l-.82.27-.39-.77c-.46-.9-1.27-1.43-2.12-1.43zm4.74 5.68l-6.2 6.77-3.74-3.74 1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36z"></path></g></svg>
+                    </div>
+                    <div class="Info-Tab-Text-Block">
+                        <span class="Info-Tab-Label-Text">인증됨</span>
+                        <!-- 구독한 날 + 이후 -->
+                        <span class="Info-Tab-Value-Text">2024년 5월 이후</span>
+                    </div>
+                    <div class="Info-Tab-Chevron-Container">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14.586 12L7.543 4.96l1.414-1.42L17.414 12l-8.457 8.46-1.414-1.42L14.586 12z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <!-- 마지막 로그인 시간 -->
+            <div class="Info-Tab-Item">
+                <div class="Info-Tab-Item-Inner-Row">
+                    <div class="Info-Tab-Icon-Container">
+                        <!-- @ 아이콘 -->
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 3.786c-4.556 0-8.25 3.694-8.25 8.25s3.694 8.25 8.25 8.25c1.96 0 3.773-.69 5.2-1.81l1.26 1.26C16.65 21.05 14.42 22 12 22 6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10v1.5c0 1.93-1.57 3.5-3.5 3.5-1.2 0-2.2-.63-2.8-1.56-.73.97-1.9 1.56-3.2 1.56C10.01 17 8 14.99 8 12.5S10.01 8 12.5 8s4.5 2.01 4.5 4.5v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V12c0-4.556-3.694-8.214-8.25-8.214zM12.5 10C11.12 10 10 11.12 10 12.5S11.12 15 12.5 15 15 13.88 15 12.5 13.88 10 12.5 10z"/>
+                        </svg>
+                    </div>
+                    <div class="Info-Tab-Text-Block">
+                        <span class="Info-Tab-Label-Text">최근 로그인 시간</span>
+                        <!-- 마지막 날짜: + 최근 로그인 정보 -->
+                        <span class="Info-Tab-Value-Text">마지막 날짜: 2024년 5월</span>
+                    </div>
+                </div>
+            </div>
+            <!-- 접속 위치 -->
+            <div class="Info-Tab-Item">
+                <div class="Info-Tab-Item-Inner-Row">
+                    <div class="Info-Tab-Icon-Container">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" class="r-4qtqp9 r-yyyyoo r-bnwqim r-lrvibr r-m6rgpd r-18jsvk2 r-1472mwg r-1me0s30 r-7v430y r-lrsllp"><g><path d="M12.25 2C6.59 2 2 6.59 2 12.25S6.59 22.5 12.25 22.5 22.5 17.91 22.5 12.25 17.91 2 12.25 2zM9.13 4.61c-.1.21-.2.44-.29.66-.62 1.6-1.01 3.69-1.08 5.98h-3.7c.36-3.01 2.35-5.53 5.07-6.64zm-5.07 8.64h3.72c.11 2.09.49 4 1.06 5.48.18.46.39.89.62 1.29-2.88-1.04-5.02-3.63-5.4-6.77zM13.79 18c-.29.75-.61 1.28-.91 1.62-.31.33-.52.38-.63.38-.11 0-.32-.05-.63-.38-.3-.34-.62-.87-.91-1.62-.48-1.22-.82-2.87-.92-4.75h4.92c-.1 1.88-.44 3.53-.92 4.75zm-4.03-6.75c.07-2.09.43-3.92.95-5.25.29-.75.61-1.28.91-1.62.31-.33.52-.38.63-.38.11 0 .32.05.63.38.3.34.62.87.91 1.62.52 1.33.88 3.16.95 5.25H9.76zm5.28 8.77c.23-.4.44-.83.62-1.29.57-1.48.95-3.39 1.06-5.48h3.72c-.38 3.14-2.52 5.73-5.4 6.77zm1.7-8.77c-.07-2.29-.46-4.38-1.08-5.98-.09-.22-.19-.45-.29-.66 2.72 1.11 4.71 3.63 5.07 6.64h-3.7z"></path></g></svg>
+                    </div>
+                    <div class="Info-Tab-Text-Block">
+                        <span class="Info-Tab-Label-Text">접속 위치:</span>
+                        <span class="Info-Tab-Value-Text">Web</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- // 정보 탭 리스트 끝 -->
+    </div>
+
+    <!-- 모달 백드롭 -->
+    <div class="Modal-BackDrop off" style="pointer-events: auto;"></div>
+
+    <!-- 거주 구역 정보 모달 -->
+    <div class="Small-Modal Region off">
+        <div class="Small-Header">
+            <h2>작동 방식</h2>
+        </div>
+        <p class="Small-Message">계정 사용자가 소재하는 국가 또는 지역은 최근 여행이나 일시적 이주로 인해 영향을 받을 수 있습니다. 이 데이터는 정확하지 않을 수 있으며 주기적으로 변경될 수 있습니다.</p>
+        <div class="Small-Buttons">
+            <button class="Small-Button Confirm">확인</button>
+        </div>
+    </div>
+
+    <!-- 인증 됨 정보 모달 -->
+    <div class="Small-Modal Pro off">
+        <div class="Small-Header">
+            <h2>인증 방법</h2>
+        </div>
+        <p class="Small-Message">구독을 통해 서비스의 핵심 기능을 모두 잠금 해제하세요. 본 서비스는 사업자용과 전문가용으로 운영됩니다. 구독 시 일반 회원에게는 공개되지 않는 프리미엄 도구와 상세 데이터를 자유롭게 활용하실 수 있습니다.</p>
+        <div class="Small-Buttons">
+            <!-- 구독 페이지로 이동 -->
+            <a href="" class="Small-Button Pro">Pro 업그레이드</a>
+            <button class="Small-Button Confirm">확인</button>
+        </div>
+    </div>
+</body>
+</html>

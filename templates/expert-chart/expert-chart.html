@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>요약</title>
+        <link rel="stylesheet" href="../../static/css/expert-chart/expert-chart.css" />
+        <script src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="../../static/js/expert-chart/event.js"></script>
+    </head>
+    <body>
+        <!-- inquiry_active_list 화면 전체 래퍼 -->
+        <main class="Activity-Page">
+            <div class="Activity-Layout">
+                <div class="Activity-Shell">
+                    <!-- 상단 제목 + 탭 네비게이션 -->
+                    <header class="Activity-Header">
+                        <div class="Activity-Header-Inner">
+                            <h1 class="Activity-Header-Title">내 활동 한눈에 보기</h1>
+                        </div>
+                        <!-- 각 버튼이 눌리면 button의 class가 "Inquiry-Tab--Active"로 변한다  -->
+                        <nav class="Inquiry-Tabnav" aria-label="거래처 활동 탭" role="navigation">
+                            <div class="Inquiry-Tabnav-Inner">
+                                <div role="tablist" class="Inquiry-Tabnav-List" data-testid="ScrollSnap-List">
+                                    <div role="presentation" class="Inquiry-Tabnav-Item">
+                                        <button type="button" role="tab" aria-selected="false" class="Inquiry-Tab" data-inquiry-tab="summary">
+                                            <span class="Inquiry-Tab-Label">요약</span>
+                                            <span class="Inquiry-Tab-Indicator"></span>
+                                        </button>
+                                    </div>
+                                    <div role="presentation" class="Inquiry-Tabnav-Item">
+                                        <button type="button" role="tab" aria-selected="false" class="Inquiry-Tab" data-inquiry-tab="partners">
+                                            <span class="Inquiry-Tab-Label">거래처 등록 목록</span>
+                                            <span class="Inquiry-Tab-Indicator"></span>
+                                        </button>
+                                    </div>
+                                    <div role="presentation" class="Inquiry-Tabnav-Item">
+                                        <button type="button" role="tab" aria-selected="true" class="Inquiry-Tab Inquiry-Tab--Active" data-inquiry-tab="activity">
+                                            <span class="Inquiry-Tab-Label">거래처 활동 목록</span>
+                                            <span class="Inquiry-Tab-Indicator"></span>
+                                        </button>
+                                    </div>
+                                    <div role="presentation" class="Inquiry-Tabnav-Item">
+                                        <button type="button" role="tab" aria-selected="false" class="Inquiry-Tab" data-inquiry-tab="quotes">
+                                            <span class="Inquiry-Tab-Label">견적 요청 목록</span>
+                                            <span class="Inquiry-Tab-Indicator"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </nav>
+                    </header>
+
+                    <!-- 탭 패널들 -->
+                    <section class="Inquiry-Panels">
+                        <section class="Inquiry-Panel Inquiry-Panel--Blank" data-inquiry-panel="summary" hidden=""></section>
+                        <section class="Inquiry-Panel Inquiry-Panel--Blank" data-inquiry-panel="partners" hidden=""></section>
+
+                        <!-- ===== Activity 패널 ===== -->
+                        <section class="Inquiry-Panel Inquiry-Panel--Activity" data-inquiry-panel="activity">
+
+                            <!-- ===== 1층: 활동 통계 카드 6개 ===== -->
+                            <section class="Expert-State-Grid">
+                                <div class="Expert-State-Card">
+                                    <div class="Expert-State-Label">프로필 조회 수</div>
+                                    <div class="Expert-State-Value">1,200</div>
+                                </div>
+                                <div class="Expert-State-Card">
+                                    <div class="Expert-State-Label">거래 성사 수</div>
+                                    <div class="Expert-State-Value">578</div>
+                                </div>
+                                <div class="Expert-State-Card">
+                                    <div class="Expert-State-Label">상담 요청 수</div>
+                                    <div class="Expert-State-Value">1,002</div>
+                                </div>
+                                <div class="Expert-State-Card">
+                                    <div class="Expert-State-Label">요청 평균 응답 속도</div>
+                                    <div class="Expert-State-Value">6h</div>
+                                </div>
+                                <div class="Expert-State-Card">
+                                    <div class="Expert-State-Label">좋아요</div>
+                                    <div class="Expert-State-Value">400</div>
+                                </div>
+                                <div class="Expert-State-Card">
+                                    <div class="Expert-State-Label">북마크</div>
+                                    <div class="Expert-State-Value">200</div>
+                                </div>
+                            </section>
+
+                            <!-- ===== 2층: 선 그래프 (프로필 조회 수 / 견적 요청 수) ===== -->
+                            <section class="Expert-Chart-Wrapper">
+                                <div class="Expert-Chart-Single">
+                                    <div class="Single-Chart-Header">
+
+                                        <!-- 왼쪽: 지표 선택 드롭다운 -->
+                                        <div class="Chart-Header-Dropbox" data-dropbox>
+                                            <button
+                                                type="button"
+                                                class="Chart-Header-Title"
+                                                data-dropbox-trigger
+                                                aria-haspopup="listbox"
+                                                aria-expanded="false"
+                                            >
+                                                <span class="Chart-Header-Text" data-dropbox-label>프로필 조회 수</span>
+                                                <svg class="Chart-Header-Icon" data-dropbox-icon xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                                                    <path d="M297.4 438.6C309.9 451.1 330.2 451.1 342.7 438.6L502.7 278.6C515.2 266.1 515.2 245.8 502.7 233.3C490.2 220.8 469.9 220.8 457.4 233.3L320 370.7L182.6 233.4C170.1 220.9 149.8 220.9 137.3 233.4C124.8 245.9 124.8 266.2 137.3 278.7L297.3 438.7z"/>
+                                                </svg>
+                                            </button>
+                                            <ul class="Chart-Header-Options" data-dropbox-menu role="listbox" hidden>
+                                                <li class="Chart-Option" role="option" data-metric="profileViewCount" aria-selected="true">프로필 조회 수</li>
+                                                <li class="Chart-Option" role="option" data-metric="inquiryRequestCount" aria-selected="false">견적 요청 수</li>
+                                            </ul>
+                                        </div>
+
+                                        <!-- 오른쪽: 기간 단위 필터 -->
+                                        <div class="Chart-Header-Filter" data-line-period-group>
+                                            <button class="Header-Filter-Button Header-Filter-Button--Active" data-line-period="7d">최근 7일</button>
+                                            <button class="Header-Filter-Button" data-line-period="30d">최근 30일</button>
+                                            <button class="Header-Filter-Button" data-line-period="6m">최근 6개월</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- 선 그래프 영역 -->
+                                    <div class="Chart-Body">
+                                        <div id="chart-line" class="Chart-Body-Area"></div>
+                                    </div>
+                                </div>
+
+                                <!-- ===== 3층: 막대 + 도넛 그래프 ===== -->
+                                <div class="Expert-Chart-Double">
+
+                                    <!-- 막대 그래프: 팔로우 변동 추이 -->
+                                    <div class="Double-Chart-Area">
+                                        <div class="Chart-Header">
+                                            <span class="Chart-Header-Text">커넥트 변동 추이</span>
+                                        </div>
+                                        <div class="Chart-Body">
+                                            <div id="chart-bar" class="Chart-Body-Area"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 도넛 그래프: 거래 카테고리 분포 -->
+                                    <div class="Double-Chart-Area">
+                                        <div class="Chart-Header">
+                                            <span class="Chart-Header-Text">거래된 카테고리 분포</span>
+                                        </div>
+                                        <div class="Chart-Body">
+                                            <div id="chart-donut" class="Chart-Body-Area"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ===== 4층: 지역 분포 지오 차트 ===== -->
+                                <div class="Expert-Chart-Single">
+                                    <div class="Chart-Header">
+                                        <span class="Chart-Header-Text">거래된 사업자 나라 분포</span>
+                                    </div>
+                                    <div class="Chart-Body">
+                                        <div id="chart-geo" class="Chart-Body-Area Chart-Body-Area--Geo"></div>
+                                    </div>
+                                </div>
+
+                            </section>
+                        </section>
+
+                        <section class="Inquiry-Panel Inquiry-Panel--Blank" data-inquiry-panel="quotes" hidden=""></section>
+                    </section>
+                </div>
+            </div>
+        </main>
+</body>
+</html>
