@@ -3,10 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- title은 상품 이름 표시 -->
+    <link rel="stylesheet" href="../../static/css/product/product.css" />
+    <script src="../../static/js/product/event.js"></script>
     <title>상품 이름</title>
 </head>
 <body>
-    
+    <div class="Product-Detail-Shell" id="productDetail">
+        <main class="Product-Detail-Main">
+
+            <!-- ── Header ── -->
+            <header class="Product-Detail-Header">
+                <button class="Product-Detail-Header-Back" id="productDetailBack" type="button" aria-label="뒤로 가기">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"></path>
+                    </svg>
+                </button>
+                <h1 class="Product-Detail-Header-Title">상품 이름</h1>
+            </header>
+
+            <!-- ── 상품 상세 ── -->
+            <section class="Product-Detail-Thread" aria-label="상품 상세">
+                <div class="Product-Detail-Hero" data-product-card data-product-id="24">
+
+                    <!-- 프로필 행 -->
+                    <div class="Product-Detail-Hero-Top">
+                        <div class="Product-Detail-Profile">
+                            <div class="Product-Detail-Profile-Avatar Product-Detail-Profile-Avatar--Brand">
+                                <span>T</span>
+                            </div>
+                            <div class="Product-Detail-Profile-Copy">
+                                <div class="Product-Detail-Profile-NameRow">
+                                    <strong class="Product-Detail-Profile-Name">상품을 등록한 회원 이름</strong>
+                                    <svg viewBox="0 0 22 22" aria-label="인증된 계정" role="img" class="Product-Detail-Profile-Verified">
+                                        <path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"></path>
+                                    </svg>
+                                </div>
+                                <div class="Product-Detail-Profile-HandleRow">
+                                    <span class="Product-Detail-Profile-Handle">@상품을 등록한 회원 아이디</span>
+                                    <span class="Product-Detail-Profile-HandleSep">·</span>
+                                    <span class="Product-Detail-Profile-Handle">2시간</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 더보기 버튼 -->
+                        <div class="Product-Detail-Hero-Actions">
+                            <div class="Product-Detail-Hero-MoreWrap">
+                                <button class="Product-Detail-Header-IconButton" id="heroMoreButton" type="button"
+                                    aria-label="게시물 더 보기" aria-haspopup="menu" aria-expanded="false">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M3 12c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm9 2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm7 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 본문 -->
+                    <div class="Product-Detail-Body-Copy">
+                        <p class="Product-Detail-Body-Text">상품 설명</p>
+                    </div>
+
+                    <!-- ── 상품 정보 (카테고리 · 가격 · 수량) ── -->
+                    <div class="Product-Detail-Info">
+
+                        <!-- 카테고리 배지 -->
+                        <div class="Product-Detail-Info-CategoryRow">
+                            <span class="Product-Detail-Info-CategoryBadge">수입</span>
+                            <span class="Product-Detail-Info-CategoryBadge Product-Detail-Info-CategoryBadge--Sub">원자재</span>
+                        </div>
+
+                        <!-- 가격 -->
+                        <div class="Product-Detail-Info-Row">
+                            <span class="Product-Detail-Info-Label">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zm.5 16.5v1h-1v-1c-1.93-.22-3.5-1.696-3.5-3.5h1.5c0 1.105.895 2 2 2s2-.895 2-2c0-1.104-.895-2-2-2-1.93 0-3.5-1.57-3.5-3.5 0-1.804 1.57-3.28 3.5-3.5v-1h1v1c1.93.22 3.5 1.696 3.5 3.5h-1.5c0-1.105-.895-2-2-2s-2 .895-2 2 .895 2 2 2c1.93 0 3.5 1.57 3.5 3.5 0 1.804-1.57 3.28-3.5 3.5z"/>
+                                </svg>
+                                가격
+                            </span>
+                            <span class="Product-Detail-Info-Value Product-Detail-Info-Value--Price">
+                                &#8361; 89,000 <em>/ 개</em>
+                            </span>
+                        </div>
+
+                        <!-- 재고 수량 -->
+                        <div class="Product-Detail-Info-Row">
+                            <span class="Product-Detail-Info-Label">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M20 7H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm-1 10H5c-.55 0-1-.45-1-1v-6h16v6c0 .55-.45 1-1 1zM4 5h16v1H4zM6 3h12v1H6z"/>
+                                </svg>
+                                재고 수량
+                            </span>
+                            <span class="Product-Detail-Info-Value Product-Detail-Info-Value--Stock">
+                                <i class="Product-Detail-Info-StockDot" aria-hidden="true"></i>
+                                수량
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 미디어 그리드 -->
+                    <div class="Product-Detail-Media-Grid">
+                        <img src="/static/images/main/KakaoTalk_20260310_145435590_01.jpg"
+                             alt="Arthur Hayes 사진"
+                             class="Product-Detail-Media-Image" />
+                        <img src="/static/images/main/KakaoTalk_20260310_145435590_02.jpg"
+                             alt="상승 그래프 이미지"
+                             class="Product-Detail-Media-Image" />
+                    </div>
+
+                    <!-- 등록 시간 · 날짜 -->
+                    <div class="Product-Detail-Meta">
+                        <span>오후 2:04 · 2026년 3월 12일</span>
+                    </div>
+
+                    <!-- 액션 바 -->
+                    <div class="Product-Detail-ActionBar" aria-label="27 답글, 146 마음, 2 북마크">
+
+                        <!-- 좋아요 -->
+                        <div class="Product-Detail-ActionBar-Slot">
+                            <button class="Product-Detail-ActionBar-Button Product-Detail-ActionBar-Button--Like"
+                                type="button" data-testid="like" aria-label="마음 146">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91zm4.187 7.69c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.41-4.86-.514-6.67.887-1.79 2.647-2.91 4.601-3.01 1.651-.09 3.368.56 4.798 2.01 1.429-1.45 3.146-2.1 4.796-2.01 1.954.1 3.714 1.22 4.601 3.01.896 1.81.846 4.17-.514 6.67z"></path>
+                                </svg>
+                                <span class="Product-Detail-ActionBar-Count">146</span>
+                            </button>
+                        </div>
+
+                        <!-- 북마크 -->
+                        <div class="Product-Detail-ActionBar-Slot">
+                            <button class="Product-Detail-ActionBar-Button Product-Detail-ActionBar-Button--Bookmark"
+                                type="button" data-testid="bookmark" aria-label="북마크">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M4 4.5C4 3.12 5.119 2 6.5 2h11C18.881 2 20 3.12 20 4.5v18.44l-8-5.71-8 5.71V4.5zM6.5 4c-.276 0-.5.22-.5.5v14.56l6-4.29 6 4.29V4.5c0-.28-.224-.5-.5-.5h-11z"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- 공유 -->
+                        <div class="Product-Detail-ActionBar-Slot">
+                            <button class="Product-Detail-ActionBar-Button Product-Detail-ActionBar-Button--Share"
+                                id="heroShareButton" type="button"
+                                aria-label="게시물 공유하기" aria-haspopup="menu" aria-expanded="false">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 미디어 프리뷰 오버레이 div -->
+        <!-- 클릭한 이미지 내용 가져와서 img에 넣기 -->
+        <div class="Post-Media-Preview-Overlay off" role="dialog" aria-modal="true" aria-label="이미지 전체화면">
+            <div class="Post-Media-Preview-Dialog">
+                <img src="" alt="preview-image" class="Post-Media-Preview-Image">
+                <button class="Post-Media-Preview-Close" type="button" aria-label="닫기">
+                    <svg viewBox="0 0 24 24" class="Post-Media-Preview-Close-Icon" aria-hidden="true">
+                        <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- 상품 더보기 메뉴 (다른 유저) -->
+        <!-- 상품이 로그인 유저 것이 아니면 표시 -->
+        <div class="Post-More-Menu Product off">
+            <div class="More-Menu-Buttons">
+                <button class="Menu-Button BanUser">
+                    <span class="Button-Icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M12 3.75c-4.55 0-8.25 3.69-8.25 8.25 0 1.92.66 3.68 1.75 5.08L17.09 5.5C15.68 4.4 13.92 3.75 12 3.75zm6.5 3.17L6.92 18.5c1.4 1.1 3.16 1.75 5.08 1.75 4.56 0 8.25-3.69 8.25-8.25 0-1.92-.65-3.68-1.75-5.08zM1.75 12C1.75 6.34 6.34 1.75 12 1.75S22.25 6.34 22.25 12 17.66 22.25 12 22.25 1.75 17.66 1.75 12z"></path></g></svg>
+                    </span>
+                    <span class="Button-Text">관심 없음</span>
+                </button>
+                <button class="Menu-Button Report">
+                    <span class="Button-Icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M3 2h18.61l-3.5 7 3.5 7H5v6H3V2zm2 12h13.38l-2.5-5 2.5-5H5v10z"></path></g></svg>
+                    </span>
+                    <span class="Button-Text">상품 신고하기</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 상품 더보기 메뉴 (등록한 회원) -->
+        <div class="Post-More-Menu Owner off">
+            <div class="More-Menu-Buttons">
+                <button class="Menu-Button Edit">
+                    <span class="Button-Icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M10 4c-1.105 0-2 .9-2 2s.895 2 2 2 2-.9 2-2-.895-2-2-2zM6 6c0-2.21 1.791-4 4-4s4 1.79 4 4-1.791 4-4 4-4-1.79-4-4zm4 7c-3.053 0-5.563 1.193-7.443 3.596l1.548 1.207C5.573 15.922 7.541 15 10 15s4.427.922 5.895 2.803l1.548-1.207C15.563 14.193 13.053 13 10 13zm8-6V5h-3V3h-2v2h-3v2h3v3h2V7h3z"></path></g></svg>
+                    </span>
+                    <span class="Button-Text">수정하기</span>
+                </button>
+                <button class="Menu-Button DisConnect">
+                    <span class="Button-Icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M10 4c-1.105 0-2 .9-2 2s.895 2 2 2 2-.9 2-2-.895-2-2-2zM6 6c0-2.21 1.791-4 4-4s4 1.79 4 4-1.791 4-4 4-4-1.79-4-4zm12.586 3l-2.043-2.04 1.414-1.42L20 7.59l2.043-2.05 1.414 1.42L21.414 9l2.043 2.04-1.414 1.42L20 10.41l-2.043 2.05-1.414-1.42L18.586 9zM3.651 19h12.698c-.337-1.8-1.023-3.21-1.945-4.19C13.318 13.65 11.838 13 10 13s-3.317.65-4.404 1.81c-.922.98-1.608 2.39-1.945 4.19zm.486-5.56C5.627 11.85 7.648 11 10 11s4.373.85 5.863 2.44c1.477 1.58 2.366 3.8 2.632 6.46l.11 1.1H1.395l.11-1.1c.266-2.66 1.155-4.88 2.632-6.46z"></path></g></svg>
+                    </span>
+                    <span class="Button-Text">삭제하기</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 공유 메뉴 -->
+        <div class="Post-More-Menu Share off">
+            <div class="More-Menu-Buttons">
+                <button class="Menu-Button Edit">
+                    <span class="Button-Icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M18.36 5.64c-1.95-1.96-5.11-1.96-7.07 0L9.88 7.05 8.46 5.64l1.42-1.42c2.73-2.73 7.16-2.73 9.9 0 2.73 2.74 2.73 7.17 0 9.9l-1.42 1.42-1.41-1.42 1.41-1.41c1.96-1.96 1.96-5.12 0-7.07zm-2.12 3.53l-7.07 7.07-1.41-1.41 7.07-7.07 1.41 1.41zm-12.02.71l1.42-1.42 1.41 1.42-1.41 1.41c-1.96 1.96-1.96 5.12 0 7.07 1.95 1.96 5.11 1.96 7.07 0l1.41-1.41 1.42 1.41-1.42 1.42c-2.73 2.73-7.16 2.73-9.9 0-2.73-2.74-2.73-7.17 0-9.9z"></path></g></svg>
+                    </span>
+                    <span class="Button-Text">링크 복사하기</span>
+                </button>
+                <button class="Menu-Button Edit">
+                    <span class="Button-Icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M1.998 5.5c0-1.381 1.119-2.5 2.5-2.5h15c1.381 0 2.5 1.119 2.5 2.5v13c0 1.381-1.119 2.5-2.5 2.5h-15c-1.381 0-2.5-1.119-2.5-2.5v-13zm2.5-.5c-.276 0-.5.224-.5.5v2.764l8 3.638 8-3.636V5.5c0-.276-.224-.5-.5-.5h-15zm15.5 5.463l-8 3.636-8-3.638V18.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5v-8.037z"></path></g></svg>
+                    </span>
+                    <span class="Button-Text">Chat으로 전송하기</span>
+                </button>
+                <button class="Menu-Button Edit">
+                    <span class="Button-Icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M18 3V0h2v3h3v2h-3v3h-2V5h-3V3zm-7.5 1a.5.5 0 00-.5.5V7h3.5A2.5 2.5 0 0116 9.5v3.48l3 2.1V11h2v7.92l-5-3.5v7.26l-6.5-3.54L3 22.68V9.5A2.5 2.5 0 015.5 7H8V4.5A2.5 2.5 0 0110.5 2H12v2zm-5 5a.5.5 0 00-.5.5v9.82l4.5-2.46 4.5 2.46V9.5a.5.5 0 00-.5-.5z"></path></g></svg>
+                    </span>
+                    <span class="Button-Text">폴더에 북마크 추가하기</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
