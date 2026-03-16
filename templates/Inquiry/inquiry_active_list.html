@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>거래처 활동 목록</title>
         <link rel="stylesheet" href="/static/css/Inquiry/inquiry_active_list.css" />
+        <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@3.0.3/dist/index.min.js"></script>
     </head>
     <body>
         <!-- inquiry_active_list 화면 전체 래퍼 -->
@@ -1975,16 +1976,20 @@
         <!-- 답글 모달 골격: event.js의 openReplyModal()이 이 영역의 내용만 채워서 연다 -->
         <div class="tweet-modal-overlay" data-reply-modal hidden>
             <div class="tweet-modal" role="dialog" aria-modal="true" aria-labelledby="reply-modal-title">
+                <!-- 작성 화면: 답글 입력창, 첨부 미리보기, 하단 툴바가 들어가는 기본 화면 -->
+                <div class="tweet-modal__compose-view">
+
                 <div class="tweet-modal__header">
                     <button type="button" class="tweet-modal__close" aria-label="닫기">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                             <g>
-                                <path d="M10.59 12 4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+                                <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
                             </g>
                         </svg>
                     </button>
                     <h2 id="reply-modal-title" class="tweet-modal__title">답글</h2>
                 </div>
+
                 <div class="tweet-modal__body">
                     <button type="button" class="tweet-modal__context-button">답글 보내는 중</button>
                     <div class="tweet-modal__source-tweet">
@@ -2008,13 +2013,171 @@
                                 contenteditable="true"
                                 role="textbox"
                                 aria-multiline="true"
+                                tabindex="0"
                             ></div>
+                            <!-- 첨부 미리보기 영역 -->
+                            <div class="tweet-modal__attachment attachments" data-attachment-preview data-testid="attachments" hidden>
+                                <div class="tweet-modal__attachment-media media-grid-wrapper" data-attachment-media></div>
+                                <div class="tweet-modal__attachment-meta media-actions-bar">
+                                    <button type="button" class="tweet-modal__attachment-meta-btn media-action-link" data-user-tag-trigger>
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                            <g><path d="M5.651 19h12.698c-.337-1.8-1.023-3.21-1.945-4.19C15.318 13.65 13.838 13 12 13s-3.317.65-4.404 1.81c-.922.98-1.608 2.39-1.945 4.19zm.486-5.56C7.627 11.85 9.648 11 12 11s4.373.85 5.863 2.44c1.477 1.58 2.366 3.8 2.632 6.46l.11 1.1H3.395l.11-1.1c.266-2.66 1.155-4.88 2.632-6.46zM12 4c-1.105 0-2 .9-2 2s.895 2 2 2 2-.9 2-2-.895-2-2-2zM8 6c0-2.21 1.791-4 4-4s4 1.79 4 4-1.791 4-4 4-4-1.79-4-4z"></path></g>
+                                        </svg>
+                                        <span data-user-tag-label>사용자 태그하기</span>
+                                    </button>
+                                    <button type="button" class="tweet-modal__attachment-meta-btn media-action-link" data-media-alt-trigger>
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                            <g><path d="M3 4.5C3 3.12 4.12 2 5.5 2h13C19.88 2 21 3.12 21 4.5v15c0 1.38-1.12 2.5-2.5 2.5h-13C4.12 22 3 20.88 3 19.5v-15zM5.5 4c-.28 0-.5.22-.5.5v15c0 .28.22.5.5.5h13c.28 0 .5-.22.5-.5v-15c0-.28-.22-.5-.5-.5h-13zM16 10H8V8h8v2zm-8 2h8v2H8v-2z"></path></g>
+                                        </svg>
+                                        <span data-media-alt-label>설명 추가</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- 답글 모달 하단: 위치 표시 + 툴바 버튼들 + 게이지 + 제출 -->
                 <div class="tweet-modal__footer">
+                    <div class="tweet-modal__footer-meta" hidden>
+                        <div class="tweet-modal__footer-meta-slot tweet-modal__footer-meta-slot--end">
+                            <button type="button" class="tweet-modal__location-display" data-location-display hidden>
+                                <div dir="ltr" class="tweet-modal__location-display-inner">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" class="tweet-modal__location-display-icon"><g><path d="M12 2c-4.687 0-8.5 3.813-8.5 8.5 0 5.967 7.621 11.116 7.945 11.332l.555.37.555-.37c.324-.216 7.945-5.365 7.945-11.332C20.5 5.813 16.687 2 12 2zm0 11.5c-1.65 0-3-1.34-3-3s1.35-3 3-3c1.66 0 3 1.34 3 3s-1.34 3-3 3z"></path></g></svg>
+                                    <div class="tweet-modal__location-display-text-wrap">
+                                        <span class="tweet-modal__location-display-text-outer">
+                                            <span class="tweet-modal__location-display-text-inner" data-location-name></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
                     <div class="tweet-modal__footer-bottom">
-                        <button type="button" class="tweet-modal__submit" data-reply-submit disabled>답글</button>
+                        <!-- 답글 작성 툴바: 첨부파일, 이모지, 위치, 굵게, 기울임 -->
+                        <div class="tweet-modal__toolbar" data-testid="toolBar">
+                            <!-- 첨부파일(사진/동영상) 업로드 버튼 + 숨겨진 file input -->
+                            <div class="tweet-modal__tool-file">
+                                <button type="button" class="tweet-modal__tool-btn" aria-label="사진 또는 동영상 추가" data-testid="mediaUploadButton">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                                        <g><path d="M3 5.5C3 4.119 4.119 3 5.5 3h13C19.881 3 21 4.119 21 5.5v13c0 1.381-1.119 2.5-2.5 2.5h-13C4.119 21 3 19.881 3 18.5v-13zM5.5 5c-.276 0-.5.224-.5.5v9.086l3-3 3 3 5-5 3 3V5.5c0-.276-.224-.5-.5-.5h-13zM19 15.414l-3-3-5 5-3-3-3 3V18.5c0 .276.224.5.5.5h13c.276 0 .5-.224.5-.5v-3.086zM9.75 7C8.784 7 8 7.784 8 8.75s.784 1.75 1.75 1.75 1.75-.784 1.75-1.75S10.716 7 9.75 7z"></path></g>
+                                    </svg>
+                                </button>
+                                <input type="file" data-testid="fileInput" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime" multiple tabindex="-1" class="tweet-modal__file-input" />
+                            </div>
+                            <!-- 판매글 선택 버튼 -->
+                            <button type="button" class="tweet-modal__tool-btn" aria-label="판매글 선택" data-testid="productSelectButton">
+                                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                                    <g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5S3.5 15.135 3.5 11z"></path></g>
+                                    <g><path d="M7 9h10v1.5H7zm0 3h7v1.5H7z"></path></g>
+                                </svg>
+                            </button>
+                            <!-- 이모지 삽입 버튼 -->
+                            <button type="button" class="tweet-modal__tool-btn" aria-label="이모티콘 추가하기" data-testid="emojiButton" aria-expanded="false" aria-haspopup="menu">
+                                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                                    <g><path d="M12 22.75C6.072 22.75 1.25 17.928 1.25 12S6.072 1.25 12 1.25 22.75 6.072 22.75 12 17.928 22.75 12 22.75zm0-20c-5.109 0-9.25 4.141-9.25 9.25s4.141 9.25 9.25 9.25 9.25-4.141 9.25-9.25S17.109 2.75 12 2.75zM9 11.75c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm6 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm-8.071 3.971c.307-.298.771-.397 1.188-.253C9.07 16.154 10.52 16.75 12 16.75s2.93-.596 3.883-.982c.417-.144.88-.044 1.188.253a.846.846 0 01-.149 1.34c-1.254.715-3.059 1.139-4.922 1.139s-3.668-.424-4.922-1.139a.847.847 0 01-.149-1.39z"></path></g>
+                                </svg>
+                            </button>
+                            <!-- 위치 태그 버튼 -->
+                            <button type="button" class="tweet-modal__tool-btn" aria-label="위치 태그하기" data-testid="geoButton">
+                                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                                    <g><path d="M12 7c-1.93 0-3.5 1.57-3.5 3.5S10.07 14 12 14s3.5-1.57 3.5-3.5S13.93 7 12 7zm0 5c-.827 0-1.5-.673-1.5-1.5S11.173 9 12 9s1.5.673 1.5 1.5S12.827 12 12 12zm0-10c-4.687 0-8.5 3.813-8.5 8.5 0 5.967 7.621 11.116 7.945 11.332l.555.37.555-.37c.324-.216 7.945-5.365 7.945-11.332C20.5 5.813 16.687 2 12 2zm0 17.77c-1.665-1.241-6.5-5.196-6.5-9.27C5.5 6.916 8.416 4 12 4s6.5 2.916 6.5 6.5c0 4.073-4.835 8.028-6.5 9.27z"></path></g>
+                                </svg>
+                            </button>
+                            <!-- 굵게 서식 버튼 -->
+                            <button type="button" class="tweet-modal__tool-btn tweet-modal__tool-btn--format" aria-label="굵게" data-format="bold">
+                                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" class="tweet-modal__tool-format-icon">
+                                    <g><path d="M15.636 11.671c2.079-.583 3.093-2.18 3.093-3.929 0-2.307-1.471-4.741-5.983-4.741H5.623V21h7.579c4.411 0 6.008-2.484 6.008-4.994 0-2.383-1.343-3.955-3.574-4.335zm-3.295-6.287c2.535 0 3.27 1.319 3.27 2.662 0 1.242-.583 2.611-3.27 2.611H8.69V5.384h3.651zM8.69 18.617v-5.628h4.208c2.231 0 3.194 1.166 3.194 2.738 0 1.547-.887 2.89-3.397 2.89H8.69z"></path></g>
+                                </svg>
+                            </button>
+                            <!-- 기울임꼴 서식 버튼 -->
+                            <button type="button" class="tweet-modal__tool-btn tweet-modal__tool-btn--format" aria-label="기울임꼴" data-format="italic">
+                                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" class="tweet-modal__tool-format-icon">
+                                    <g><path d="M9 6h3.731L9.184 18H5v2h10v-2h-3.731l3.547-12H19V4H9v2z"></path></g>
+                                </svg>
+                            </button>
+                        </div>
+                        <!-- 기존 커스텀 이모지 피커 마크업: 외부 라이브러리 실패 시 fallback 용도로 유지 -->
+                        <div class="tweet-modal__emoji-picker" role="dialog" aria-label="이모티콘 선택기" hidden>
+                            <div class="tweet-modal__emoji-search">
+                                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" class="tweet-modal__emoji-search-icon">
+                                    <g><path d="M10.5 3.75c-3.728 0-6.75 3.022-6.75 6.75s3.022 6.75 6.75 6.75c1.55 0 2.977-.522 4.114-1.4l4.893 4.893 1.06-1.06-4.892-4.893a6.714 6.714 0 001.4-4.114c0-3.728-3.022-6.75-6.75-6.75zm-5.25 6.75c0-2.9 2.35-5.25 5.25-5.25s5.25 2.35 5.25 5.25-2.35 5.25-5.25 5.25-5.25-2.35-5.25-5.25z"></path></g>
+                                </svg>
+                                <input
+                                    type="search"
+                                    class="tweet-modal__emoji-search-input"
+                                    data-testid="emojiSearchInput"
+                                    placeholder="이모티콘 검색하기"
+                                    aria-label="이모티콘 검색하기"
+                                />
+                            </div>
+                            <div class="tweet-modal__emoji-tabs" role="tablist" aria-label="이모지 카테고리">
+                                <button type="button" class="tweet-modal__emoji-tab tweet-modal__emoji-tab--active" data-emoji-category="recent" role="tab" aria-selected="true" aria-label="최근"></button>
+                                <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="smileys" role="tab" aria-selected="false" aria-label="스마일리 및 사람"></button>
+                                <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="animals" role="tab" aria-selected="false" aria-label="동물 및 자연"></button>
+                                <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="food" role="tab" aria-selected="false" aria-label="음식 및 음료"></button>
+                                <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="activities" role="tab" aria-selected="false" aria-label="활동"></button>
+                                <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="travel" role="tab" aria-selected="false" aria-label="여행 및 장소"></button>
+                                <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="objects" role="tab" aria-selected="false" aria-label="사물"></button>
+                                <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="symbols" role="tab" aria-selected="false" aria-label="기호"></button>
+                                <button type="button" class="tweet-modal__emoji-tab" data-emoji-category="flags" role="tab" aria-selected="false" aria-label="깃발"></button>
+                            </div>
+                            <div class="tweet-modal__emoji-content" data-testid="emojiPickerContent"></div>
+                        </div>
+                        <!-- 원형 글자수 게이지 + 답글 제출 버튼 -->
+                        <div class="composerActions">
+                            <div class="composerGauge" data-reply-gauge role="progressbar" aria-label="글자 수 진행률" aria-valuemin="0" aria-valuemax="500" aria-valuenow="0">
+                                <span class="composerGaugeText" data-reply-gauge-text>500</span>
+                            </div>
+                            <button type="button" class="tweet-modal__submit" data-reply-submit disabled>답글</button>
+                        </div>
+                    </div>
+                </div>
+                </div><!-- /.tweet-modal__compose-view -->
+
+                <!-- 위치 선택 서브뷰: compose view를 숨기고 이 블록을 대신 표시한다 -->
+                <div class="tweet-modal__location-view" hidden>
+                    <div class="tweet-modal__location-modal">
+                        <div class="tweet-modal__location-header">
+                            <button type="button" class="tweet-modal__location-close" aria-label="닫기">
+                                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g><path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"></path></g></svg>
+                            </button>
+                            <h2 class="tweet-modal__location-title">위치 태그하기</h2>
+                            <div class="tweet-modal__location-actions">
+                                <button type="button" class="tweet-modal__location-action tweet-modal__location-action--ghost" data-location-delete hidden>삭제</button>
+                                <button type="button" class="tweet-modal__location-action tweet-modal__location-action--solid" data-location-complete disabled>완료</button>
+                            </div>
+                        </div>
+                        <div class="tweet-modal__location-search">
+                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" class="tweet-modal__location-search-icon"><g><path d="M10.5 3.75c-3.728 0-6.75 3.022-6.75 6.75s3.022 6.75 6.75 6.75c1.55 0 2.977-.522 4.114-1.4l4.893 4.893 1.06-1.06-4.892-4.893a6.714 6.714 0 001.4-4.114c0-3.728-3.022-6.75-6.75-6.75zm-5.25 6.75c0-2.9 2.35-5.25 5.25-5.25s5.25 2.35 5.25 5.25-2.35 5.25-5.25 5.25-5.25-2.35-5.25-5.25z"></path></g></svg>
+                            <input type="search" class="tweet-modal__location-search-input" data-location-search placeholder="위치 검색" aria-label="위치 검색" />
+                        </div>
+                        <div class="tweet-modal__location-list" role="menu" data-location-list>
+                            <button type="button" class="tweet-modal__location-item" role="menuitem"><span class="tweet-modal__location-item-label">대한민국 서초구</span><span class="tweet-modal__location-item-check"></span></button>
+                            <button type="button" class="tweet-modal__location-item" role="menuitem"><span class="tweet-modal__location-item-label">대한민국 강남구</span><span class="tweet-modal__location-item-check"></span></button>
+                            <button type="button" class="tweet-modal__location-item" role="menuitem"><span class="tweet-modal__location-item-label">대한민국 송파구</span><span class="tweet-modal__location-item-check"></span></button>
+                            <button type="button" class="tweet-modal__location-item" role="menuitem"><span class="tweet-modal__location-item-label">대한민국 광진구</span><span class="tweet-modal__location-item-check"></span></button>
+                            <button type="button" class="tweet-modal__location-item" role="menuitem"><span class="tweet-modal__location-item-label">대한민국 동작구</span><span class="tweet-modal__location-item-check"></span></button>
+                            <button type="button" class="tweet-modal__location-item" role="menuitem"><span class="tweet-modal__location-item-label">대한민국 중구</span><span class="tweet-modal__location-item-check"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 판매글 선택 서브뷰: compose view를 숨기고 이 블록을 대신 표시한다 -->
+                <div class="tweet-modal__product-view" data-product-select-modal hidden>
+                    <div class="draft-panel__header">
+                        <button type="button" class="draft-panel__back" data-product-select-close aria-label="돌아가기">
+                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g><path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"></path></g></svg>
+                        </button>
+                        <h2 class="draft-panel__title">판매글 선택하기</h2>
+                        <button type="button" class="draft-panel__action" data-product-select-complete disabled>완료</button>
+                    </div>
+                    <div class="draft-panel__content">
+                        <div class="draft-panel__list" data-product-select-list></div>
+                        <div class="draft-panel__empty" data-product-empty hidden>
+                            <p class="draft-panel__empty-title">등록된 상품이 없습니다</p>
+                            <p class="draft-panel__empty-body">마이페이지에서 상품을 먼저 등록해 주세요.</p>
+                        </div>
                     </div>
                 </div>
             </div>
