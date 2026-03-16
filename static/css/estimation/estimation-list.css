@@ -44,6 +44,15 @@ body.modal-open {
     background: #eff3f4;
 }
 
+.postHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    position: relative;
+    margin-bottom : 8px;
+}
+
 .estimation-preview-card__email {
     max-width: 140px;
     color: #536471;
@@ -170,37 +179,52 @@ body.modal-open {
     min-width: 76px;
     height: 34px;
     padding: 0 14px;
-    border: 1px solid #d7e0e5;
     border-radius: 9999px;
-    background: #fff;
-    color: #536471;
     font-size: 14px;
     font-weight: 700;
     transition: all 0.2s;
 }
 
-.estimation-action-btn:hover {
-    background: #f7f9f9;
+.estimation-action-btn--approve {
+    border: 1px solid #1d9bf0;
+    background: rgba(29, 155, 240, 0.1);
+    color: #1d9bf0;
+}
+
+.estimation-action-btn--approve:hover {
+    background: rgba(29, 155, 240, 0.16);
 }
 
 .estimation-action-btn--approve.is-active {
-    border-color: #0f1419;
-    background: #0f1419;
-    color: #fff;
+    border-color: #1d9bf0;
+    background: #1d9bf0;
+    color: #ffffff;
 }
 
 .estimation-action-btn--approve.is-active:hover {
-    background: #272c30;
+    border-color: #1a8cd8;
+    background: #1a8cd8;
 }
 
-.estimation-action-btn--reject.is-active {
-    border-color: #f4212e;
+.estimation-action-btn--reject {
+    border: 1px solid #f4212e;
     background: rgba(244, 33, 46, 0.1);
     color: #f4212e;
 }
 
-.estimation-action-btn--reject.is-active:hover {
+.estimation-action-btn--reject:hover {
     background: rgba(244, 33, 46, 0.16);
+}
+
+.estimation-action-btn--reject.is-active {
+    border-color: #f4212e;
+    background: #f4212e;
+    color: #ffffff;
+}
+
+.estimation-action-btn--reject.is-active:hover {
+    border-color: #dc1f2b;
+    background: #dc1f2b;
 }
 
 [data-estimation-detail-target] {
