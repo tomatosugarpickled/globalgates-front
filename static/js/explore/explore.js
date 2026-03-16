@@ -87,20 +87,20 @@ if (trendReportMenu) {
 
             activeBtn = btn;
             const rect = btn.getBoundingClientRect();
-            const menuHeight = 5 * 44;
 
-            const top = (rect.bottom + menuHeight > window.innerHeight)
-                ? rect.top - menuHeight
-                : rect.bottom;
-
-            trendReportMenu.style.top  = top + "px";
+            trendReportMenu.style.top  = rect.bottom + "px";
             trendReportMenu.style.left = (rect.right - 284) + "px";
             trendReportMenu.hidden = false;
+
+            const menuH = trendReportMenu.offsetHeight;
+            if (rect.bottom + menuH > window.innerHeight) {
+                trendReportMenu.style.top = (rect.top - menuH) + "px";
+            }
         });
     });
 
     // 메뉴 아이템 클릭 시 해당 트렌딩 아이템 → dismissed 상태로 교체
-    trendReportMenu.querySelectorAll(".menu-item").forEach((item) => {
+    trendReportMenu.querySelectorAll(".more-menu").forEach((item) => {
         item.addEventListener("click", (e) => {
             if (activeBtn) {
                 const trendingItem = activeBtn.closest(".trending-item");
@@ -150,10 +150,9 @@ if (trendReportMenu) {
     function handleLike(btn) {
         var isLiked = btn.classList.contains("liked");
         btn.classList.toggle("liked", !isLiked);
-        var svgs = btn.querySelectorAll("svg");
-        if (svgs.length >= 2) {
-            svgs[0].classList.toggle("off", !isLiked);
-            svgs[1].classList.toggle("off", isLiked);
+        var path = btn.querySelector("svg path");
+        if (path) {
+            path.setAttribute("d", isLiked ? path.getAttribute("data-path-inactive") : path.getAttribute("data-path-active"));
         }
         var countEl = btn.querySelector(".Post-Action-Count");
         if (countEl) {
@@ -166,17 +165,16 @@ if (trendReportMenu) {
     function handleBookmark(btn) {
         var isBookmarked = btn.classList.contains("bookmarked");
         btn.classList.toggle("bookmarked", !isBookmarked);
-        var svgs = btn.querySelectorAll("svg");
-        if (svgs.length >= 2) {
-            svgs[0].classList.toggle("off", !isBookmarked);
-            svgs[1].classList.toggle("off", isBookmarked);
+        var path = btn.querySelector("svg path");
+        if (path) {
+            path.setAttribute("d", isBookmarked ? path.getAttribute("data-path-inactive") : path.getAttribute("data-path-active"));
         }
     }
 
     // 이미지 프리뷰
     var previewOverlay = document.getElementById("postMediaPreviewOverlay");
-    var previewImg     = document.getElementById("postMediaPreviewImage");
-    var previewClose   = document.getElementById("postMediaPreviewClose");
+    var previewImg = document.getElementById("postMediaPreviewImage");
+    var previewClose = document.getElementById("postMediaPreviewClose");
 
     function openPreview(src, alt) {
         if (!previewOverlay || !src) return;
@@ -185,6 +183,7 @@ if (trendReportMenu) {
         previewOverlay.classList.remove("off");
         document.body.style.overflow = "hidden";
     }
+    
     function closePreview() {
         if (!previewOverlay) return;
         previewOverlay.classList.add("off");
@@ -255,7 +254,7 @@ window.addEventListener("load", function () {
 
         // 케이스 3: 입력 있음
         function showResults(val) {
-            if (searchResultLabel) searchResultLabel.textContent = val + " 검색";
+            if (searchResultLabel) searchResultLabel.textContent = val;
             if (searchPanelEmpty) searchPanelEmpty.hidden = true;
             if (searchRecentSec)  searchRecentSec.hidden  = true;
             if (searchResultsEl)  searchResultsEl.hidden  = false;

@@ -127,35 +127,35 @@
             </div>
             <div class="div-tbody" id="memberTbody">
               <div class="div-tr">
-                <div class="div-td">1</div><div class="div-td">이정식</div><div class="div-td" style="color:#1d9bf0">sokkomann@gmail.com</div>
+                <div class="div-td">1</div><div class="div-td">이정식</div><div class="div-td td-email">sokkomann@gmail.com</div>
                 <div class="div-td">GG무역</div>
                 <div class="div-td"><span class="badge badge-free">free</span></div>
                 <div class="div-td"><span class="badge badge-active">활동중</span></div>
                 <div class="div-td">2025-01-15</div>
               </div>
               <div class="div-tr">
-                <div class="div-td">2</div><div class="div-td">박하민</div><div class="div-td" style="color:#1d9bf0">sokkomann@gmail.com</div>
+                <div class="div-td">2</div><div class="div-td">박하민</div><div class="div-td td-email">sokkomann@gmail.com</div>
                 <div class="div-td">한국무역</div>
                 <div class="div-td"><span class="badge badge-proplus">pro+</span></div>
                 <div class="div-td"><span class="badge badge-active">활동중</span></div>
                 <div class="div-td">2025-02-03</div>
               </div>
               <div class="div-tr">
-                <div class="div-td">3</div><div class="div-td">김민중</div><div class="div-td" style="color:#1d9bf0">sokkomann@gmail.com</div>
+                <div class="div-td">3</div><div class="div-td">김민중</div><div class="div-td td-email">sokkomann@gmail.com</div>
                 <div class="div-td">망고상사</div>
                 <div class="div-td"><span class="badge badge-free">free</span></div>
                 <div class="div-td"><span class="badge badge-active">활동중</span></div>
                 <div class="div-td">2025-02-18</div>
               </div>
               <div class="div-tr">
-                <div class="div-td">4</div><div class="div-td">김윤찬</div><div class="div-td" style="color:#1d9bf0">sokkomann@gmail.com</div>
+                <div class="div-td">4</div><div class="div-td">김윤찬</div><div class="div-td td-email">sokkomann@gmail.com</div>
                 <div class="div-td">글로벌물산</div>
                 <div class="div-td"><span class="badge badge-pro">pro</span></div>
                 <div class="div-td"><span class="badge badge-reject">정지됨</span></div>
                 <div class="div-td">2025-03-01</div>
               </div>
               <div class="div-tr">
-                <div class="div-td">5</div><div class="div-td">홍성호</div><div class="div-td" style="color:#1d9bf0">sokkomann@gmail.com</div>
+                <div class="div-td">5</div><div class="div-td">홍성호</div><div class="div-td td-email">sokkomann@gmail.com</div>
                 <div class="div-td">밥먹고수출</div>
                 <div class="div-td"><span class="badge badge-free">free</span></div>
                 <div class="div-td"><span class="badge badge-reject">정지됨</span></div>
@@ -331,15 +331,15 @@
 
               <div class="form-group">
                 <label class="form-label">뉴스 원문 URL</label>
-                <div style="display:flex; gap:8px">
-                  <input class="form-input" type="url" id="newsUrl" placeholder="요약할 뉴스의 링크를 입력하세요" style="flex:1" />
+                <div class="news-url-row">
+                  <input class="form-input" type="url" id="newsUrl" placeholder="요약할 뉴스의 링크를 입력하세요" />
                   <button class="btn-ai" id="aiBtn">AI 요약 적용</button>
                 </div>
                 <span class="nw-hint">뉴스 URL을 첨부하고 버튼을 눌러보세요</span>
               </div>
 
               <div class="ai-box" id="aiBox">
-                <div class="form-group" style="margin-bottom:0">
+                <div class="form-group">
                   <label class="form-label">AI 요약 결과</label>
                   <div class="ai-summary-text" id="aiSummaryPreview"></div>
                 </div>
@@ -387,13 +387,13 @@
             <div class="nw-module-header">
               <div class="nw-module-title">뉴스 등록</div>
             </div>
-            <div class="nw-module-body" style="padding:0">
+            <div class="nw-module-body">
               <div class="preview-card">
                 <div class="pt-title" id="previewTitle">제목이 여기에 표시됩니다</div>
                 <div class="pt-updated">Last updated YYYY-MM-DD</div>
                 <div class="pt-summary" id="previewContent">내용이 여기에 표시됩니다. AI 요약 또는 직접 입력하면 이곳에 미리보기가 나타납니다.</div>
                 <div class="pt-disclaimer" id="previewSource">출처</div>
-                <span id="previewCategory" style="display:none">무역동향</span>
+                <span id="previewCategory">무역동향</span>
               </div>
             </div>
           </div>
@@ -597,7 +597,7 @@
         </div>
       </div>
       <div class="stats-two-col">
-        <div class="nw-module" style="margin-bottom:0">
+        <div class="nw-module">
           <div class="nw-module-header">
             <div class="nw-module-title">등급 분포</div>
           </div>
@@ -605,7 +605,7 @@
             <div id="chart-member-type" class="chart-area"></div>
           </div>
         </div>
-        <div class="nw-module" style="margin-bottom:0">
+        <div class="nw-module">
           <div class="nw-module-header">
             <div class="nw-module-title">시간대별 이용</div>
             <div class="stats-filter-bar" id="filterHourly">
@@ -671,7 +671,7 @@
 
     <!-- 통계 신고 (portals[8]) -->
     <div class="page" id="page-stats-report">
-      <div class="stats-data-grid" style="grid-template-columns: repeat(3, 1fr)">
+      <div class="stats-data-grid">
         <div class="stats-data-card">
           <div class="stats-data-label">총 신고</div>
           <div class="stats-data-value">153</div>
@@ -719,7 +719,7 @@
         </div>
       </div>
       <div class="stats-two-col">
-        <div class="nw-module" style="margin-bottom:0">
+        <div class="nw-module">
           <div class="nw-module-header">
             <div class="nw-module-title">회원 신고 유형</div>
           </div>
@@ -727,7 +727,7 @@
             <div id="chart-report-member-type" class="chart-area"></div>
           </div>
         </div>
-        <div class="nw-module" style="margin-bottom:0">
+        <div class="nw-module">
           <div class="nw-module-header">
             <div class="nw-module-title">글 신고 유형</div>
           </div>
@@ -746,7 +746,7 @@
 
 <!-- 회원 상세 모달 -->
 <div class="modal-overlay off" id="modalMemberDetail">
-  <div class="modal" style="width:900px">
+  <div class="modal">
     <div class="modal-header">
       <h3>회원 상세보기</h3>
       <button class="modal-close" id="modalMemberClose">✕</button>
@@ -802,7 +802,7 @@
 
 <!-- 게시물 수정 모달 -->
 <div class="modal-overlay off" id="modalPostEdit">
-  <div class="modal" style="width:900px">
+  <div class="modal">
     <div class="modal-header">
       <h3>게시물 수정</h3>
       <button class="modal-close" id="modalPostClose">✕</button>
@@ -875,7 +875,7 @@
 
 <!-- 뉴스 수정 모달 -->
 <div class="modal-overlay off" id="modalNewsDetail">
-  <div class="modal" style="width:900px">
+  <div class="modal">
     <div class="modal-header">
       <h3>뉴스 수정</h3>
       <button class="modal-close" id="modalNewsClose">✕</button>
@@ -920,7 +920,7 @@
 
 <!-- 신고 심사 모달 -->
 <div class="modal-overlay off" id="modalReportDetail">
-  <div class="modal" style="width:900px">
+  <div class="modal">
     <div class="modal-header">
       <h3 id="modalReportTitle">신고 심사</h3>
       <button class="modal-close" id="modalReportClose">✕</button>
@@ -965,18 +965,16 @@
   </div>
 </div>
 
-
-<!-- 광고 상세 모달 -->
 <!-- 뉴스 자동등록 설정 모달 -->
 <div class="modal-overlay off" id="modalNewsAutoSettings">
-  <div class="modal" style="width:580px">
+  <div class="modal">
     <div class="modal-header">
       <h3>뉴스 자동등록 설정</h3>
       <button class="modal-close" id="modalNewsSettingsClose">✕</button>
     </div>
     <div class="modal-body">
       <div class="module-card">
-        <div class="modal-section-title" style="width:100%; text-align:center">Auto Registration</div>
+        <div class="modal-section-title">뉴스 자동등록</div>
         <div class="modal-field-row">
           <div class="modal-field-label">자동등록</div>
           <div class="modal-field-value">

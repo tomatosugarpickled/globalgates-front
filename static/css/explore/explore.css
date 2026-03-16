@@ -315,16 +315,14 @@
     width: 284px;
     background-color: #fff;
     border-radius: 12px;
-    box-shadow:
-        rgba(101, 119, 134, 0.2) 0px 0px 15px 0px,
-        rgba(101, 119, 134, 0.15) 0px 0px 3px 1px;
+    box-shadow: rgba(101, 119, 134, 0.2) 0px 0px 15px 0px, rgba(101, 119, 134, 0.15) 0px 0px 3px 1px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     z-index: 500;
 }
 
-.menu-item {
+.more-menu {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -335,11 +333,11 @@
     color: #0f1419;
 }
 
-.menu-item:hover {
+.more-menu:hover {
     background-color: rgba(0, 0, 0, 0.03);
 }
 
-.menu-item-icon {
+.more-menu-icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -349,13 +347,13 @@
     color: #0f1419;
 }
 
-.menu-item-icon svg {
+.more-menu-icon svg {
     width: 20px;
     height: 20px;
     fill: currentColor;
 }
 
-.menu-item-text {
+.more-menu-text {
     font-size: 15px;
     font-weight: 400;
     line-height: 20px;

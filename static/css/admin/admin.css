@@ -811,11 +811,19 @@
       background: #fff;
       border: 1px solid rgb(229, 234, 236);
       border-radius: 16px;
-      width: 1400px;
+      width: 900px;
       max-width: calc(100vw - 279px - 48px);
       max-height: calc(100vh - 80px);
       overflow-y: auto;
       box-shadow: rgba(0,0,0,0.05) 0px 1px 2px 0px;
+    }
+    
+    #modalNewsAutoSettings .modal {
+        width: 580px;
+    }
+
+    #modalNewsAutoSettings.modal-overlay {
+        padding-left: 0px;
     }
 
     .modal-header {
@@ -1126,3 +1134,22 @@
         background: #000;
         cursor: default;
     }
+
+    /* 인라인 스타일 이관 */
+    .td-email { color: #1d9bf0; }
+
+    .news-url-row { display: flex; gap: 8px; }
+
+    #newsUrl { flex: 1; }
+
+    #aiBox .form-group { margin-bottom: 0; }
+
+    .news-write-preview .nw-module-body { padding: 0; }
+
+    #previewCategory { display: none; }
+
+    .stats-two-col .nw-module { margin-bottom: 0; }
+
+    #page-stats-report .stats-data-grid { grid-template-columns: repeat(3, 1fr); }
+
+    #modalNewsAutoSettings .modal-section-title { width: 100%; text-align: center; }

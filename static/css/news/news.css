@@ -121,27 +121,27 @@ img { max-width: 100%;
 .tweet-action svg { width: 17.5px; height: 17.5px; color: rgb(83, 100, 113); fill: currentColor; transition: color 0.2s ease; }
 .tweet-action-count { font-size: 13px; color: rgb(83, 100, 113); transition: color 0.2s ease; }
 
-.tweet-action--reply:hover .tweet-action-icon { background-color: rgba(29, 155, 240, 0.1); }
-.tweet-action--reply:hover svg, .tweet-action--reply:hover .tweet-action-count { color: rgb(29, 155, 240); }
-.tweet-action--repost:hover .tweet-action-icon { background-color: rgba(0, 186, 124, 0.1); }
-.tweet-action--repost:hover svg, .tweet-action--repost:hover .tweet-action-count { color: rgb(0, 186, 124); }
-.tweet-action--repost.active svg, .tweet-action--repost.active .tweet-action-count { color: rgb(0, 186, 124); }
-.tweet-action--like:hover .tweet-action-icon { background-color: rgba(249, 24, 128, 0.1); }
-.tweet-action--like:hover svg, .tweet-action--like:hover .tweet-action-count { color: rgb(249, 24, 128); }
-.tweet-action--like.active svg, .tweet-action--like.active .tweet-action-count { color: rgb(249, 24, 128); }
-.tweet-action--views:hover .tweet-action-icon { background-color: rgba(29, 155, 240, 0.1); }
-.tweet-action--views:hover svg, .tweet-action--views:hover .tweet-action-count { color: rgb(29, 155, 240); }
-.tweet-action--bookmark:hover .tweet-action-icon { background-color: rgba(29, 155, 240, 0.1); }
-.tweet-action--bookmark:hover svg { color: rgb(29, 155, 240); }
-.tweet-action--bookmark.active svg { color: rgb(29, 155, 240); }
-.tweet-action--share:hover .tweet-action-icon { background-color: rgba(29, 155, 240, 0.1); }
-.tweet-action--share:hover svg { color: rgb(29, 155, 240); }
+.tweet-action-reply:hover .tweet-action-icon { background-color: rgba(29, 155, 240, 0.1); }
+.tweet-action-reply:hover svg, .tweet-action-reply:hover .tweet-action-count { color: rgb(29, 155, 240); }
+.tweet-action-repost:hover .tweet-action-icon { background-color: rgba(0, 186, 124, 0.1); }
+.tweet-action-repost:hover svg, .tweet-action-repost:hover .tweet-action-count { color: rgb(0, 186, 124); }
+.tweet-action-repost.active svg, .tweet-action-repost.active .tweet-action-count { color: rgb(0, 186, 124); }
+.tweet-action-like:hover .tweet-action-icon { background-color: rgba(249, 24, 128, 0.1); }
+.tweet-action-like:hover svg, .tweet-action-like:hover .tweet-action-count { color: rgb(249, 24, 128); }
+.tweet-action-like.active svg, .tweet-action-like.active .tweet-action-count { color: rgb(249, 24, 128); }
+.tweet-action-views:hover .tweet-action-icon { background-color: rgba(29, 155, 240, 0.1); }
+.tweet-action-views:hover svg, .tweet-action-views:hover .tweet-action-count { color: rgb(29, 155, 240); }
+.tweet-action-bookmark:hover .tweet-action-icon { background-color: rgba(29, 155, 240, 0.1); }
+.tweet-action-bookmark:hover svg { color: rgb(29, 155, 240); }
+.tweet-action-bookmark.active svg { color: rgb(29, 155, 240); }
+.tweet-action-share:hover .tweet-action-icon { background-color: rgba(29, 155, 240, 0.1); }
+.tweet-action-share:hover svg { color: rgb(29, 155, 240); }
 
 .relevant-people { padding: 12px 16px; border-bottom: 1px solid rgb(239, 243, 244); }
 .relevant-people h2 { font-size: 20px; font-weight: 800; margin-bottom: 12px; }
 .user-card { display: flex; align-items: flex-start; padding: 12px 0; cursor: pointer; }
 .user-card-avatar { width: 40px; height: 40px; border-radius: 9999px; overflow: hidden; margin-right: 12px; flex-shrink: 0; }
-.user-card-avatar--square { border-radius: 4px; }
+.user-card-avatar-square { border-radius: 4px; }
 .user-card-info { flex: 1; min-width: 0; }
 .user-card-header { display: flex; align-items: center; justify-content: space-between; }
 .user-card-name { font-size: 15px; font-weight: 700; }
@@ -417,8 +417,8 @@ img { max-width: 100%;
   line-height: 20px;
 }
 
-.post-detail-actions--reply,
-.post-detail-actions--reply.tweet-action-bar {
+.post-detail-actions-reply,
+.post-detail-actions-reply.tweet-action-bar {
   padding: 0;
   border-top: 0;
   justify-content: flex-start;
@@ -426,8 +426,8 @@ img { max-width: 100%;
   gap: 0;
 }
 
-.post-detail-actions--reply .post-detail-action-row,
-.post-detail-actions--reply.tweet-action-bar .post-detail-action-row {
+.post-detail-actions-reply .post-detail-action-row,
+.post-detail-actions-reply.tweet-action-bar .post-detail-action-row {
   justify-content: flex-start;
   margin: 0;
   gap: 0;
