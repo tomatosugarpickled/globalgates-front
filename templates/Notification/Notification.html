@@ -81,7 +81,7 @@
                         <div class="notif-list" aria-label="타임라인: 알림">
 
                             <!-- 알림 3: 팔로우 - 밤하늘의 별들 -->
-                            <article class="notif-item" role="article" tabindex="0" data-testid="notification">
+                            <article class="notif-item" role="article" tabindex="0" data-testid="notification" data-notif-type="follow">
                                 <div class="notif-item__inner">
                                     <div class="notif-item__icon-col">
                                         <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--follow">
@@ -109,7 +109,7 @@
                             </article>
 
                             <!-- 알림 4: 새 게시물 알림 - Andrej Karpathy -->
-                            <article class="notif-item" role="article" tabindex="0" data-testid="notification">
+                            <article class="notif-item" role="article" tabindex="0" data-testid="notification" data-notif-type="post">
                                 <div class="notif-item__inner">
                                     <div class="notif-item__icon-col">
                                         <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--bell">
@@ -137,7 +137,7 @@
                             </article>
 
                             <!-- 알림 5: 팔로우 - Mia 외 19명 (다수 아바타) -->
-                            <article class="notif-item" role="article" tabindex="0" data-testid="notification">
+                            <article class="notif-item" role="article" tabindex="0" data-testid="notification" data-notif-type="follow">
                                 <div class="notif-item__inner">
                                     <div class="notif-item__icon-col">
                                         <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--follow">
@@ -175,7 +175,7 @@
                             </article>
 
                             <!-- 알림 14: 파란색 체크마크 획득 -->
-                            <article class="notif-item" role="article" tabindex="0" data-testid="notification">
+                            <article class="notif-item" role="article" tabindex="0" data-testid="notification" data-notif-type="system">
                                 <div class="notif-item__inner">
                                     <div class="notif-item__icon-col">
                                         <svg viewBox="0 0 22 22" aria-hidden="true" class="notif-icon notif-icon--verified-badge">
@@ -202,8 +202,8 @@
                                 </div>
                             </article>
 
-                            <!-- 알림 15: 댓글 알림 - 김민중 (@sokkomann) -->
-                            <article class="notif-tweet-item" role="article" tabindex="0" data-testid="tweet">
+                            <!-- 알림 15: 댓글(멘션) 알림 - 김민중 (@sokkomann) -->
+                            <article class="notif-tweet-item" role="article" tabindex="0" data-testid="tweet" data-notif-type="mention">
                                 <div class="notif-item__inner">
                                     <div class="tweet-body">
                                         <!-- 헤더: 아바타 + 메타정보 + 더보기 버튼 -->
@@ -287,7 +287,7 @@
                             </article>
 
                             <!-- 알림 16: 보안 - 전화번호 추가 -->
-                            <article class="notif-item notif-item--system" role="article" tabindex="0" data-testid="notification">
+                            <article class="notif-item notif-item--system" role="article" tabindex="0" data-testid="notification" data-notif-type="system">
                                 <div class="notif-item__inner">
                                     <div class="notif-item__icon-col">
                                         <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--lock">
@@ -307,7 +307,7 @@
                             </article>                        
 
                             <!-- 알림 20: 녹음 준비 알림 -->
-                            <article class="notif-item" role="article" tabindex="0" data-testid="notification">
+                            <article class="notif-item" role="article" tabindex="0" data-testid="notification" data-notif-type="system">
                                 <div class="notif-item__inner">
                                     <div class="notif-item__icon-col">
                                         <svg viewBox="0 0 24 24" aria-hidden="true" class="notif-icon notif-icon--audio">
@@ -422,10 +422,7 @@
             <div class="tweet-modal" role="dialog" aria-modal="true" aria-labelledby="reply-modal-title">
                 <!-- 작성 화면: 답글 입력창, 첨부 미리보기, 하단 툴바가 들어가는 기본 화면 -->
                 <div class="tweet-modal__compose-view">
-                <!-- 작성 진행률: event.js가 입력 길이에 따라 progressBar width를 갱신한다 -->
-                <div class="tweet-modal__progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                    <div class="tweet-modal__progress-bar" data-testid="progressBar-bar" style="width: 0%;"></div>
-                </div>
+                <!-- 작성 진행률: 원형 게이지는 footer-bottom의 composerActions에 배치 -->
 
                 <!-- 답글 모달 헤더: 닫기와 임시저장 진입 버튼 -->
                 <div class="tweet-modal__header">
@@ -545,9 +542,10 @@
                                     class="tweet-modal__file-input"
                                 />
                             </div>
-                            <button type="button" class="tweet-modal__tool-btn" aria-label="GIF 추가" data-testid="gifSearchButton">
+                            <button type="button" class="tweet-modal__tool-btn" aria-label="판매글 선택" data-testid="productSelectButton">
                                 <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                                    <g><path d="M3 5.5C3 4.119 4.119 3 5.5 3h13C19.881 3 21 4.119 21 5.5v13c0 1.381-1.119 2.5-2.5 2.5h-13C4.119 21 3 19.881 3 18.5v-13zm2.5-.5c-.276 0-.5.224-.5.5v13c0 .276.224.5.5.5h13c.276 0 .5-.224.5-.5v-13c0-.276-.224-.5-.5-.5h-13zm2.5 8h1v-2h2V9.5h-2v-1H8v5h1v-2zm5.5 2v-5h-1.5v5H13zm3-3v1h-2.5v2h3.5v1H13v-5h3.5v1H14z"></path></g>
+                                    <g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5S3.5 15.135 3.5 11z"></path></g>
+                                    <g><path d="M7 9h10v1.5H7zm0 3h7v1.5H7z"></path></g>
                                 </svg>
                             </button>
                             <button
@@ -618,7 +616,20 @@
 
                             <div class="tweet-modal__emoji-content" data-testid="emojiPickerContent"></div>
                         </div>
-                        <button type="button" class="tweet-modal__submit" data-testid="tweetButton" disabled>답글</button>
+                        <div class="composerActions">
+                            <div
+                                class="composerGauge"
+                                id="replyGauge"
+                                role="progressbar"
+                                aria-label="글자 수 진행률"
+                                aria-valuemin="0"
+                                aria-valuemax="500"
+                                aria-valuenow="0"
+                            >
+                                <span class="composerGaugeText" id="replyGaugeText">500</span>
+                            </div>
+                            <button type="button" class="tweet-modal__submit" data-testid="tweetButton" disabled>답글</button>
+                        </div>
                     </div>
                 </div>
                 </div><!-- /.tweet-modal__compose-view -->
@@ -850,6 +861,26 @@
                         </div>
                     </div>
                 </div><!-- /.tweet-modal__draft-view -->
+
+                <!-- 판매글 선택 서브뷰: compose view를 숨기고 이 블록을 대신 표시한다 -->
+                <div class="tweet-modal__product-view" data-product-select-modal hidden>
+                    <div class="draft-panel__header">
+                        <button type="button" class="draft-panel__back" data-product-select-close aria-label="돌아가기">
+                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g><path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"></path></g></svg>
+                        </button>
+                        <h2 class="draft-panel__title">판매글 선택하기</h2>
+                        <button type="button" class="draft-panel__action" data-product-select-complete disabled>완료</button>
+                    </div>
+                    <div class="draft-panel__content">
+                        <div class="draft-panel__list" data-product-select-list>
+                            <!-- JS에서 동적으로 상품 목록 렌더링 -->
+                        </div>
+                        <div class="draft-panel__empty" data-product-empty hidden>
+                            <p class="draft-panel__empty-title">등록된 상품이 없습니다</p>
+                            <p class="draft-panel__empty-body">마이페이지에서 상품을 먼저 등록해 주세요.</p>
+                        </div>
+                    </div>
+                </div>
             </div><!-- /.tweet-modal -->
         </div><!-- /.tweet-modal-overlay -->
         <script src="/static/js/Notification/event.js"></script>

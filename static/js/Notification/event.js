@@ -24,10 +24,22 @@ window.onload = function () {
     const replyEditor = q(".tweet-modal__editor");
     // 답글 제출(게시) 버튼
     const replySubmitButton = q(".tweet-modal__submit");
-    // 답글 글자수 진행률 표시 컨테이너
-    const replyProgress = q(".tweet-modal__progress");
-    // 답글 글자수 진행률 바
-    const replyProgressBar = q(".tweet-modal__progress-bar");
+    // 답글 글자수 원형 게이지
+    const replyGauge = q("#replyGauge");
+    // 답글 글자수 남은 수 텍스트
+    const replyGaugeText = q("#replyGaugeText");
+    // 판매글 선택 버튼
+    const replyProductButton = q("[data-testid='productSelectButton']");
+    // 판매글 선택 서브뷰
+    const replyProductView = q("[data-product-select-modal]");
+    // 판매글 선택 뒤로가기 버튼
+    const productSelectClose = replyProductView?.querySelector("[data-product-select-close]");
+    // 판매글 선택 목록 컨테이너
+    const productSelectList = replyProductView?.querySelector("[data-product-select-list]");
+    // 판매글 선택 완료 버튼
+    const productSelectComplete = replyProductView?.querySelector("[data-product-select-complete]");
+    // 판매글 빈 상태
+    const productSelectEmpty = replyProductView?.querySelector("[data-product-empty]");
     // 답글 대상 게시물의 컨텍스트 버튼
     const replyContextButton = q(".tweet-modal__context-button");
     // 답글 하단 메타 정보 영역 (위치 등)
@@ -166,9 +178,12 @@ window.onload = function () {
     let isInsertingReplyEmoji = false;
     // 사용자별 팔로우 상태를 저장하는 Map
     const notificationFollowState = new Map();
-    // 최대 첨부 이미지 수, 미디어 ALT 텍스트 최대 길이
+    // 최대 첨부 이미지 수, 미디어 ALT 텍스트 최대 길이, 답글 최대 글자수
     const maxReplyImages = 4,
-        maxReplyMediaAltLength = 1000;
+        maxReplyMediaAltLength = 1000,
+        replyMaxLength = 500;
+    // 선택된 판매글 정보
+    let selectedProduct = null;
 
     // ===== 3. Config =====
     // 최근 사용 이모지 로컬스토리지 키
@@ -1516,7 +1531,6 @@ window.onload = function () {
             sel?.removeAllRanges();
             sel?.addRange(range);
         }
-aster
 
         const sel = window.getSelection();
         if (!sel) { isInsertingReplyEmoji = false; return; }
@@ -1576,21 +1590,30 @@ aster
         });
     }
 
-    // 답글 제출 버튼과 진행률 바를 현재 입력 상태에 맞게 동기화한다
+    // 500자 기준 원형 게이지와 남은 글자 수를 동시에 갱신한다
     function syncReplySubmitState() {
-        if (
-            !replyEditor ||
-            !replySubmitButton ||
-            !replyProgressBar ||
-            !replyProgress
-        )
-            return;
-        const text = replyEditor.textContent.replace(/\u00a0/g, " ").trim();
-        const canSubmit = text.length > 0 || hasReplyAttachment();
-        const pv = Math.min((text.length / 280) * 100, 100);
-        replySubmitButton.disabled = !canSubmit;
-        replyProgressBar.style.width = `${pv}%`;
-        replyProgress.setAttribute("aria-valuenow", String(Math.round(pv)));
+        if (!replyEditor) return;
+        let content = replyEditor.textContent?.replace(/\u00a0/g, " ") ?? "";
+        if (content.length > replyMaxLength) {
+            content = content.slice(0, replyMaxLength);
+            replyEditor.textContent = content;
+            placeCaretAtEnd(replyEditor);
+            saveReplySelection();
+        }
+        const currentLength = content.length;
+        const remaining = Math.max(replyMaxLength - currentLength, 0);
+        const canSubmit = content.trim().length > 0 || hasReplyAttachment();
+        const progress = `${Math.min(currentLength / replyMaxLength, 1) * 360}deg`;
+        if (replySubmitButton) {
+            replySubmitButton.disabled = !canSubmit;
+        }
+        if (replyGauge) {
+            replyGauge.style.setProperty("--gauge-progress", progress);
+            replyGauge.setAttribute("aria-valuenow", String(currentLength));
+        }
+        if (replyGaugeText) {
+            replyGaugeText.textContent = String(remaining);
+        }
     }
 
     // 답글 대상 게시물의 컨텍스트 텍스트를 반환한다
@@ -1647,6 +1670,10 @@ aster
         pendingLocation = null;
         selectedTaggedUsers = [];
         pendingTaggedUsers = [];
+        selectedProduct = null;
+        if (replyProductButton) replyProductButton.disabled = false;
+        const existingProductCard = replyModalOverlay?.querySelector("[data-selected-product]");
+        if (existingProductCard) existingProductCard.remove();
         resetReplyAttachment();
         if (replyEmojiSearchInput) replyEmojiSearchInput.value = "";
         if (replyLocationSearchInput) replyLocationSearchInput.value = "";
@@ -1654,6 +1681,7 @@ aster
         if (replyLocationView) replyLocationView.hidden = true;
         if (replyTagView) replyTagView.hidden = true;
         if (replyMediaView) replyMediaView.hidden = true;
+        if (replyProductView) replyProductView.hidden = true;
         closeDraftPanel({ restoreFocus: false });
         renderDraftPanel();
         renderLocationList();
@@ -1695,11 +1723,16 @@ aster
         closeTagPanel({ restoreFocus: false });
         closeMediaEditor({ restoreFocus: false, discardChanges: true });
         closeDraftPanel({ restoreFocus: false });
+        if (replyProductView) replyProductView.hidden = true;
         if (replyEditor) replyEditor.textContent = "";
 
         savedReplySelection = null; savedReplySelectionOffsets = null; pendingReplyFormats = new Set();
         selectedLocation = null; pendingLocation = null;
         selectedTaggedUsers = []; pendingTaggedUsers = [];
+        selectedProduct = null;
+        if (replyProductButton) replyProductButton.disabled = false;
+        const existingProductCard = replyModalOverlay?.querySelector("[data-selected-product]");
+        if (existingProductCard) existingProductCard.remove();
         resetReplyAttachment(); renderLocationList(); syncLocationUI();
         syncUserTagTrigger(); syncReplyMediaEditsToAttachments();
         syncReplySubmitState(); syncReplyFormatButtons();
@@ -2437,16 +2470,32 @@ aster
         { passive: true },
     );
 
-    // 알림 탭 클릭 시 해당 탭을 활성화한다
+    // 알림 탭 클릭 시 해당 탭을 활성화하고 알림 목록을 필터링한다
+    // data-notif-tab="all" → 모든 알림 표시
+    // data-notif-tab="mentions" → data-notif-type="mention" 인 알림만 표시
     notifTabs.forEach((tab) => {
         tab.addEventListener("click", (e) => {
             e.preventDefault();
+            // 모든 탭의 활성 상태를 해제하고 클릭된 탭만 활성화
             notifTabs.forEach((t) => {
                 t.classList.remove("notif-tab--active");
                 t.setAttribute("aria-selected", "false");
             });
             tab.classList.add("notif-tab--active");
             tab.setAttribute("aria-selected", "true");
+
+            // 선택된 탭 이름에 따라 알림 목록 필터링
+            const filter = tab.dataset.notifTab; // "all" 또는 "mentions"
+            const notifItems = document.querySelectorAll(".notif-list > [data-notif-type]");
+            notifItems.forEach((item) => {
+                if (filter === "all") {
+                    // 전체 탭: 모든 알림 표시
+                    item.style.display = "";
+                } else if (filter === "mentions") {
+                    // 멘션 탭: data-notif-type="mention" 인 항목만 표시
+                    item.style.display = item.dataset.notifType === "mention" ? "" : "none";
+                }
+            });
         });
     });
 
@@ -2541,6 +2590,10 @@ aster
             }
             if (isLocationModalOpen()) {
                 closeLocationPanel();
+                return;
+            }
+            if (replyProductView && !replyProductView.hidden) {
+                closeProductSelectPanel();
                 return;
             }
             if (isDraftConfirmOpen()) {
@@ -2917,4 +2970,146 @@ aster
         }
         loadDraftIntoComposer(item);
     });
+
+    // ===== 판매글 선택 서브뷰 =====
+    // 판매글 선택 버튼 클릭 시 서브뷰를 연다
+    replyProductButton?.addEventListener("click", (e) => {
+        e.preventDefault();
+        openProductSelectPanel();
+    });
+
+    // 판매글 선택 뒤로가기
+    productSelectClose?.addEventListener("click", () => {
+        closeProductSelectPanel();
+    });
+
+    // 판매글 선택 완료 버튼
+    productSelectComplete?.addEventListener("click", () => {
+        const checkedItem = productSelectList?.querySelector(".draft-panel__item--selected");
+        if (checkedItem) {
+            selectedProduct = {
+                name: checkedItem.querySelector(".draft-panel__text")?.textContent ?? "",
+                price: checkedItem.querySelector(".draft-panel__date")?.textContent ?? "",
+                image: checkedItem.querySelector(".draft-panel__avatar")?.src ?? "",
+                id: checkedItem.dataset.productId ?? "",
+            };
+            renderSelectedProduct();
+            if (replyProductButton) replyProductButton.disabled = true;
+        }
+        closeProductSelectPanel();
+    });
+
+    // 판매글 선택 서브뷰 열기 (compose view를 숨기고 product view를 표시)
+    function openProductSelectPanel() {
+        if (!replyProductView) return;
+        renderProductList();
+        if (composeView) composeView.hidden = true;
+        replyProductView.hidden = false;
+    }
+
+    // 판매글 선택 서브뷰 닫기 (product view를 숨기고 compose view를 복원)
+    function closeProductSelectPanel() {
+        if (!replyProductView) return;
+        replyProductView.hidden = true;
+        if (composeView) composeView.hidden = false;
+    }
+
+    // 내 상품 목록 렌더링 (임시저장 수정 모드와 동일한 draft-panel 스타일)
+    function renderProductList() {
+        if (!productSelectList) return;
+        // TODO: REST API - GET /api/products/my 로 실제 데이터 가져오기
+        // 현재는 하드코딩된 샘플 데이터 사용
+        const sampleProducts = [
+            { id: "1", name: "상품 이름 1", price: "₩50,000", stock: "100개", image: "../../static/images/main/global-gates-logo.png", tags: ["#부품", "#전자"] },
+            { id: "2", name: "상품 이름 2", price: "₩30,000", stock: "50개", image: "../../static/images/main/global-gates-logo.png", tags: ["#부품", "#기계"] },
+            { id: "3", name: "상품 이름 3", price: "₩80,000", stock: "200개", image: "../../static/images/main/global-gates-logo.png", tags: ["#부품", "#소재"] },
+        ];
+
+        if (sampleProducts.length === 0) {
+            productSelectList.innerHTML = "";
+            if (productSelectEmpty) productSelectEmpty.hidden = false;
+            return;
+        }
+        if (productSelectEmpty) productSelectEmpty.hidden = true;
+
+        productSelectList.innerHTML = sampleProducts.map((p) => `
+            <button type="button" class="draft-panel__item draft-panel__item--selectable" data-product-id="${p.id}" aria-pressed="false">
+                <span class="draft-panel__checkbox">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9 20c-.264 0-.518-.104-.707-.293l-4.785-4.785 1.414-1.414L9 17.586 19.072 7.5l1.42 1.416L9.708 19.7c-.188.19-.442.3-.708.3z"></path></g></svg>
+                </span>
+                <img class="draft-panel__avatar" alt="" src="${p.image}">
+                <span class="draft-panel__item-body">
+                    <span class="draft-panel__text">${p.name}</span>
+                    <span class="draft-panel__meta">${p.tags.join(" ")}</span>
+                    <span class="draft-panel__date">${p.price} · ${p.stock}</span>
+                </span>
+            </button>
+        `).join("");
+    }
+
+    // 상품 클릭 시 선택 토글 (단일 선택) — 한 번만 등록
+    productSelectList?.addEventListener("click", (e) => {
+        const item = e.target.closest(".draft-panel__item");
+        if (!item) return;
+        const wasSelected = item.classList.contains("draft-panel__item--selected");
+        // 다른 선택 해제
+        productSelectList.querySelectorAll(".draft-panel__item--selected").forEach((el) => {
+            el.classList.remove("draft-panel__item--selected");
+            el.setAttribute("aria-pressed", "false");
+            const cb = el.querySelector(".draft-panel__checkbox");
+            if (cb) cb.classList.remove("draft-panel__checkbox--checked");
+        });
+        if (!wasSelected) {
+            item.classList.add("draft-panel__item--selected");
+            item.setAttribute("aria-pressed", "true");
+            const cb = item.querySelector(".draft-panel__checkbox");
+            if (cb) cb.classList.add("draft-panel__checkbox--checked");
+        }
+        if (productSelectComplete) {
+            productSelectComplete.disabled = !productSelectList.querySelector(".draft-panel__item--selected");
+        }
+    });
+
+    // 선택된 판매글을 에디터 아래에 표시
+    function renderSelectedProduct() {
+        const existing = replyModalOverlay?.querySelector("[data-selected-product]");
+        if (existing) existing.remove();
+        if (!selectedProduct || !replyEditor) return;
+
+        const card = document.createElement("div");
+        card.setAttribute("data-selected-product", "");
+        card.className = "tweet-modal__selected-product";
+        card.innerHTML = `
+            <div class="selected-product__card">
+                <img class="selected-product__image" src="${selectedProduct.image}" alt="${selectedProduct.name}">
+                <div class="selected-product__info">
+                    <strong class="selected-product__name">${selectedProduct.name}</strong>
+                    <span class="selected-product__price">${selectedProduct.price}</span>
+                </div>
+                <button type="button" class="selected-product__remove" aria-label="판매글 제거">
+                    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                        <g><path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path></g>
+                    </svg>
+                </button>
+            </div>
+        `;
+        card.querySelector(".selected-product__remove")?.addEventListener("click", () => {
+            selectedProduct = null;
+            card.remove();
+            if (replyProductButton) replyProductButton.disabled = false;
+        });
+        replyEditor.parentElement?.appendChild(card);
+    }
+
 };
+
+// contenteditable에 공통으로 쓰는 커서 이동 유틸이다.
+function placeCaretAtEnd(element) {
+    const selection = window.getSelection();
+    if (!selection) return;
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
