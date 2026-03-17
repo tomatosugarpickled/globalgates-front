@@ -32,6 +32,8 @@ window.addEventListener("load", () => {
     const detailPanels = qAll("[data-estimation-detail-panel]");
     // 상세 모달 닫기 역할을 하는 요소들을 모은다.
     const detailCloseButtons = qAll("[data-estimation-detail-close]");
+    // 승인/거절 버튼들을 모은다.
+    const decisionButtons = qAll("[data-estimation-decision]");
     // 탭 프리뷰 애니메이션 지속 시간이다.
     const PREVIEW_DURATION_MS = 280;
     // 기간칩별 일 수 매핑이다.
@@ -189,6 +191,22 @@ window.addEventListener("load", () => {
         activeDetailTrigger = null;
     };
 
+    // 같은 견적 요청의 승인/거절 버튼 상태를 동기화한다.
+    const syncDecisionButtons = (decisionId, selectedDecision) => {
+        // 같은 요청을 가리키는 버튼만 순회한다.
+        decisionButtons
+            .filter((button) => button.dataset.estimationDecisionId === decisionId)
+            .forEach((button) => {
+                // 현재 버튼이 선택된 종류인지 계산한다.
+                const isActive =
+                    button.dataset.estimationDecision === selectedDecision;
+                // 활성 클래스를 상태에 맞게 반영한다.
+                button.classList.toggle("is-active", isActive);
+                // 접근성 상태도 같이 갱신한다.
+                button.setAttribute("aria-pressed", String(isActive));
+            });
+    };
+
     // 요청 상세 모달을 연다.
     const openDetailModal = (target, trigger) => {
         // 상세 대상이 없거나 모달이 없으면 종료한다.
@@ -288,6 +306,20 @@ window.addEventListener("load", () => {
     detailCloseButtons.forEach((button) => {
         // 클릭 시 상세 모달을 닫는다.
         button.addEventListener("click", closeDetailModal);
+    });
+
+    // 승인/거절 버튼들에 클릭 이벤트를 붙인다.
+    decisionButtons.forEach((button) => {
+        // 버튼 클릭 시 동작을 등록한다.
+        button.addEventListener("click", (event) => {
+            // 카드 본문 상세 열기와 충돌하지 않게 전파를 막는다.
+            event.stopPropagation();
+            // 같은 요청의 버튼들을 현재 선택으로 맞춘다.
+            syncDecisionButtons(
+                button.dataset.estimationDecisionId || "",
+                button.dataset.estimationDecision || "",
+            );
+        });
     });
 
     // 문서 전체 클릭을 감시한다.

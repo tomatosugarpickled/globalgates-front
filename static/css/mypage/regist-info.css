@@ -274,7 +274,7 @@ body {
 .Small-Modal {
     display: grid;
     position: fixed;
-    max-width: 600px;
+    max-width: 450px;
     width: 100%;
     left: 50%;
     top: 50%;

@@ -48,8 +48,8 @@ window.onload = () => {
     const searchInput = document.querySelector(".Search-Conversation-Input");
     const searchClearBtn = document.querySelector(".Search-Clear-Btn");
     const searchConvPanel = document.querySelector(".Search-Conversation");
-    const searchConvEmpty = document.querySelector(".Search-Conv-Empty"); // 검색값 없을 때 그리드
-    const searchConvResults = document.querySelector(".Search-Conv-Results"); // 검색값 있을 때 리스트
+    const searchConvEmpty = document.querySelector(".Search-Conv-Empty");
+    const searchConvResults = document.querySelector(".Search-Conv-Results");
     const userListEl = document.querySelector(".UserList-Wrapper");
 
     // 모바일 여부 판단
@@ -57,7 +57,7 @@ window.onload = () => {
         return window.innerWidth <= 600;
     }
 
-    // 채팅방 열기 (모바일이면 유저목록 숨기기)
+    // 채팅방 열기
     function openChatRoom() {
         newChatDiv.classList.add("off");
         chatDiv.classList.remove("off");
@@ -67,7 +67,7 @@ window.onload = () => {
         }
     }
 
-    // 채팅방 닫기 (모바일이면 유저목록 다시 보이기)
+    // 채팅방 닫기
     function closeChatRoom() {
         chatDiv.classList.add("off");
         newChatDiv.classList.remove("off");
@@ -77,40 +77,31 @@ window.onload = () => {
         }
     }
 
-    // 뒤로가기 버튼 이벤트
     backBtn.addEventListener("click", () => {
         closeChatRoom();
     });
 
-    // 화면 크기 변경 시 처리
     window.addEventListener("resize", () => {
         if (!isMobile()) {
-            // 데스크탑으로 전환되면 유저목록 항상 표시
             userListWrapper.classList.remove("off");
         } else {
-            // 모바일로 전환 시 채팅방이 열려있으면 유저목록 숨기기
             if (!chatDiv.classList.contains("off")) {
                 userListWrapper.classList.add("off");
             }
         }
     });
-    // ---------------------------------------------
 
     // 좌측 대화 검색 -----------------------------------
-
-    // 검색 패널 열기
     function openSearchPanel() {
         searchBarPlaceholder.style.display = "none";
         searchBarInput.style.display = "flex";
         userListEl.style.display = "none";
         searchConvPanel.classList.remove("off");
-        // 기본: 그리드(빈 상태) 표시
         searchConvEmpty.style.display = "flex";
         searchConvResults.classList.add("off");
         setTimeout(() => searchInput.focus(), 50);
     }
 
-    // 검색 패널 닫기
     function closeSearchPanel() {
         searchBarPlaceholder.style.display = "";
         searchBarInput.style.display = "none";
@@ -120,23 +111,18 @@ window.onload = () => {
         searchClearBtn.classList.add("off");
     }
 
-    // 플레이스홀더 검색바 클릭 → 패널 열기
     searchBarPlaceholder.addEventListener("click", (e) => {
         e.stopPropagation();
         openSearchPanel();
     });
 
-    // input 값 변화 → 그리드/리스트 전환
     searchInput.addEventListener("input", () => {
         const hasValue = searchInput.value.trim().length > 0;
-        // 지우기 버튼 토글
         searchClearBtn.classList.toggle("off", !hasValue);
-        // 그리드 ↔ 리스트 전환
         searchConvEmpty.style.display = hasValue ? "none" : "flex";
         searchConvResults.classList.toggle("off", !hasValue);
     });
 
-    // 지우기 버튼 → input 초기화 후 그리드로 복귀
     searchClearBtn.addEventListener("click", () => {
         searchInput.value = "";
         searchClearBtn.classList.add("off");
@@ -145,12 +131,10 @@ window.onload = () => {
         searchInput.focus();
     });
 
-    // ESC 누르면 검색 패널 닫기
     searchInput.addEventListener("keydown", (e) => {
         if (e.key === "Escape") closeSearchPanel();
     });
 
-    // 검색 패널 바깥 클릭 시 닫기
     document.addEventListener("click", (e) => {
         if (
             !searchConvPanel.classList.contains("off") &&
@@ -161,35 +145,56 @@ window.onload = () => {
             closeSearchPanel();
         }
     });
-    // ---------------------------------------------
-    // 채팅 입력란 이모지 버튼
-    const picker = new EmojiButton({
-        position: "bottom-start",
-    });
-    picker.on("emoji", (emoji) => {
-        const textBox = document.getElementById("chat-input");
-        textBox.value += emoji;
-    });
 
-    // 채팅 메뉴 이모지 버튼
+    // -----------------------------------------------
+
+    // EmojiButton 라이브러리가 로드된 경우에만 초기화
+    let picker = null;
+    const emoteButton = document.getElementById("emoji-btn");
+
+    if (typeof EmojiButton !== "undefined") {
+        picker = new EmojiButton({
+            position: "top-start",
+            zIndex: 9999,
+        });
+        picker.on("emoji", (emoji) => {
+            const textBox = document.getElementById("chat-input");
+            textBox.value += emoji;
+            // 입력값 생기면 전송 버튼 활성화
+            chatSubmit.classList.remove("off");
+        });
+
+        emoteButton.addEventListener("click", (e) => {
+            e.stopPropagation();
+            picker.togglePicker(emoteButton);
+        });
+    } else {
+        // 라이브러리가 없을 경우 버튼 숨김 처리
+        if (emoteButton) emoteButton.style.display = "none";
+    }
+
     const emojiPicker = document.querySelector(".Chat-Emoji-Picker");
     let activeEmoteBtn = null;
 
     function openEmojiPicker(btn) {
         emojiPicker.classList.remove("off");
         const rect = btn.getBoundingClientRect();
-        const pickerWidth = emojiPicker.offsetWidth;
-        const pickerHeight = emojiPicker.offsetHeight;
+        const pickerWidth = emojiPicker.offsetWidth || 200;
+        const pickerHeight = emojiPicker.offsetHeight || 50;
 
-        const top = rect.top - pickerHeight - 8;
+        let top = rect.top - pickerHeight - 8;
         let left = rect.left;
 
+        if (top < 8) top = rect.bottom + 8;
         if (left + pickerWidth > window.innerWidth) {
             left = window.innerWidth - pickerWidth - 8;
         }
+        if (left < 8) left = 8;
 
+        emojiPicker.style.position = "fixed";
         emojiPicker.style.top = `${top}px`;
         emojiPicker.style.left = `${left}px`;
+        emojiPicker.style.zIndex = "9999";
         activeEmoteBtn = btn;
     }
 
@@ -204,78 +209,64 @@ window.onload = () => {
             e.stopPropagation();
             const emoji = btn.dataset.emoji;
             const targetChat = activeEmoteBtn?.closest(".Each-Main-Content");
-
-            // 이모지 div 추가
             addReaction(emoji, targetChat);
-            closeEmojiPicker();
-
             closeEmojiPicker();
         });
     });
 
-    // 외부 클릭 시 닫기
+    // 외부 클릭 시 이모지 피커 닫기
     document.addEventListener("click", (e) => {
-        if (!emojiPicker.contains(e.target)) {
+        if (
+            !emojiPicker.classList.contains("off") &&
+            !emojiPicker.contains(e.target) &&
+            e.target !== activeEmoteBtn
+        ) {
             closeEmojiPicker();
         }
     });
 
-    // ---------------------------------------------
+    // -----------------------------------------------
 
     // 상담 받기 클릭시 전문가 검색창 표시
     function openSearchExpertModal() {
         openModal(searchExpertModal);
 
-        // 전문가 모달창 닫기 버튼
         const closeBtn = searchExpertModal.querySelector(
             ".Modal-Header-Button",
         );
-        // 전문가 모달창 input
-        const searchInput = document.querySelector(
+        const searchInputModal = document.querySelector(
             ".Search-Modal-SearchBar input",
         );
 
         let timer;
         const delay = 1000;
 
-        // 전문가 회원 검색
-        searchInput.addEventListener("keyup", (e) => {
+        searchInputModal.addEventListener("keyup", (e) => {
             e.preventDefault();
-
             clearTimeout(timer);
-
-            // 검색 값이 입력되면 1초 뒤에 검색
             timer = setTimeout(() => {
-                // 여기에 rest api 요청 작성
+                // REST API 요청 작성
             }, delay);
         });
 
-        // 검색한 전문가들
         const experts = searchExpertModal.querySelectorAll(".Each-Expert");
-        // 전문가를 선택하면 모달이 닫히고 채팅방 불러오기
         experts.forEach((expert) => {
             expert.addEventListener("click", (e) => {
-                // 새 채팅방 요청
-
-                // 완료되면 모달 닫고 채팅방 div 열기
                 closeModal(searchExpertModal);
                 openChatRoom();
             });
         });
 
-        // 닫기 버튼 누르면 모달창 닫기
         closeBtn.addEventListener("click", (e) => {
             closeModal(searchExpertModal);
         });
     }
 
-    // 상담 받기 버튼 (채팅 없을 때 중앙 버튼)
     newChatBtn.addEventListener("click", (e) => {
         e.preventDefault();
         openSearchExpertModal();
     });
 
-    // 헤더 Invite 버튼 (전문가 찾기)
     const inviteBtn = document.querySelector(".Header-Each-Button.Invite");
     if (inviteBtn) {
         inviteBtn.addEventListener("click", (e) => {
@@ -284,24 +275,17 @@ window.onload = () => {
         });
     }
 
-    // 채팅방 이벤트 --------------------------------------
-    // 채팅방이 있다면 클릭 시 채팅방 불러오기
+    // 채팅방 이벤트 -----------------------------------
     if (chats) {
         chats.forEach((chat) => {
             chat.addEventListener("click", (e) => {
-                // 눌린 채팅방에 current 추가
                 chats.forEach((c) => c.classList.remove("current"));
                 chat.classList.add("current");
-
-                // 해당 유저의 채팅방 요청
-
-                // 성공하면 채팅방 열기
                 openChatRoom();
             });
         });
     }
 
-    // 채팅방 버튼들
     const buttons = chatDiv.querySelectorAll(".ChatPage-Button");
     buttons.forEach((button) => {
         button.addEventListener("click", (e) => {
@@ -316,21 +300,16 @@ window.onload = () => {
             }
         });
     });
-    // 채팅들
+
     const conversations = chatDiv.querySelectorAll(
         ".Left, .Right, .MyReply, .Reply",
     );
-    // 답변 채팅들
     const replyCons = chatDiv.querySelectorAll(".MyReply, .Reply");
 
-    // 채팅 입력란 Emote 버튼
-    const emoteButton = document.getElementById("emoji-btn");
-
-    // 채팅 메뉴 누르면 메뉴 등장하는 이벤트
+    // 채팅 메뉴 관련
     const chatMenu = document.querySelector(".Chat-Extend-Menu");
     let activeBtn = null;
 
-    // 메뉴 닫기 함수
     function closeMenu() {
         if (activeBtn) {
             const menu = activeBtn.closest(".Message-Buttons");
@@ -341,13 +320,11 @@ window.onload = () => {
         activeBtn = null;
     }
 
-    // 메뉴 위치 업데이트 함수
     function updateMenuPosition() {
         if (!activeBtn) return;
 
         const rect = activeBtn.getBoundingClientRect();
 
-        // 버튼이 화면 밖으로 벗어나면 메뉴 닫기
         if (rect.top < 0 || rect.bottom > window.innerHeight) {
             closeMenu();
             return;
@@ -358,7 +335,6 @@ window.onload = () => {
         const spaceBelow = window.innerHeight - rect.bottom;
         const spaceRight = window.innerWidth - rect.left;
 
-        // 아래 공간이 메뉴 height만큼 없으면 위로
         let top;
         if (spaceBelow >= menuHeight) {
             top = rect.bottom + 8;
@@ -372,40 +348,53 @@ window.onload = () => {
         } else {
             left = rect.right - menuWidth;
         }
-        // 왼쪽 경계 밖으로 나가지 않도록
         left = Math.max(8, left);
-        // 오른쪽 경계 밖으로 나가지 않도록
         left = Math.min(left, window.innerWidth - menuWidth - 8);
 
         chatMenu.style.top = `${top}px`;
         chatMenu.style.left = `${left}px`;
     }
 
-    // 각 채팅에 마우스가 올라가면 메뉴바 표시
     conversations.forEach((c) => {
         const menu = c.querySelector(".Message-Buttons");
+        if (!menu) return;
+
         const emojiBtn = menu.querySelector(".Message-Button.Emote");
         const moreBtn = menu.querySelector(".Message-Button.Menu");
-        if (menu) {
-            c.addEventListener("mouseover", (e) => {
-                menu.classList.remove("off");
-            });
-            c.addEventListener(
-                "touchstart",
-                () => {
-                    menu.classList.remove("off");
-                },
-                { passive: true },
-            );
-            c.addEventListener("mouseleave", (e) => {
-                // 메뉴바가 열려있고 이 채팅의 버튼이 activeBtn이면 숨기지 않음
-                if (activeBtn === moreBtn) return;
-                menu.classList.add("off");
-            });
 
-            // 이모지 버튼 이벤트
+        c.addEventListener("mouseover", () => {
+            menu.classList.remove("off");
+        });
+
+        c.addEventListener(
+            "touchstart",
+            () => {
+                menu.classList.remove("off");
+            },
+            { passive: true },
+        );
+
+        c.addEventListener("mouseleave", () => {
+            // 이 채팅의 버튼이 activeBtn이거나 이모지 피커가 이 채팅에 연결된 경우 숨기지 않음
+            if (activeBtn === moreBtn) return;
+            if (
+                activeEmoteBtn === emojiBtn &&
+                !emojiPicker.classList.contains("off")
+            )
+                return;
+            menu.classList.add("off");
+        });
+
+        if (emojiBtn) {
             emojiBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
+
+                // 더보기 메뉴가 열려있으면 닫기
+                if (chatMenu.classList.contains("on")) {
+                    closeMenu();
+                }
+
+                // 같은 버튼 다시 클릭 시 닫기
                 if (
                     activeEmoteBtn === emojiBtn &&
                     !emojiPicker.classList.contains("off")
@@ -413,12 +402,19 @@ window.onload = () => {
                     closeEmojiPicker();
                     return;
                 }
+
                 openEmojiPicker(emojiBtn);
             });
+        }
 
-            // 더보기 메뉴 이벤트
+        if (moreBtn) {
             moreBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
+
+                // 이모지 피커가 열려있으면 닫기
+                if (!emojiPicker.classList.contains("off")) {
+                    closeEmojiPicker();
+                }
 
                 // 같은 버튼 다시 클릭 시 닫기
                 if (
@@ -429,11 +425,14 @@ window.onload = () => {
                     return;
                 }
 
-                // 모바일에서 menu 버튼이 off 상태일 수 있으므로 강제 표시
-                menu.classList.remove("off");
+                // 이전에 열린 메뉴의 Message-Buttons 숨기기
+                if (activeBtn) {
+                    const prevMenu = activeBtn.closest(".Message-Buttons");
+                    if (prevMenu) prevMenu.classList.add("off");
+                }
 
+                menu.classList.remove("off");
                 activeBtn = moreBtn;
-                // on 먼저 붙여서 크기를 렌더링한 뒤 위치 계산
                 chatMenu.classList.remove("off");
                 chatMenu.classList.add("on");
                 updateMenuPosition();
@@ -441,20 +440,21 @@ window.onload = () => {
         }
     });
 
-    // 스크롤 시 메뉴 위치 업데이트
     const scrollContainer = document.querySelector(".ChatPage-Main-Container");
-    scrollContainer.addEventListener(
-        "scroll",
-        () => {
-            if (chatMenu.classList.contains("on")) {
-                updateMenuPosition();
-            }
-        },
-        { passive: true },
-    );
+    if (scrollContainer) {
+        scrollContainer.addEventListener(
+            "scroll",
+            () => {
+                if (chatMenu.classList.contains("on")) {
+                    updateMenuPosition();
+                }
+            },
+            { passive: true },
+        );
+    }
 
-    // 외부 클릭 시 메뉴 닫기
     document.addEventListener("click", (e) => {
+        // 채팅 더보기 메뉴 외부 클릭 시 닫기
         if (!chatMenu.contains(e.target)) {
             closeMenu();
         }
@@ -489,41 +489,43 @@ window.onload = () => {
     chatMenuBtns.forEach((button) => {
         button.addEventListener("click", (e) => {
             const name = button.getAttribute("name");
+
             switch (name) {
                 case "reply":
-                    const targetChat = activeBtn.closest(".Each-Main-Content");
-                    const userName =
-                        targetChat
-                            ?.closest(".Left, .Right, .MyReply, .Reply")
-                            ?.querySelector(".UserName-Text")
-                            ?.textContent.trim() ?? "상대방";
+                    const targetChat = activeBtn?.closest(".Each-Main-Content");
+                    const isLeft =
+                        targetChat?.classList.contains("Left") ||
+                        targetChat?.classList.contains("Reply");
+                    const userName = isLeft
+                        ? (chatDiv
+                              .querySelector(
+                                  ".ChatPage-UserInfo .UserName-Text",
+                              )
+                              ?.textContent.trim() ?? "상대방")
+                        : "나";
                     const content =
                         targetChat
                             ?.querySelector(".Message-Content")
                             ?.textContent.trim() ?? "";
+                    closeMenu(); // [FIX 1] 메뉴 먼저 닫기
                     openReply(userName, content);
-                    closeMenu();
                     break;
                 case "trans":
+                    closeMenu(); // [FIX 1] 메뉴 먼저 닫기
                     openModal(postChatModal);
                     break;
                 case "copy":
-                    // 현재 열린 채팅의 메시지 내용 가져오기
                     const messageContent = activeBtn
-                        .closest(".Each-Main-Content")
+                        ?.closest(".Each-Main-Content")
                         ?.querySelector(".Message-Content")?.innerText;
-
+                    closeMenu(); // [FIX 1] 메뉴 먼저 닫기
                     if (!messageContent) break;
-
                     navigator.clipboard
                         .writeText(messageContent)
                         .then(() => {
-                            // 이미 애니메이션 중이면 초기화
                             toast.classList.remove("show");
-                            void toast.offsetWidth; // reflow 강제
-
+                            void toast.offsetWidth;
                             toast.classList.add("show");
-
                             setTimeout(() => {
                                 toast.classList.remove("show");
                             }, 4000);
@@ -533,13 +535,14 @@ window.onload = () => {
                         });
                     break;
                 case "delete":
+                    closeMenu(); // [FIX 1] 메뉴 먼저 닫기
                     openModal(deleteChatModal);
                     break;
             }
         });
     });
 
-    // 답변의 채팅누르면 해당 채팅으로 이동 후 애니메이션 이벤트
+    // 답변 채팅 클릭 시 해당 채팅으로 이동
     replyCons.forEach((reply) => {
         const replyWrapper = reply.querySelector(".MyReply-Wrapper");
         if (!replyWrapper) return;
@@ -553,25 +556,20 @@ window.onload = () => {
             );
             if (!targetLi) return;
 
-            // 1. 스크롤 이동
             targetLi.scrollIntoView({ behavior: "smooth", block: "center" });
 
-            // 2. 스크롤 완료 후 방향에 따라 애니메이션 실행
             setTimeout(() => {
                 const messageContainer = targetLi.closest(".Each-Main-Content");
                 if (!messageContainer) return;
 
-                // 방향 판별 - li의 클래스로 확인
                 const isLeft = targetLi.classList.contains("Left");
                 const animClass = isLeft ? "chat-pop-right" : "chat-pop-left";
 
-                // 기존 클래스 제거 후 재실행
                 messageContainer.classList.remove(
                     "chat-pop-right",
                     "chat-pop-left",
                 );
-                void messageContainer.offsetWidth; // reflow 강제
-
+                void messageContainer.offsetWidth;
                 messageContainer.classList.add(animClass);
 
                 messageContainer.addEventListener(
@@ -585,34 +583,80 @@ window.onload = () => {
         });
     });
 
-    // 하단 입력란 부분 -------------------------------------
-    // 채팅 입력 wrapper
+    // 하단 입력란 부분 -----------------------------------
     const chatInputDiv = document.querySelector(".Input-TextArea-Container");
-    // 채팅 입력 form
     const chatForm = document.getElementById("chatSubmit");
-    // 채팅 입력 input
     const chatInput = document.getElementById("chat-input");
-    // 채팅 첨부파일 div
-    const chatAttachDiv = document.querySelector(".Input-Image-Card");
-    // 채팅 첨부파일 input
+    // [FIX 4] 이미지 첨부 관련 요소
     const chatAttach = document.getElementById("chat-image");
-    // 채팅 submit 버튼
+    const inputImageContainer = document.querySelector(
+        ".Input-Image-Container",
+    );
+    const inputImageCard =
+        inputImageContainer?.querySelector(".Input-Image-Card");
+    const inputImageEl = inputImageCard?.querySelector("img");
+    const removeImageBtn = inputImageCard?.querySelector(
+        ".Remove-Image-Button",
+    );
     const chatSubmit = document.querySelector(".Submit-Button-Wrapper");
 
-    // 채팅 input에 입력값이 있으면 버튼 활성화
+    // 채팅 input 값 변화 시 전송 버튼 활성화
     chatInput.addEventListener("keyup", (e) => {
         if (chatInput.value) {
             chatSubmit.classList.remove("off");
-        } else {
+        } else if (
+            !inputImageContainer ||
+            inputImageContainer.classList.contains("off")
+        ) {
+            // 이미지도 없고 텍스트도 없으면 버튼 비활성화
             chatSubmit.classList.add("off");
         }
     });
 
-    // 채팅 보내기 이벤트 -----------------------------
+    if (chatAttach) {
+        chatAttach.addEventListener("change", (e) => {
+            const file = chatAttach.files[0];
+            if (!file) return;
+
+            // 이미지 파일만 허용
+            if (!file.type.startsWith("image/")) {
+                alert("이미지 파일만 첨부할 수 있습니다.");
+                chatAttach.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                if (inputImageEl) {
+                    inputImageEl.src = ev.target.result;
+                }
+                if (inputImageContainer) {
+                    inputImageContainer.classList.remove("off");
+                }
+                // 이미지 첨부되면 전송 버튼 활성화
+                chatSubmit.classList.remove("off");
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // [FIX 4] 이미지 제거 버튼
+    if (removeImageBtn) {
+        removeImageBtn.addEventListener("click", () => {
+            if (inputImageEl) inputImageEl.src = "";
+            if (inputImageContainer) inputImageContainer.classList.add("off");
+            if (chatAttach) chatAttach.value = "";
+            // 텍스트도 없으면 전송 버튼 비활성화
+            if (!chatInput.value) {
+                chatSubmit.classList.add("off");
+            }
+        });
+    }
+
+    // 채팅 보내기 이벤트
     chatSubmit.addEventListener("keyup", (e) => {
         e.preventDefault();
         if (e.key === "Enter") {
-            // 엔터키 눌리면 submit
             chatForm.submit();
         }
     });
@@ -621,18 +665,11 @@ window.onload = () => {
         chatForm.submit();
     });
 
-    // 이모지 버튼 이벤트
-    emoteButton.addEventListener("click", (e) => {
-        picker.togglePicker(emoteButton);
-    });
-
-    // 모달 이벤트 부분 -------------------------------------
-    // 채팅방 회원 정보 누르면 모달 열기
+    // 모달 이벤트 부분 -----------------------------------
     chatUser.addEventListener("click", (e) => {
         openModal(userInfoModal);
     });
 
-    // 회원 정보 모달 닫기 버튼
     const userInfoClose = userInfoModal.querySelector(
         ".Big-Modal-Button.Close",
     );
@@ -640,24 +677,21 @@ window.onload = () => {
         closeModal(userInfoModal);
     });
 
-    // 회원 정보 모달 버튼들
     userInfoModal.addEventListener("click", (e) => {
-        const toggle = false;
+        let toggle = false;
         const btn = e.target.closest("button");
         const setting = e.target.closest(".Modal-Bottom-Setting");
         const upperBtn = e.target.closest(".Modal-Upper-Button");
         const menuBtns = userInfoModal.querySelectorAll(".Menu-Icon");
 
-        // 닫기, 별명 변경 버튼
         if (btn?.classList.contains("Close")) return closeModal(userInfoModal);
         if (btn?.classList.contains("Alias"))
             return openModal(changeAliasModal);
 
-        // 상단 버튼
         if (upperBtn) {
             if (upperBtn.classList.contains("Call"))
                 return alert("추후 업데이트 예정입니다.");
-            if (upperBtn.classList.contains("Profile")) return; // 프로필 이동 로직
+            if (upperBtn.classList.contains("Profile")) return;
             if (upperBtn.classList.contains("More")) {
                 userInfoModal
                     .querySelector(".Extend-Menu-Wrapper")
@@ -666,15 +700,11 @@ window.onload = () => {
             }
         }
 
-        // 더보기 드롭다운 버튼
         menuBtns.forEach((button) => {
             button.addEventListener("click", (e) => {
                 const name = button.classList[1];
                 switch (name) {
                     case "Mute":
-                        // 해당 대화 차단 로직
-
-                        // 성공하면 실행
                         toggle = !toggle;
                         const text = `
                         ${
@@ -686,7 +716,7 @@ window.onload = () => {
                             ${toggle ? "뮤트" : "언뮤트"}
                             </div>
                             `;
-                        btn.innerHTML = text;
+                        button.innerHTML = text;
                         break;
                     case "Delete":
                         userInfoModal
@@ -698,7 +728,6 @@ window.onload = () => {
             });
         });
 
-        // 하단 설정 버튼
         if (setting) {
             const modalMap = {
                 RemovedMsg: removedMsgModal,
@@ -717,7 +746,6 @@ window.onload = () => {
     const inputWrapper = changeAliasModal.querySelector(".Input-Area");
     const aliasInput = document.getElementById("user-alias");
 
-    // 값이 입력되면 스타일 변경
     const tempBorder = inputWrapper.style.border;
     aliasInput.addEventListener("focus", (e) => {
         inputWrapper.style.border = "1px solid #1e9cf1";
@@ -734,28 +762,26 @@ window.onload = () => {
             saveBtn.classList.add("disabled");
         }
     });
+    saveBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        alert("추후 수정 예정");
+        // 별명 변경 요청 로직 작성
+    });
 
     // 사라진 메세지 모달 이벤트
     const setRemoveTimes = removedMsgModal.querySelectorAll(".Set-Remove-Time");
     const removeAll = removedMsgModal.querySelector(".Remove-All-Button");
     setRemoveTimes.forEach((setTime) => {
         setTime.addEventListener("click", (e) => {
-            // 모든 svg 비활성화
             setRemoveTimes.forEach((btn) =>
                 btn.querySelector("svg").classList.add("off"),
             );
-
-            // 클릭한 버튼의 svg만 활성화
             setTime.querySelector("svg").classList.remove("off");
-
-            // 선택한 시간 Info 모달 Setting-Arrow에 반영
             const selectedTime =
                 setTime.querySelector(".Area-Content-Text").textContent;
             userInfoModal.querySelector(
                 ".Modal-Bottom-Setting.RemovedMsg .Setting-Arrow",
             ).textContent = selectedTime;
-
-            // 설정 변경 요청 로직 작성
         });
     });
     removeAll.addEventListener("click", (e) => {
@@ -769,65 +795,43 @@ window.onload = () => {
         toggleBtn.classList.toggle("clicked");
         toggleSpan.classList.toggle("moved");
         const isActive = toggleBtn.classList.contains("clicked");
-
-        // Info 모달 Setting-Arrow에 반영
         userInfoModal.querySelector(
             ".Modal-Bottom-Setting.BanScreanShot .Setting-Arrow",
         ).textContent = isActive ? "켜기" : "끄기";
-
-        // 설정 변경 요청 로직
     });
 
-    // 저장 버튼 이벤트
     saveBtn.addEventListener("click", (e) => {
         if (saveBtn.disabled) return;
         // 저장 로직
     });
-    // ----------------------------------------------
 
-    // 작은 모달 클릭 이벤트 --------------------------
-
-    // 특정 채팅 지우기 모달 이벤트
+    // 작은 모달 클릭 이벤트 ----------------------------
     const deleteChatBtn = deleteChatModal.querySelector(".Small-Button.Ban");
     deleteChatBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-
-        // 대화 삭제 요청 로직 작성
         alert("추후 추가 예정");
     });
 
-    // 대화 삭제 모달 이벤트
     const leaveChatBtn = leaveModal.querySelector(".Small-Button.Ban");
     leaveChatBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-
-        // 대화 삭제 요청 로직 작성
         alert("추후 추가 예정");
     });
 
-    // 모든 대화 지우기 모달 이벤트
     const removeAllMsgBtn =
         removeAllMsgModal.querySelector(".Small-Button.Ban");
     removeAllMsgBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-
-        // 모든 대화 지우기 요청 로직 작성
         alert("추후 추가 예정");
     });
 
-    // 대화 차단 모달 이벤트
     const banChatBtn = banUserModal.querySelector(".Small-Button.Ban");
     banChatBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-
-        // 대화 차단 요청 로직 작성
         alert("추후 추가 예정");
     });
 
-    // -----------------------------------------------
-
-    // 모달 여닫기 이벤트 ---------------------
-    // 모달 열기
+    // 모달 여닫기 이벤트 -----------------------------------
     function openModal(modal) {
         modalBackDrop.classList.remove("off");
         modal.classList.remove("off");
@@ -837,22 +841,18 @@ window.onload = () => {
         ) {
             requestAnimationFrame(() => modal.classList.add("on"));
         }
-        // Small-Modal 열릴 때 백드롭을 Big-Modal(51) 위로 올려서 Big-Modal을 가림
         if (modal.classList.contains("Small-Modal")) {
             modalBackDrop.style.zIndex = "53";
         }
     }
 
-    // 모달 닫기
     function closeModal(modal) {
         if (modal.classList.contains("Big-Modal")) {
             modal.classList.remove("on");
-            // 애니메이션 끝난 후 off 처리
             modal.addEventListener(
                 "transitionend",
                 () => {
                     modal.classList.add("off");
-                    // 열린 모달이 없으면 백드롭도 닫기
                     const anyOpen = document.querySelectorAll(
                         ".Big-Modal.on, .Small-Modal.on",
                     );
@@ -865,9 +865,7 @@ window.onload = () => {
         } else if (modal.classList.contains("Small-Modal")) {
             modal.classList.remove("on");
             modal.classList.add("off");
-            // Small-Modal 닫히면 백드롭 z-index 원복
             modalBackDrop.style.zIndex = "";
-            // 열린 Big-Modal이 없으면 백드롭도 닫기
             const anyOpen = document.querySelectorAll(".Big-Modal.on");
             if (anyOpen.length === 0) {
                 modalBackDrop.classList.add("off");
@@ -878,7 +876,6 @@ window.onload = () => {
         }
     }
 
-    // 백드롭 클릭 시 모든 모달 닫기
     modalBackDrop.addEventListener("click", () => {
         const modals = document.querySelectorAll(
             ".Big-Modal, .Small-Modal, .Search-Modal",
@@ -891,47 +888,66 @@ window.onload = () => {
         modalBackDrop.classList.add("off");
     });
 
-    // 모든 모달 뒤로가기 버튼 이벤트
     const backBtns = document.querySelectorAll(".Big-Modal-Button.Close");
     backBtns.forEach((back) => {
         const currentModal = back.closest(".Big-Modal");
         back.addEventListener("click", (e) => closeModal(currentModal));
     });
 
-    // 모든 작은 모달 닫기 버튼 이벤트
     const closeBtns = document.querySelectorAll(".Close-Button, .Cancel");
     closeBtns.forEach((closeBtn) => {
         const currentModal = closeBtn.closest(".Small-Modal");
         closeBtn.addEventListener("click", (e) => closeModal(currentModal));
     });
 
-    // 채팅에 이모지 div 추가하기
     function addReaction(emoji, targetChat) {
         if (!targetChat) return;
 
         const reactionsDiv = targetChat.querySelector(".Message-Reactions");
         if (!reactionsDiv) return;
 
+        // 현재 내가 선택한 반응 찾기
+        const myCurrentReaction = reactionsDiv.querySelector(
+            ".Reaction-Badge.my-reaction",
+        );
+
+        // 같은 이모지를 다시 클릭한 경우 → 취소
+        if (myCurrentReaction && myCurrentReaction.dataset.emoji === emoji) {
+            const countEl = myCurrentReaction.querySelector(".Reaction-Count");
+            const count = parseInt(countEl.textContent) - 1;
+            if (count <= 0) {
+                myCurrentReaction.remove();
+            } else {
+                countEl.textContent = count;
+                myCurrentReaction.classList.remove("my-reaction");
+            }
+            if (reactionsDiv.children.length === 0) {
+                targetChat.classList.remove("has-reaction");
+            }
+            return;
+        }
+
+        // 기존에 다른 반응이 있으면 취소
+        if (myCurrentReaction) {
+            const countEl = myCurrentReaction.querySelector(".Reaction-Count");
+            const count = parseInt(countEl.textContent) - 1;
+            if (count <= 0) {
+                myCurrentReaction.remove();
+            } else {
+                countEl.textContent = count;
+                myCurrentReaction.classList.remove("my-reaction");
+            }
+        }
+
+        // 새 이모지 추가 or 기존 이모지 카운트 증가
         const existing = [
             ...reactionsDiv.querySelectorAll(".Reaction-Badge"),
         ].find((badge) => badge.dataset.emoji === emoji);
 
         if (existing) {
-            if (existing.classList.contains("my-reaction")) {
-                const countEl = existing.querySelector(".Reaction-Count");
-                const count = parseInt(countEl.textContent) - 1;
-
-                if (count <= 0) {
-                    existing.remove();
-                } else {
-                    countEl.textContent = count;
-                    existing.classList.remove("my-reaction");
-                }
-            } else {
-                const countEl = existing.querySelector(".Reaction-Count");
-                countEl.textContent = parseInt(countEl.textContent) + 1;
-                existing.classList.add("my-reaction");
-            }
+            const countEl = existing.querySelector(".Reaction-Count");
+            countEl.textContent = parseInt(countEl.textContent) + 1;
+            existing.classList.add("my-reaction");
         } else {
             const badge = document.createElement("div");
             badge.classList.add("Reaction-Badge", "my-reaction");
@@ -945,7 +961,6 @@ window.onload = () => {
             reactionsDiv.appendChild(badge);
         }
 
-        // reaction 유무에 따라 클래스 토글
         if (reactionsDiv.children.length > 0) {
             targetChat.classList.add("has-reaction");
         } else {

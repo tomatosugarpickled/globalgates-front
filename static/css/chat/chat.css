@@ -1288,7 +1288,7 @@ body {
     overflow: hidden;
     border-radius: 24px;
     background-color: #f0f4f5;
-    padding: 8px 0px;
+    padding: 0px;
     font-size: 15px;
     line-height: 1.5rem;
 }
@@ -1356,7 +1356,8 @@ body {
 .Input-TextArea-Container {
     display: flex;
     width: 100%;
-    padding: 0px 8px;
+    min-height: 48px;
+    padding: 0px 10px;
     align-items: center;
     justify-self: flex-end;
 }
@@ -1365,16 +1366,19 @@ body {
     position: relative;
     margin: 0px;
     box-sizing: border-box;
-    max-height: 240px;
     flex: 1 1 0%;
     resize: none;
     background-color: transparent;
-    padding: 4px 8px;
-    font-size: 16px;
-    font-weight: 400;
     color: #0f141a;
     border: none;
     outline: none;
+    
+    max-height: 160px;      
+    min-height: 24px;        
+    padding: 4px 20px;       
+    font-size: 15px;         
+    font-weight: 400;
+    line-height: 1.5;        
 
     scrollbar-width: thin;
     scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
@@ -1919,7 +1923,7 @@ body {
 
 .Save {
     padding: 0px 16px;
-    opacity: 0.5;
+    opacity: 1;
     background-color: #1e9cf1;
 }
 
@@ -2056,6 +2060,8 @@ body {
     transform: translateX(-50%);
     min-width: max-content;
     z-index: 50;
+    border-radius: 0.75rem;;
+    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px;
 }
 
 .Button-Content {
@@ -2418,7 +2424,6 @@ body {
     background-color: #f0f4f5;
     border: 1px #e4eaec;
     border-radius: 0.75rem;
-    box-shadow: var(0 0 #0000, 0 0 #0000), var(0 0 #0000, 0 0 #0000), var(0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1));
 }
 
 .Menu-Content {
@@ -2741,6 +2746,7 @@ button[name="delete"] {
 }
 
 .disabled {
+    opacity: 0.5;
     pointer-events: none;
 }
 
