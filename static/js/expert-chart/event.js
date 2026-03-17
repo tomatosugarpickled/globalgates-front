@@ -459,6 +459,7 @@ window.onload = () => {
                 alignment: "center",
                 textStyle: { color: "#6B7280", fontSize: 11 },
             },
+            pieSliceText: "none",
             pieSliceBorderColor: "#FFFFFF",
             tooltip: { textStyle: { fontName: "DM Sans", fontSize: 13 } },
             animation: { startup: true, duration: 600, easing: "out" },
