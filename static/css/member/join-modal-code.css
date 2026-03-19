@@ -1696,3 +1696,10 @@ button {
     opacity: 1;
     background-color: rgb(15, 20, 25);
 }
+
+/* join-modal-code: 이메일을 받지 못했나요? 포인터 */
+.change,
+.replace-email,
+.replace-phone {
+    cursor: pointer !important;
+}
